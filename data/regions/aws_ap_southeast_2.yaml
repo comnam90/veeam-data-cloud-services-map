@@ -1,0 +1,10 @@
+id: "aws-ap-southeast-2"
+name: "AP Southeast 2 (Sydney)"
+provider: "AWS"
+coords: [-33.8688, 150.9]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"
+    - edition: "Foundation"
+      tier: "Non-Core"

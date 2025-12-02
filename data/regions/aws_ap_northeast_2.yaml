@@ -1,0 +1,8 @@
+id: "aws-ap-northeast-2"
+name: "AP Northeast 2 (Seoul)"
+provider: "AWS"
+coords: [37.5665, 126.5]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"

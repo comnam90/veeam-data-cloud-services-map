@@ -1,0 +1,8 @@
+id: "aws-eu-west-2"
+name: "EU West 2 (London)"
+provider: "AWS"
+coords: [51.5074, -0.6]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"

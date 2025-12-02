@@ -1,0 +1,10 @@
+id: "aws-eu-south-2"
+name: "EU South 2 (Spain)"
+provider: "AWS"
+coords: [40.4168, -3.7038]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

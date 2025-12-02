@@ -1,0 +1,10 @@
+id: "aws-ap-northeast-1"
+name: "AP Northeast 1 (Tokyo)"
+provider: "AWS"
+coords: [35.6762, 139.2]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"
+    - edition: "Foundation"
+      tier: "Non-Core"

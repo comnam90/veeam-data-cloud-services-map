@@ -1,0 +1,10 @@
+id: "aws-us-east-2"
+name: "US East 2 (Ohio)"
+provider: "AWS"
+coords: [40.4173, -82.9071]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

@@ -1,0 +1,8 @@
+id: "aws-eu-south-1"
+name: "EU South 1 (Milan)"
+provider: "AWS"
+coords: [45.4642, 9.6]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"

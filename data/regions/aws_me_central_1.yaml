@@ -1,0 +1,8 @@
+id: "aws-me-central-1"
+name: "Middle East (UAE)"
+provider: "AWS"
+coords: [25.2048, 54.8]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"

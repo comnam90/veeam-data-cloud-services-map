@@ -1,0 +1,8 @@
+id: "aws-ap-south-1"
+name: "AP South 1 (Mumbai)"
+provider: "AWS"
+coords: [19.076, 72.8777]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"

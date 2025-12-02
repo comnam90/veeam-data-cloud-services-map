@@ -1,0 +1,8 @@
+id: "aws-ap-south-2"
+name: "AP South 2 (Hyderabad)"
+provider: "AWS"
+coords: [17.385, 78.4867]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"

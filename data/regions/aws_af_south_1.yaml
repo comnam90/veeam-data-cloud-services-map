@@ -1,7 +1,7 @@
-id: "aws-ap-southeast-2"
-name: "Australia East (Sydney)"
+id: "aws-af-south-1"
+name: "AF South 1 (Cape Town)"
 provider: "AWS"
-coords: [-33.8688, 150.9]
+coords: [-33.9249, 18.0]
 services:
   vdc_vault:
     - edition: "Advanced"

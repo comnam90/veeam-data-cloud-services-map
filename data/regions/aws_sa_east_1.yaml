@@ -1,0 +1,10 @@
+id: "aws-sa-east-1"
+name: "SA East 1 (São Paulo)"
+provider: "AWS"
+coords: [-23.5505, -46.2]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"
+    - edition: "Foundation"
+      tier: "Non-Core"

@@ -1,0 +1,10 @@
+id: "aws-eu-central-1"
+name: "EU Central 1 (Frankfurt)"
+provider: "AWS"
+coords: [50.1109, 8.2]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"
+    - edition: "Foundation"
+      tier: "Non-Core"

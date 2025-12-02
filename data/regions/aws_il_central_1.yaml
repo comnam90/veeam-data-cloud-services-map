@@ -1,0 +1,8 @@
+id: "aws-il-central-1"
+name: "Israel (Tel Aviv)"
+provider: "AWS"
+coords: [32.0853, 34.3]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"

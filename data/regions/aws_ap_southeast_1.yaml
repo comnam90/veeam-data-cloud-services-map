@@ -1,0 +1,8 @@
+id: "aws-ap-southeast-1"
+name: "AP Southeast 1 (Singapore)"
+provider: "AWS"
+coords: [1.3521, 103.4]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"

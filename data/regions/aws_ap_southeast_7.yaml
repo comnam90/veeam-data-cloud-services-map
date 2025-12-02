@@ -1,0 +1,10 @@
+id: "aws-ap-southeast-7"
+name: "AP Southeast 7 (Thailand)"
+provider: "AWS"
+coords: [13.7563, 100.5018]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"
+    - edition: "Foundation"
+      tier: "Non-Core"

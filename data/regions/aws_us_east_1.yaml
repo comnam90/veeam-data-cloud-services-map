@@ -1,0 +1,10 @@
+id: "aws-us-east-1"
+name: "US East 1 (N. Virginia)"
+provider: "AWS"
+coords: [38.9, -77.4]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"
