@@ -226,7 +226,7 @@
         currentTiles.addTo(map);
 
         const systemDarkQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const themeModes = ['system', 'light', 'dark'];
+        const themeModes = ['system', 'dark', 'light'];
         let currentMode = localStorage.getItem('theme') || 'system';
 
         function updateIcon(mode) {
@@ -234,7 +234,7 @@
             document.getElementById('iconLight').classList.toggle('hidden', mode !== 'light');
             document.getElementById('iconDark').classList.toggle('hidden', mode !== 'dark');
             
-            const titles = { system: 'Theme: System', dark: 'Theme: Dark', light: 'Theme: Light' };
+            const titles = { system: 'Theme: System', light: 'Theme: Light', dark: 'Theme: Dark' };
             document.getElementById('themeToggle').title = titles[mode];
         }
 
