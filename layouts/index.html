@@ -99,11 +99,17 @@
                     <option value="Non-Core">Non-Core</option>
                 </select>
 
-                <select id="themeSelector" class="bg-slate-800 light:bg-white border border-slate-600 light:border-slate-300 rounded px-3 py-2 text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500 outline-none">
-                    <option value="dark">🌙 Dark</option>
-                    <option value="light">☀️ Light</option>
-                    <option value="system">💻 System</option>
-                </select>
+                <button id="themeToggle" class="p-2 rounded-lg bg-slate-800 light:bg-slate-100 border border-slate-600 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-200 transition-colors" title="Toggle theme">
+                    <svg id="iconSystem" class="w-5 h-5 text-slate-300 light:text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/>
+                    </svg>
+                    <svg id="iconLight" class="w-5 h-5 text-yellow-400 hidden" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+                    </svg>
+                    <svg id="iconDark" class="w-5 h-5 text-slate-300 hidden" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
@@ -220,6 +226,17 @@
         currentTiles.addTo(map);
 
         const systemDarkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const themeModes = ['system', 'light', 'dark'];
+        let currentMode = localStorage.getItem('theme') || 'system';
+
+        function updateIcon(mode) {
+            document.getElementById('iconSystem').classList.toggle('hidden', mode !== 'system');
+            document.getElementById('iconLight').classList.toggle('hidden', mode !== 'light');
+            document.getElementById('iconDark').classList.toggle('hidden', mode !== 'dark');
+            
+            const titles = { system: 'Theme: System', dark: 'Theme: Dark', light: 'Theme: Light' };
+            document.getElementById('themeToggle').title = titles[mode];
+        }
 
         function applyTheme(isLight) {
             const html = document.documentElement;
@@ -240,7 +257,9 @@
         }
 
         function setTheme(mode) {
+            currentMode = mode;
             localStorage.setItem('theme', mode);
+            updateIcon(mode);
             
             if (mode === 'system') {
                 applyTheme(!systemDarkQuery.matches);
@@ -249,21 +268,20 @@
             }
         }
 
-        document.getElementById('themeSelector').addEventListener('change', (e) => {
-            setTheme(e.target.value);
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const nextIndex = (themeModes.indexOf(currentMode) + 1) % themeModes.length;
+            setTheme(themeModes[nextIndex]);
         });
 
         // Listen for system theme changes
         systemDarkQuery.addEventListener('change', (e) => {
-            if (localStorage.getItem('theme') === 'system') {
+            if (currentMode === 'system') {
                 applyTheme(!e.matches);
             }
         });
 
-        // Apply saved theme on load
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        document.getElementById('themeSelector').value = savedTheme;
-        setTheme(savedTheme);
+        // Apply saved theme on load (default to system)
+        setTheme(currentMode);
 
         let markers = [];
 
