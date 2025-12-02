@@ -4,3 +4,4 @@ provider: "Azure"
 coords: [33.448, -112.074]
 services:
   vdc_m365: true
+  vdc_azure_backup: true

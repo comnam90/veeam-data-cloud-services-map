@@ -12,3 +12,4 @@ services:
   vdc_salesforce:
     - edition: "Enterprise"
       tier: "Standard"
+  vdc_azure_backup: true
