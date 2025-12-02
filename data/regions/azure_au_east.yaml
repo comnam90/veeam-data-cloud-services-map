@@ -1,0 +1,14 @@
+id: "azure-au-east"
+name: "Australia East (Sydney)"
+provider: "Azure"
+coords: [-33.8688, 151.2093]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"
+  vdc_m365: true
+  vdc_salesforce:
+    - edition: "Enterprise"
+      tier: "Standard"
