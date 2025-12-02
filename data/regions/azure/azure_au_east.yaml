@@ -11,3 +11,4 @@ services:
   vdc_m365: true
   vdc_salesforce: true
   vdc_azure_backup: true
+  vdc_entra_id: true

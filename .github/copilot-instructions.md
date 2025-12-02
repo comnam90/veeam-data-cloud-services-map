@@ -29,12 +29,14 @@ services:
 
 **Boolean services** (available globally with same editions, just mark presence):
 - `vdc_m365` - Veeam Data Cloud for Microsoft 365 (Flex/Express/Premium available everywhere)
+- `vdc_entra_id` - Veeam Data Cloud for Entra ID
 - `vdc_salesforce` - Veeam Data Cloud for Salesforce
 - `vdc_azure_backup` - Veeam Data Cloud for Azure
 
 ### Valid Service Keys
 - `vdc_vault` - Veeam Data Cloud Vault (tiered: edition + Core/Non-Core)
 - `vdc_m365` - Veeam Data Cloud for Microsoft 365 (boolean: `true` if available)
+- `vdc_entra_id` - Veeam Data Cloud for Entra ID (boolean: `true` if available)
 - `vdc_salesforce` - Veeam Data Cloud for Salesforce (boolean: `true` if available)
 - `vdc_azure_backup` - Veeam Data Cloud for Azure (boolean: `true` if available)
 
@@ -42,7 +44,7 @@ services:
 - **Provider values are case-sensitive**: Use exactly `"AWS"` or `"Azure"`
 - **Coords must be an array**, not a string: `coords: [-33, 151]` ✓ vs `coords: "[-33, 151]"` ✗
 - **Tiered services use arrays**: `vdc_vault` contains an array of `{edition, tier}` objects
-- **Boolean services use `true`**: `vdc_m365`, `vdc_salesforce`, `vdc_azure_backup` are just `true` if available
+- **Boolean services use `true`**: `vdc_m365`, `vdc_entra_id`, `vdc_salesforce`, `vdc_azure_backup` are just `true` if available
 
 ### Tier Pricing Context (VDC Vault)
 - **Core**: Standard pricing ($14/TB Foundation, $24/TB Advanced)

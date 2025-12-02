@@ -62,6 +62,7 @@ services:
 
 **Boolean Services** (just `true` if available):
 * `vdc_m365` - VDC for Microsoft 365 (Flex/Express/Premium editions available in all M365 regions)
+* `vdc_entra_id` - VDC for Entra ID
 * `vdc_salesforce` - VDC for Salesforce
 * `vdc_azure_backup` - VDC for Azure
 
