@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Site.Title }}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* Force dark mode background for the page */
+        body { background-color: #0f172a; color: white; }
+        
+        /* Map container height */
+        #map { height: 85vh; width: 100%; border-radius: 0.75rem; border: 1px solid #334155; }
+
+        /* --- Custom Popup Overrides for Dark Mode --- */
+        .leaflet-popup-content-wrapper {
+            background: #1e293b; /* slate-800 */
+            color: white;
+            border: 1px solid #475569; /* slate-600 */
+            padding: 0;
+            border-radius: 0.5rem;
+        }
+        .leaflet-popup-tip {
+            background: #1e293b;
+            border: 1px solid #475569;
+        }
+        .leaflet-popup-content {
+            margin: 0 !important;
+            width: auto !important;
+        }
+        /* Hide the default close button, we will make our own if needed, or stick with default */
+        .leaflet-container a.leaflet-popup-close-button {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased overflow-hidden">
+
+    <!-- Navbar / Controls -->
+    <div class="h-[15vh] bg-slate-900 border-b border-slate-800 flex flex-col justify-center px-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-green-400">Veeam <span class="text-white">Service Map</span></h1>
+                <p class="text-xs text-slate-400">Interactive Global Availability</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex gap-3">
+                <select id="providerFilter" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 outline-none">
+                    <option value="all">All Providers</option>
+                    <option value="Azure">Azure</option>
+                    <option value="AWS">AWS</option>
+                </select>
+
+                <select id="serviceFilter" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 outline-none">
+                    <option value="all">All Services</option>
+                    <option value="vdc_vault">VDC Vault</option>
+                    <option value="vdc_m365">VDC for M365</option>
+                    <option value="vdc_salesforce">VDC for Salesforce</option>
+                </select>
+
+                <select id="tierFilter" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 outline-none">
+                    <option value="all">All Tiers</option>
+                    <option value="Core">Core Regions</option>
+                    <option value="Non-Core">Non-Core</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Area -->
+    <div class="p-4 bg-slate-950">
+        <div id="map"></div>
+    </div>
+
+    <script>
+        // --- 1. HUGO DATA INJECTION ---
+        // This is where Hugo reads your YAML files and prints them as a JS variable.
+        const regions = [
+            {{ range $key, $data := .Site.Data.regions }}
+            {
+                id: "{{ $key }}",
+                name: "{{ $data.name }}",
+                provider: "{{ $data.provider }}",
+                coords: {{ $data.coords | jsonify }}, 
+                services: {{ $data.services | jsonify }} 
+            },
+            {{ end }}
+        ];
+
+        // --- 2. ICON HELPER (Inline SVGs for portability) ---
+        function getServiceIcon(serviceKey) {
+            // Simple inline SVGs to match the request without needing external files
+            const icons = {
+                'vdc_m365': `<svg class="w-6 h-6 text-[#EA3E23]" fill="currentColor" viewBox="0 0 24 24"><path d="M11.5 12.5H6V7h5.5v5.5zm0 6H6v-5.5h5.5v5.5zm6-6h-5.5V7h5.5v5.5zm0 6h-5.5v-5.5h5.5v5.5z"/></svg>`, // Windows-ish logo
+                'vdc_vault': `<svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>`, // Shield
+                'vdc_salesforce': `<svg class="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg>`, // Cloud
+                'azure_backup': `<svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4H6v-2h4V7h2v4h4v2h-4v4z"/></svg>` // Plus box
+            };
+            return icons[serviceKey] || `<svg class="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>`;
+        }
+
+        function getProviderBadgeColor(provider) {
+            if (provider === 'Azure') return 'bg-[#0078D4]';
+            if (provider === 'AWS') return 'bg-[#FF9900] text-black';
+            return 'bg-slate-600';
+        }
+
+        // --- 3. MAP INITIALIZATION ---
+        const map = L.map('map', {
+            center: [-25, 140], // Centered roughly on Australia/NZ
+            zoom: 3,
+            zoomControl: false // Move zoom control if needed, or keep false for clean look
+        });
+        
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // Dark Matter Tiles
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            maxZoom: 19
+        }).addTo(map);
+
+        let markers = [];
+
+        // --- 4. RENDER LOGIC ---
+        function renderMap() {
+            // Clear markers
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+
+            const pFilter = document.getElementById('providerFilter').value;
+            const sFilter = document.getElementById('serviceFilter').value;
+            const tFilter = document.getElementById('tierFilter').value;
+
+            regions.forEach(region => {
+                // --- FILTERING ---
+                let matchesProvider = (pFilter === 'all' || region.provider === pFilter);
+                let matchesService = false;
+                
+                // If filtering by specific service, check if it exists
+                if (sFilter === 'all') {
+                    matchesService = true; // Show region if it has ANY service (could refine this)
+                } else if (region.services[sFilter]) {
+                    // Service exists, now check Tier
+                    if (tFilter === 'all') {
+                        matchesService = true;
+                    } else {
+                        // Check if ANY edition of this service matches the requested Tier
+                        const serviceConfigs = region.services[sFilter];
+                        if (serviceConfigs.some(config => config.tier === tFilter)) {
+                            matchesService = true;
+                        }
+                    }
+                }
+
+                if (matchesProvider && matchesService) {
+                    
+                    // --- POPUP BUILDER ---
+                    let iconGrid = '';
+                    let serviceList = '';
+                    const providerColor = getProviderBadgeColor(region.provider);
+
+                    // Sort keys to make popup consistent
+                    Object.keys(region.services).forEach(key => {
+                        const configs = region.services[key];
+                        // If we are filtering by Tier, only show the relevant config in the list?
+                        // For now, let's show all available services in that region if the region matches.
+                        
+                        iconGrid += `
+                            <div class="flex flex-col items-center justify-center w-10">
+                                ${getServiceIcon(key)}
+                                <span class="text-[9px] mt-1 text-slate-400 font-mono uppercase">${key.replace('vdc_', '').substring(0,4)}</span>
+                            </div>
+                        `;
+
+                        // Detailed list items
+                        configs.forEach(conf => {
+                            // Highlight the matching tier if filtering
+                            const isHighlight = (tFilter !== 'all' && conf.tier === tFilter);
+                            const textClass = isHighlight ? "text-green-400 font-bold" : "text-slate-300";
+                            
+                            serviceList += `
+                                <li class="flex items-start text-xs py-1 border-b border-slate-700 last:border-0">
+                                    <span class="${textClass} flex-1">
+                                        ${key.replace('vdc_', '').replace('_', ' ').toUpperCase()} 
+                                    </span>
+                                    <span class="text-slate-500 ml-2 text-[10px] bg-slate-800 px-1 rounded border border-slate-700">
+                                        ${conf.edition} (${conf.tier})
+                                    </span>
+                                </li>
+                            `;
+                        });
+                    });
+
+                    const popupHTML = `
+                        <div class="w-80 p-4 font-sans">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="font-bold text-lg text-white leading-tight pr-2">${region.name}</h3>
+                                <span class="${providerColor} text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                                    ${region.provider.toUpperCase()}
+                                </span>
+                            </div>
+
+                            <div class="flex gap-2 mb-4 p-2 bg-slate-900/50 rounded-lg border border-slate-700/50 overflow-x-auto">
+                                ${iconGrid}
+                            </div>
+
+                            <div class="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
+                                <div class="bg-slate-700/50 px-3 py-1.5 border-b border-slate-700">
+                                    <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Available Services</span>
+                                </div>
+                                <ul class="px-3 py-2 space-y-0">
+                                    ${serviceList}
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+
+                    // Create Marker
+                    // Use a simple circle marker for clean look, or use L.icon for custom pin
+                    const marker = L.circleMarker(region.coords, {
+                        radius: 8,
+                        fillColor: region.provider === 'Azure' ? '#0078D4' : '#FF9900',
+                        color: '#fff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).bindPopup(popupHTML);
+
+                    marker.addTo(map);
+                    markers.push(marker);
+                }
+            });
+        }
+
+        // --- 5. EVENTS ---
+        document.getElementById('providerFilter').addEventListener('change', renderMap);
+        document.getElementById('serviceFilter').addEventListener('change', renderMap);
+        document.getElementById('tierFilter').addEventListener('change', renderMap);
+
+        // Initial Load
+        renderMap();
+
+    </script>
+</body>
+</html>

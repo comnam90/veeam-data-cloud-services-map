@@ -1,0 +1,16 @@
+id: "aws-ap-southeast-2"
+name: "Australia East (Sydney)"
+provider: "AWS"
+coords: [-33.8688, 151.2093]
+services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"
+    - edition: "Foundation"
+      tier: "Non-Core"
+  vdc_m365:
+    - edition: "Enterprise"
+      tier: "Standard"
+  vdc_salesforce:
+    - edition: "Enterprise"
+      tier: "Standard"
