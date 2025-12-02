@@ -99,14 +99,11 @@
                     <option value="Non-Core">Non-Core</option>
                 </select>
 
-                <button id="themeToggle" class="p-2 rounded-lg bg-slate-800 light:bg-slate-100 border border-slate-600 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-200 transition-colors" title="Toggle theme">
-                    <svg id="sunIcon" class="w-5 h-5 text-yellow-400 hidden" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
-                    </svg>
-                    <svg id="moonIcon" class="w-5 h-5 text-slate-300" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
-                    </svg>
-                </button>
+                <select id="themeSelector" class="bg-slate-800 light:bg-white border border-slate-600 light:border-slate-300 rounded px-3 py-2 text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500 outline-none">
+                    <option value="dark">🌙 Dark</option>
+                    <option value="light">☀️ Light</option>
+                    <option value="system">💻 System</option>
+                </select>
             </div>
         </div>
     </div>
@@ -222,42 +219,51 @@
         let currentTiles = darkTiles;
         currentTiles.addTo(map);
 
-        function setTheme(isLight) {
+        const systemDarkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        function applyTheme(isLight) {
             const html = document.documentElement;
-            const sunIcon = document.getElementById('sunIcon');
-            const moonIcon = document.getElementById('moonIcon');
             
             if (isLight) {
                 html.classList.add('light');
                 html.classList.remove('dark');
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
-                map.removeLayer(darkTiles);
-                lightTiles.addTo(map);
+                if (map.hasLayer(darkTiles)) map.removeLayer(darkTiles);
+                if (!map.hasLayer(lightTiles)) lightTiles.addTo(map);
                 currentTiles = lightTiles;
-                localStorage.setItem('theme', 'light');
             } else {
                 html.classList.remove('light');
                 html.classList.add('dark');
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
-                map.removeLayer(lightTiles);
-                darkTiles.addTo(map);
+                if (map.hasLayer(lightTiles)) map.removeLayer(lightTiles);
+                if (!map.hasLayer(darkTiles)) darkTiles.addTo(map);
                 currentTiles = darkTiles;
-                localStorage.setItem('theme', 'dark');
             }
         }
 
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            const isCurrentlyLight = document.documentElement.classList.contains('light');
-            setTheme(!isCurrentlyLight);
+        function setTheme(mode) {
+            localStorage.setItem('theme', mode);
+            
+            if (mode === 'system') {
+                applyTheme(!systemDarkQuery.matches);
+            } else {
+                applyTheme(mode === 'light');
+            }
+        }
+
+        document.getElementById('themeSelector').addEventListener('change', (e) => {
+            setTheme(e.target.value);
         });
 
-        // Apply saved theme or default to dark
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-            setTheme(true);
-        }
+        // Listen for system theme changes
+        systemDarkQuery.addEventListener('change', (e) => {
+            if (localStorage.getItem('theme') === 'system') {
+                applyTheme(!e.matches);
+            }
+        });
+
+        // Apply saved theme on load
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.getElementById('themeSelector').value = savedTheme;
+        setTheme(savedTheme);
 
         let markers = [];
 
