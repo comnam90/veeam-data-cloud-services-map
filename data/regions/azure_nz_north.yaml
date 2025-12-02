@@ -6,6 +6,6 @@ services:
   vdc_vault:
     - edition: "Foundation"
       tier: "Core"
-  azure_backup:
+  vdc_azure_backup:
     - edition: "Standard"
       tier: "Core"
