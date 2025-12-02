@@ -9,7 +9,5 @@ services:
     - edition: "Advanced"
       tier: "Core"
   vdc_m365: true
-  vdc_salesforce:
-    - edition: "Enterprise"
-      tier: "Standard"
+  vdc_salesforce: true
   vdc_azure_backup: true
