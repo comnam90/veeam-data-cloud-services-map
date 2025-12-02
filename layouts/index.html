@@ -121,7 +121,8 @@
     <script>
         // Hugo injects YAML data as JSON; may produce strings instead of arrays in some edge cases
         const rawRegions = [
-            {{ range $key, $data := .Site.Data.regions }}
+            {{ range $provider, $regions := .Site.Data.regions }}
+            {{ range $key, $data := $regions }}
             {
                 id: "{{ $key }}",
                 name: "{{ $data.name }}",
@@ -129,6 +130,7 @@
                 coords: {{ $data.coords | jsonify }}, 
                 services: {{ $data.services | jsonify }} 
             },
+            {{ end }}
             {{ end }}
         ];
 
