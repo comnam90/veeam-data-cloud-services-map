@@ -5,26 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Site.Title }}</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <style>
+    <style type="text/tailwindcss">
+        @custom-variant dark (&:where(.dark, .dark *));
+        @custom-variant light (&:where(.light, .light *));
+        
         body { background-color: #0f172a; color: white; }
+        .dark body { background-color: #0f172a; color: white; }
+        .light body { background-color: #f1f5f9; color: #0f172a; }
+        
         #map { height: calc(85vh - 2rem); width: 100%; border-radius: 0.75rem; border: 1px solid #334155; }
+        .light #map { border: 1px solid #cbd5e1; }
 
-        /* Override Leaflet's default light popup styles to match dark theme */
+        /* Override Leaflet's default popup styles to match theme */
         .leaflet-popup-content-wrapper {
-            background: #1e293b; /* slate-800 */
+            background: #1e293b;
             color: white;
-            border: 1px solid #475569; /* slate-600 */
+            border: 1px solid #475569;
             padding: 0;
             border-radius: 0.5rem;
+        }
+        .light .leaflet-popup-content-wrapper {
+            background: white;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
         }
         .leaflet-popup-tip {
             background: #1e293b;
             border: 1px solid #475569;
+        }
+        .light .leaflet-popup-tip {
+            background: white;
+            border: 1px solid #cbd5e1;
         }
         .leaflet-popup-content {
             margin: 0 !important;
@@ -33,25 +49,40 @@
         .leaflet-container a.leaflet-popup-close-button {
             color: #94a3b8;
         }
+        .light .leaflet-container a.leaflet-popup-close-button {
+            color: #64748b;
+        }
+        
+        /* Popup inner content theme support */
+        .light .leaflet-popup-content h3 { color: #0f172a; }
+        .light .leaflet-popup-content .bg-slate-900\/50 { background: #f1f5f9; border-color: #e2e8f0; }
+        .light .leaflet-popup-content .bg-slate-800 { background: #f8fafc; }
+        .light .leaflet-popup-content .bg-slate-700\/50 { background: #e2e8f0; }
+        .light .leaflet-popup-content .border-slate-700 { border-color: #e2e8f0; }
+        .light .leaflet-popup-content .border-slate-700\/50 { border-color: #e2e8f0; }
+        .light .leaflet-popup-content .text-white { color: #0f172a; }
+        .light .leaflet-popup-content .text-slate-300 { color: #475569; }
+        .light .leaflet-popup-content .text-slate-400 { color: #64748b; }
+        .light .leaflet-popup-content .text-slate-500 { color: #64748b; }
     </style>
 </head>
 <body class="font-sans antialiased overflow-hidden">
 
-    <div class="h-[15vh] bg-slate-900 border-b border-slate-800 flex flex-col justify-center px-6">
+    <div class="h-[15vh] bg-slate-900 light:bg-white border-b border-slate-800 light:border-slate-200 flex flex-col justify-center px-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-green-400">Veeam <span class="text-white">Service Map</span></h1>
-                <p class="text-xs text-slate-400">Interactive Global Availability</p>
+                <h1 class="text-2xl font-bold text-green-400">Veeam <span class="text-white light:text-slate-900">Service Map</span></h1>
+                <p class="text-xs text-slate-400 light:text-slate-500">Interactive Global Availability</p>
             </div>
 
-            <div class="flex gap-3">
-                <select id="providerFilter" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 outline-none">
+            <div class="flex gap-3 items-center">
+                <select id="providerFilter" class="bg-slate-800 light:bg-white border border-slate-600 light:border-slate-300 rounded px-3 py-2 text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500 outline-none">
                     <option value="all">All Providers</option>
                     <option value="Azure">Azure</option>
                     <option value="AWS">AWS</option>
                 </select>
 
-                <select id="serviceFilter" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 outline-none">
+                <select id="serviceFilter" class="bg-slate-800 light:bg-white border border-slate-600 light:border-slate-300 rounded px-3 py-2 text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500 outline-none">
                     <option value="all">All Services</option>
                     <option value="vdc_vault">VDC Vault</option>
                     <option value="vdc_m365">VDC for M365</option>
@@ -59,16 +90,25 @@
                     <option value="vdc_azure_backup">VDC for Azure</option>
                 </select>
 
-                <select id="tierFilter" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 outline-none">
+                <select id="tierFilter" class="bg-slate-800 light:bg-white border border-slate-600 light:border-slate-300 rounded px-3 py-2 text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500 outline-none">
                     <option value="all">All Tiers</option>
                     <option value="Core">Core Regions</option>
                     <option value="Non-Core">Non-Core</option>
                 </select>
+
+                <button id="themeToggle" class="p-2 rounded-lg bg-slate-800 light:bg-slate-100 border border-slate-600 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-200 transition-colors" title="Toggle theme">
+                    <svg id="sunIcon" class="w-5 h-5 text-yellow-400 hidden" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+                    </svg>
+                    <svg id="moonIcon" class="w-5 h-5 text-slate-300" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="p-4 bg-slate-950">
+    <div class="p-4 bg-slate-950 light:bg-slate-100">
         <div id="map"></div>
     </div>
 
@@ -148,17 +188,17 @@
 
         const legend = L.control({ position: 'bottomleft' });
         legend.onAdd = function() {
-            const div = L.DomUtil.create('div', 'leaflet-bar');
+            const div = L.DomUtil.create('div', 'leaflet-bar legend-container');
             div.innerHTML = `
-                <div class="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-xs">
-                    <div class="font-bold text-slate-400 mb-2 uppercase tracking-wider">Providers</div>
+                <div class="bg-slate-800 light:bg-white border border-slate-600 light:border-slate-300 rounded-lg px-3 py-2 text-xs">
+                    <div class="font-bold text-slate-400 light:text-slate-500 mb-2 uppercase tracking-wider">Providers</div>
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="w-3 h-3 rounded-full bg-[#0078D4] border border-white"></span>
-                        <span class="text-white">Azure</span>
+                        <span class="w-3 h-3 rounded-full bg-[#0078D4] border border-white light:border-slate-300"></span>
+                        <span class="text-white light:text-slate-900">Azure</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-[#FF9900] border border-white"></span>
-                        <span class="text-white">AWS</span>
+                        <span class="w-3 h-3 rounded-full bg-[#FF9900] border border-white light:border-slate-300"></span>
+                        <span class="text-white light:text-slate-900">AWS</span>
                     </div>
                 </div>
             `;
@@ -166,10 +206,55 @@
         };
         legend.addTo(map);
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
             maxZoom: 19
-        }).addTo(map);
+        });
+        
+        const lightTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            maxZoom: 19
+        });
+
+        let currentTiles = darkTiles;
+        currentTiles.addTo(map);
+
+        function setTheme(isLight) {
+            const html = document.documentElement;
+            const sunIcon = document.getElementById('sunIcon');
+            const moonIcon = document.getElementById('moonIcon');
+            
+            if (isLight) {
+                html.classList.add('light');
+                html.classList.remove('dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                map.removeLayer(darkTiles);
+                lightTiles.addTo(map);
+                currentTiles = lightTiles;
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                map.removeLayer(lightTiles);
+                darkTiles.addTo(map);
+                currentTiles = darkTiles;
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isCurrentlyLight = document.documentElement.classList.contains('light');
+            setTheme(!isCurrentlyLight);
+        });
+
+        // Apply saved theme or default to dark
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            setTheme(true);
+        }
 
         let markers = [];
 
