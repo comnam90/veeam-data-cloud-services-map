@@ -1,0 +1,10 @@
+id: "azure-france-central"
+name: "France Central"
+provider: "Azure"
+coords: [46.3772, 2.373]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

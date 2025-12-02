@@ -1,0 +1,10 @@
+id: "azure-indonesia-central"
+name: "Indonesia Central"
+provider: "Azure"
+coords: [-6.2088, 106.8456]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

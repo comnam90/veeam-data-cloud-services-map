@@ -1,0 +1,8 @@
+id: "azure-south-india"
+name: "South India"
+provider: "Azure"
+coords: [13.0827, 80.2707]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Non-Core"

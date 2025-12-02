@@ -1,0 +1,10 @@
+id: "azure-germany-west-central"
+name: "Germany West Central"
+provider: "Azure"
+coords: [50.1109, 8.6821]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

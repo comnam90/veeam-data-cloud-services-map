@@ -1,0 +1,10 @@
+id: "azure-us-west2"
+name: "West US 2"
+provider: "Azure"
+coords: [47.233, -119.852]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

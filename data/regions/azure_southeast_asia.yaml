@@ -1,0 +1,10 @@
+id: "azure-southeast-asia"
+name: "Southeast Asia"
+provider: "Azure"
+coords: [1.3521, 103.8198]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

@@ -1,0 +1,10 @@
+id: "azure-us-central"
+name: "Central US"
+provider: "Azure"
+coords: [41.5908, -93.6208]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

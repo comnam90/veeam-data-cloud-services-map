@@ -1,0 +1,10 @@
+id: "azure-austria-east"
+name: "Austria East"
+provider: "Azure"
+coords: [48.2082, 16.3738]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

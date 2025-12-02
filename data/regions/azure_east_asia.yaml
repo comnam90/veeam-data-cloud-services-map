@@ -1,0 +1,10 @@
+id: "azure-east-asia"
+name: "East Asia"
+provider: "Azure"
+coords: [22.3193, 114.1694]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

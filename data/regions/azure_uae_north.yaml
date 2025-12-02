@@ -1,0 +1,8 @@
+id: "azure-uae-north"
+name: "UAE North"
+provider: "Azure"
+coords: [25.2048, 55.2708]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Non-Core"

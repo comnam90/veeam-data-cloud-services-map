@@ -1,0 +1,10 @@
+id: "azure-north-europe"
+name: "North Europe"
+provider: "Azure"
+coords: [53.3498, -6.2603]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

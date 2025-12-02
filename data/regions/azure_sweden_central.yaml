@@ -1,0 +1,10 @@
+id: "azure-sweden-central"
+name: "Sweden Central"
+provider: "Azure"
+coords: [59.3293, 18.0686]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

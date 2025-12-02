@@ -1,0 +1,10 @@
+id: "azure-us-south-central"
+name: "South Central US"
+provider: "Azure"
+coords: [29.4167, -98.5]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

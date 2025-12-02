@@ -1,0 +1,10 @@
+id: "azure-south-africa-north"
+name: "South Africa North"
+provider: "Azure"
+coords: [-25.7479, 28.2293]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Non-Core"
+    - edition: "Advanced"
+      tier: "Non-Core"

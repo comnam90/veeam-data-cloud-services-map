@@ -1,0 +1,8 @@
+id: "azure-us-north-central"
+name: "North Central US"
+provider: "Azure"
+coords: [41.8819, -87.6278]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Non-Core"

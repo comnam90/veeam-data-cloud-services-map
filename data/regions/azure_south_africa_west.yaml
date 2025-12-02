@@ -1,0 +1,8 @@
+id: "azure-south-africa-west"
+name: "South Africa West"
+provider: "Azure"
+coords: [-33.9249, 18.4241]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Non-Core"

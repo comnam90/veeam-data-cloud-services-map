@@ -1,0 +1,10 @@
+id: "azure-brazil-south"
+name: "Brazil South"
+provider: "Azure"
+coords: [-23.5505, -46.6333]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Non-Core"
+    - edition: "Advanced"
+      tier: "Non-Core"

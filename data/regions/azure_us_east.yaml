@@ -1,0 +1,10 @@
+id: "azure-us-east"
+name: "East US"
+provider: "Azure"
+coords: [37.3719, -79.8164]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Non-Core"
+    - edition: "Advanced"
+      tier: "Non-Core"

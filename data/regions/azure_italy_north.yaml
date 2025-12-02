@@ -1,0 +1,10 @@
+id: "azure-italy-north"
+name: "Italy North"
+provider: "Azure"
+coords: [45.4642, 9.19]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

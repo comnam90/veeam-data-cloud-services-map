@@ -1,0 +1,8 @@
+id: "azure-canada-east"
+name: "Canada East"
+provider: "Azure"
+coords: [46.8139, -71.2082]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"

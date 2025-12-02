@@ -1,0 +1,10 @@
+id: "azure-india-central"
+name: "India Central"
+provider: "Azure"
+coords: [18.5204, 73.8567]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

@@ -1,0 +1,10 @@
+id: "azure-israel-central"
+name: "Israel Central"
+provider: "Azure"
+coords: [32.0853, 34.7818]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

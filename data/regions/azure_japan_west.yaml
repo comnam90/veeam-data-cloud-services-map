@@ -1,0 +1,10 @@
+id: "azure-japan-west"
+name: "Japan West"
+provider: "Azure"
+coords: [34.6937, 135.5023]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

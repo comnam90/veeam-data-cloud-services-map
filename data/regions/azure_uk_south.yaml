@@ -1,0 +1,10 @@
+id: "azure-uk-south"
+name: "UK South"
+provider: "Azure"
+coords: [51.5074, -0.1278]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

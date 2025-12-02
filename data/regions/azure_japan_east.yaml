@@ -1,0 +1,10 @@
+id: "azure-japan-east"
+name: "Japan East"
+provider: "Azure"
+coords: [35.6762, 139.6503]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

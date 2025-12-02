@@ -1,0 +1,8 @@
+id: "azure-australia-southeast"
+name: "Australia Southeast"
+provider: "Azure"
+coords: [-37.8136, 144.9631]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Non-Core"

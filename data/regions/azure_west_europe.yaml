@@ -1,0 +1,10 @@
+id: "azure-west-europe"
+name: "West Europe"
+provider: "Azure"
+coords: [52.3676, 4.9041]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

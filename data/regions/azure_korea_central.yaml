@@ -1,0 +1,10 @@
+id: "azure-korea-central"
+name: "Korea Central"
+provider: "Azure"
+coords: [37.5665, 126.978]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"

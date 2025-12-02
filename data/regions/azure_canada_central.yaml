@@ -1,0 +1,10 @@
+id: "azure-canada-central"
+name: "Canada Central"
+provider: "Azure"
+coords: [43.6532, -79.3832]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - edition: "Advanced"
+      tier: "Core"
