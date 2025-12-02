@@ -44,12 +44,10 @@ provider: "AWS"                     # "AWS" or "Azure" (Case sensitive for icon/
 coords: [38.0339, -78.5079]         # [Latitude, Longitude]
 
 services:
-  # Simple Service (Single Tier)
-  vdc_m365:
-    - edition: "Enterprise"
-      tier: "Standard"
+  # Boolean Service - just mark as available (editions are universal)
+  vdc_m365: true
 
-  # Complex Service (Multi-Tier / Core vs Non-Core)
+  # Tiered Service - editions and tiers vary by region
   vdc_vault:
     - edition: "Advanced"
       tier: "Core"
@@ -59,10 +57,13 @@ services:
 
 ### Available Keys
 
-* `vdc_vault` (Veeam Data Cloud Vault)
-* `vdc_m365` (VDC for Microsoft 365)
-* `vdc_salesforce` (VDC for Salesforce)
-* `vdc_azure_backup` (VDC for Azure)
+**Tiered Services** (edition + tier per region):
+* `vdc_vault` - Veeam Data Cloud Vault (Core/Non-Core pricing tiers)
+* `vdc_salesforce` - VDC for Salesforce
+* `vdc_azure_backup` - VDC for Azure
+
+**Boolean Services** (just `true` if available):
+* `vdc_m365` - VDC for Microsoft 365 (Flex/Express/Premium editions available in all M365 regions)
 
 *Note: New service keys will automatically appear in the popup, but you may need to add a matching SVG icon in `layouts/index.html` if you want a custom logo for it.*
 

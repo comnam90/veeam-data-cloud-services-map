@@ -17,16 +17,26 @@ name: "Human Readable Name"          # Display name for popup
 provider: "AWS"                      # MUST be exactly "AWS" or "Azure" (case-sensitive)
 coords: [-33.8688, 151.2093]         # [latitude, longitude] as array
 services:
-  vdc_vault:                         # Service key (see valid keys below)
+  vdc_vault:                         # Tiered service (see below)
     - edition: "Advanced"
       tier: "Core"                   # "Core" or "Non-Core"
+  vdc_m365: true                     # Boolean service (available or not listed)
 ```
 
-### Valid Service Keys
+### Service Types
+**Tiered services** (edition + tier matter per region):
 - `vdc_vault` - Veeam Data Cloud Vault
-- `vdc_m365` - Veeam Data Cloud for Microsoft 365  
 - `vdc_salesforce` - Veeam Data Cloud for Salesforce
 - `vdc_azure_backup` - Veeam Data Cloud for Azure
+
+**Boolean services** (available globally with same editions, just mark presence):
+- `vdc_m365` - Veeam Data Cloud for Microsoft 365 (Flex/Express/Premium available everywhere)
+
+### Valid Service Keys
+- `vdc_vault` - Veeam Data Cloud Vault (tiered: edition + Core/Non-Core)
+- `vdc_m365` - Veeam Data Cloud for Microsoft 365 (boolean: `true` if available)
+- `vdc_salesforce` - Veeam Data Cloud for Salesforce (tiered)
+- `vdc_azure_backup` - Veeam Data Cloud for Azure (tiered)
 
 ### Critical Conventions
 - **Provider values are case-sensitive**: Use exactly `"AWS"` or `"Azure"`

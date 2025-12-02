@@ -5,21 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Site.Title }}</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        /* Force dark mode background for the page */
         body { background-color: #0f172a; color: white; }
-        
-        /* Map container height */
         #map { height: 85vh; width: 100%; border-radius: 0.75rem; border: 1px solid #334155; }
 
-        /* --- Custom Popup Overrides for Dark Mode --- */
+        /* Override Leaflet's default light popup styles to match dark theme */
         .leaflet-popup-content-wrapper {
             background: #1e293b; /* slate-800 */
             color: white;
@@ -42,7 +37,6 @@
 </head>
 <body class="font-sans antialiased overflow-hidden">
 
-    <!-- Navbar / Controls -->
     <div class="h-[15vh] bg-slate-900 border-b border-slate-800 flex flex-col justify-center px-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -50,7 +44,6 @@
                 <p class="text-xs text-slate-400">Interactive Global Availability</p>
             </div>
 
-            <!-- Filters -->
             <div class="flex gap-3">
                 <select id="providerFilter" class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 outline-none">
                     <option value="all">All Providers</option>
@@ -75,14 +68,12 @@
         </div>
     </div>
 
-    <!-- Map Area -->
     <div class="p-4 bg-slate-950">
         <div id="map"></div>
     </div>
 
     <script>
-        // --- 1. HUGO DATA INJECTION ---
-        // We inject the raw data first, then clean it up immediately below.
+        // Hugo injects YAML data as JSON; may produce strings instead of arrays in some edge cases
         const rawRegions = [
             {{ range $key, $data := .Site.Data.regions }}
             {
@@ -95,23 +86,19 @@
             {{ end }}
         ];
 
-        // --- 2. DATA CLEANING / PARSING ---
-        // This fixes the issue where data comes in as strings "[-33, 151]" instead of arrays [-33, 151]
+        // Normalize data types to handle YAML edge cases like coords: "[-33, 151]" as string
         const regions = rawRegions.map(region => {
             let cleanCoords = region.coords;
             let cleanServices = region.services;
 
-            // Fix Coords if it is a string
             if (typeof cleanCoords === 'string') {
                 try { 
                     cleanCoords = JSON.parse(cleanCoords); 
                 } catch(e) {
-                    // Fallback for simple "lat,long" strings without brackets
                     if (cleanCoords.includes(',')) cleanCoords = cleanCoords.split(',').map(Number);
                 }
             }
 
-            // Fix Services if it is a string
             if (typeof cleanServices === 'string') {
                 try { 
                     cleanServices = JSON.parse(cleanServices); 
@@ -124,19 +111,17 @@
             return {
                 ...region,
                 coords: cleanCoords,
-                services: cleanServices || {} // Ensure it's never null
+                services: cleanServices || {}
             };
         });
 
         console.log("Processed Regions Data:", regions);
 
-        // --- HELPER: Ensure data is always an array to prevent crashes ---
         function ensureArray(input) {
             if (!input) return [];
             return Array.isArray(input) ? input : [input];
         }
 
-        // --- 3. ICON HELPER ---
         function getServiceIcon(serviceKey) {
             const icons = {
                 'vdc_m365': `<svg class="w-6 h-6 text-[#EA3E23]" fill="currentColor" viewBox="0 0 24 24"><path d="M11.5 12.5H6V7h5.5v5.5zm0 6H6v-5.5h5.5v5.5zm6-6h-5.5V7h5.5v5.5zm0 6h-5.5v-5.5h5.5v5.5z"/></svg>`, 
@@ -153,11 +138,10 @@
             return 'bg-slate-600';
         }
 
-        // --- 4. MAP INITIALIZATION ---
         const map = L.map('map', {
-            center: [-25, 140], 
+            center: [-25, 140],
             zoom: 3,
-            zoomControl: false 
+            zoomControl: false
         });
         
         L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -169,7 +153,6 @@
 
         let markers = [];
 
-        // --- 5. RENDER LOGIC ---
         function renderMap() {
             markers.forEach(m => map.removeLayer(m));
             markers = [];
@@ -179,41 +162,41 @@
             const tFilter = document.getElementById('tierFilter').value;
 
             regions.forEach(region => {
-                // Since we cleaned the data at the top, we trust these coords now
                 if (!region.coords || !Array.isArray(region.coords)) {
                     console.warn(`Skipping ${region.name}: Missing valid coordinates.`);
                     return; 
                 }
 
-                // --- FILTERING ---
                 let matchesProvider = (pFilter === 'all' || region.provider === pFilter);
                 let matchesService = false;
                 
                 if (sFilter === 'all') {
                     matchesService = true; 
                 } else if (region.services && region.services[sFilter]) {
-                    const serviceConfigs = ensureArray(region.services[sFilter]);
+                    const serviceValue = region.services[sFilter];
                     
-                    if (tFilter === 'all') {
-                        matchesService = true;
+                    // Boolean services (vdc_m365: true) have no tiers, so ignore tier filter
+                    if (serviceValue === true) {
+                        matchesService = (tFilter === 'all');
                     } else {
-                        if (serviceConfigs.some(config => config.tier === tFilter)) {
+                        const serviceConfigs = ensureArray(serviceValue);
+                        if (tFilter === 'all') {
                             matchesService = true;
+                        } else {
+                            matchesService = serviceConfigs.some(config => config.tier === tFilter);
                         }
                     }
                 }
 
                 if (matchesProvider && matchesService) {
                     
-                    // --- POPUP BUILDER ---
                     let iconGrid = '';
                     let serviceList = '';
                     const providerColor = getProviderBadgeColor(region.provider);
 
-                    // Guard if services are empty/undefined
                     if (region.services) {
                         Object.keys(region.services).forEach(key => {
-                            const configs = ensureArray(region.services[key]);
+                            const serviceValue = region.services[key];
                             
                             iconGrid += `
                                 <div class="flex flex-col items-center justify-center w-10">
@@ -222,23 +205,37 @@
                                 </div>
                             `;
 
-                            configs.forEach(conf => {
-                                if (!conf) return; 
-
-                                const isHighlight = (tFilter !== 'all' && conf.tier === tFilter);
-                                const textClass = isHighlight ? "text-green-400 font-bold" : "text-slate-300";
-                                
+                            if (serviceValue === true) {
                                 serviceList += `
                                     <li class="flex items-start text-xs py-1 border-b border-slate-700 last:border-0">
-                                        <span class="${textClass} flex-1">
+                                        <span class="text-slate-300 flex-1">
                                             ${key.replace('vdc_', '').replace('_', ' ').toUpperCase()} 
                                         </span>
-                                        <span class="text-slate-500 ml-2 text-[10px] bg-slate-800 px-1 rounded border border-slate-700">
-                                            ${conf.edition || 'Std'} (${conf.tier || 'N/A'})
+                                        <span class="text-green-400 ml-2 text-[10px] bg-slate-800 px-1 rounded border border-slate-700">
+                                            Available
                                         </span>
                                     </li>
                                 `;
-                            });
+                            } else {
+                                const configs = ensureArray(serviceValue);
+                                configs.forEach(conf => {
+                                    if (!conf) return; 
+
+                                    const isHighlight = (tFilter !== 'all' && conf.tier === tFilter);
+                                    const textClass = isHighlight ? "text-green-400 font-bold" : "text-slate-300";
+                                    
+                                    serviceList += `
+                                        <li class="flex items-start text-xs py-1 border-b border-slate-700 last:border-0">
+                                            <span class="${textClass} flex-1">
+                                                ${key.replace('vdc_', '').replace('_', ' ').toUpperCase()} 
+                                            </span>
+                                            <span class="text-slate-500 ml-2 text-[10px] bg-slate-800 px-1 rounded border border-slate-700">
+                                                ${conf.edition || 'Std'} (${conf.tier || 'N/A'})
+                                            </span>
+                                        </li>
+                                    `;
+                                });
+                            }
                         });
                     }
 
