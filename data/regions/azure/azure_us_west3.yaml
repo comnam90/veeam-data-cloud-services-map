@@ -1,0 +1,6 @@
+id: "azure-us-west3"
+name: "West US 3 (Phoenix)"
+provider: "Azure"
+coords: [33.448, -112.074]
+services:
+  vdc_m365: true

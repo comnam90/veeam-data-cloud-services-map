@@ -8,3 +8,4 @@ services:
       tier: "Non-Core"
     - edition: "Advanced"
       tier: "Non-Core"
+  vdc_m365: true
