@@ -21,49 +21,52 @@
         #map { height: calc(85vh - 2rem); width: 100%; border-radius: 0.75rem; border: 1px solid #334155; }
         .light #map { border: 1px solid #cbd5e1; }
 
-        /* Override Leaflet's default popup styles to match theme */
+        /* Leaflet popup - dark mode (default and explicit .dark) */
         .leaflet-popup-content-wrapper {
-            background: #1e293b;
-            color: white;
-            border: 1px solid #475569;
+            background: #1e293b !important;
+            color: white !important;
+            border: 1px solid #475569 !important;
             padding: 0;
             border-radius: 0.5rem;
         }
-        .light .leaflet-popup-content-wrapper {
-            background: white;
-            color: #0f172a;
-            border: 1px solid #cbd5e1;
-        }
         .leaflet-popup-tip {
-            background: #1e293b;
-            border: 1px solid #475569;
+            background: #1e293b !important;
+            border: 1px solid #475569 !important;
+        }
+        .leaflet-container a.leaflet-popup-close-button {
+            color: #94a3b8 !important;
+        }
+        
+        /* Leaflet popup - light mode */
+        .light .leaflet-popup-content-wrapper {
+            background: white !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
         }
         .light .leaflet-popup-tip {
-            background: white;
-            border: 1px solid #cbd5e1;
+            background: white !important;
+            border: 1px solid #cbd5e1 !important;
         }
+        .light .leaflet-container a.leaflet-popup-close-button {
+            color: #64748b !important;
+        }
+        
         .leaflet-popup-content {
             margin: 0 !important;
             width: auto !important;
         }
-        .leaflet-container a.leaflet-popup-close-button {
-            color: #94a3b8;
-        }
-        .light .leaflet-container a.leaflet-popup-close-button {
-            color: #64748b;
-        }
         
-        /* Popup inner content theme support */
-        .light .leaflet-popup-content h3 { color: #0f172a; }
-        .light .leaflet-popup-content .bg-slate-900\/50 { background: #f1f5f9; border-color: #e2e8f0; }
-        .light .leaflet-popup-content .bg-slate-800 { background: #f8fafc; }
-        .light .leaflet-popup-content .bg-slate-700\/50 { background: #e2e8f0; }
-        .light .leaflet-popup-content .border-slate-700 { border-color: #e2e8f0; }
-        .light .leaflet-popup-content .border-slate-700\/50 { border-color: #e2e8f0; }
-        .light .leaflet-popup-content .text-white { color: #0f172a; }
-        .light .leaflet-popup-content .text-slate-300 { color: #475569; }
-        .light .leaflet-popup-content .text-slate-400 { color: #64748b; }
-        .light .leaflet-popup-content .text-slate-500 { color: #64748b; }
+        /* Popup inner content - light mode overrides */
+        .light .leaflet-popup-content h3 { color: #0f172a !important; }
+        .light .leaflet-popup-content .bg-slate-900\/50 { background: #f1f5f9 !important; border-color: #e2e8f0 !important; }
+        .light .leaflet-popup-content .bg-slate-800 { background: #f8fafc !important; }
+        .light .leaflet-popup-content .bg-slate-700\/50 { background: #e2e8f0 !important; }
+        .light .leaflet-popup-content .border-slate-700 { border-color: #e2e8f0 !important; }
+        .light .leaflet-popup-content .border-slate-700\/50 { border-color: #e2e8f0 !important; }
+        .light .leaflet-popup-content .text-white { color: #0f172a !important; }
+        .light .leaflet-popup-content .text-slate-300 { color: #475569 !important; }
+        .light .leaflet-popup-content .text-slate-400 { color: #64748b !important; }
+        .light .leaflet-popup-content .text-slate-500 { color: #64748b !important; }
     </style>
 </head>
 <body class="font-sans antialiased overflow-hidden">
