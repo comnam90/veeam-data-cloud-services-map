@@ -35,7 +35,6 @@
             margin: 0 !important;
             width: auto !important;
         }
-        /* Hide the default close button, we will make our own if needed, or stick with default */
         .leaflet-container a.leaflet-popup-close-button {
             color: #94a3b8;
         }
@@ -82,7 +81,6 @@
 
     <script>
         // --- 1. HUGO DATA INJECTION ---
-        // This is where Hugo reads your YAML files and prints them as a JS variable.
         const regions = [
             {{ range $key, $data := .Site.Data.regions }}
             {
@@ -95,14 +93,19 @@
             {{ end }}
         ];
 
-        // --- 2. ICON HELPER (Inline SVGs for portability) ---
+        // --- HELPER: Ensure data is always an array to prevent crashes ---
+        function ensureArray(input) {
+            if (!input) return [];
+            return Array.isArray(input) ? input : [input];
+        }
+
+        // --- 2. ICON HELPER ---
         function getServiceIcon(serviceKey) {
-            // Simple inline SVGs to match the request without needing external files
             const icons = {
-                'vdc_m365': `<svg class="w-6 h-6 text-[#EA3E23]" fill="currentColor" viewBox="0 0 24 24"><path d="M11.5 12.5H6V7h5.5v5.5zm0 6H6v-5.5h5.5v5.5zm6-6h-5.5V7h5.5v5.5zm0 6h-5.5v-5.5h5.5v5.5z"/></svg>`, // Windows-ish logo
-                'vdc_vault': `<svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>`, // Shield
-                'vdc_salesforce': `<svg class="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg>`, // Cloud
-                'azure_backup': `<svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4H6v-2h4V7h2v4h4v2h-4v4z"/></svg>` // Plus box
+                'vdc_m365': `<svg class="w-6 h-6 text-[#EA3E23]" fill="currentColor" viewBox="0 0 24 24"><path d="M11.5 12.5H6V7h5.5v5.5zm0 6H6v-5.5h5.5v5.5zm6-6h-5.5V7h5.5v5.5zm0 6h-5.5v-5.5h5.5v5.5z"/></svg>`, 
+                'vdc_vault': `<svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>`, 
+                'vdc_salesforce': `<svg class="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg>`, 
+                'azure_backup': `<svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4H6v-2h4V7h2v4h4v2h-4v4z"/></svg>`
             };
             return icons[serviceKey] || `<svg class="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>`;
         }
@@ -115,14 +118,13 @@
 
         // --- 3. MAP INITIALIZATION ---
         const map = L.map('map', {
-            center: [-25, 140], // Centered roughly on Australia/NZ
+            center: [-25, 140], 
             zoom: 3,
-            zoomControl: false // Move zoom control if needed, or keep false for clean look
+            zoomControl: false 
         });
         
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // Dark Matter Tiles
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
             maxZoom: 19
@@ -132,7 +134,6 @@
 
         // --- 4. RENDER LOGIC ---
         function renderMap() {
-            // Clear markers
             markers.forEach(m => map.removeLayer(m));
             markers = [];
 
@@ -145,16 +146,15 @@
                 let matchesProvider = (pFilter === 'all' || region.provider === pFilter);
                 let matchesService = false;
                 
-                // If filtering by specific service, check if it exists
                 if (sFilter === 'all') {
-                    matchesService = true; // Show region if it has ANY service (could refine this)
+                    matchesService = true; 
                 } else if (region.services[sFilter]) {
-                    // Service exists, now check Tier
+                    // FIX: Ensure it is an array before checking .some()
+                    const serviceConfigs = ensureArray(region.services[sFilter]);
+                    
                     if (tFilter === 'all') {
                         matchesService = true;
                     } else {
-                        // Check if ANY edition of this service matches the requested Tier
-                        const serviceConfigs = region.services[sFilter];
                         if (serviceConfigs.some(config => config.tier === tFilter)) {
                             matchesService = true;
                         }
@@ -168,11 +168,9 @@
                     let serviceList = '';
                     const providerColor = getProviderBadgeColor(region.provider);
 
-                    // Sort keys to make popup consistent
                     Object.keys(region.services).forEach(key => {
-                        const configs = region.services[key];
-                        // If we are filtering by Tier, only show the relevant config in the list?
-                        // For now, let's show all available services in that region if the region matches.
+                        // FIX: Ensure configs is always an array
+                        const configs = ensureArray(region.services[key]);
                         
                         iconGrid += `
                             <div class="flex flex-col items-center justify-center w-10">
@@ -181,9 +179,10 @@
                             </div>
                         `;
 
-                        // Detailed list items
                         configs.forEach(conf => {
-                            // Highlight the matching tier if filtering
+                            // Guard against empty config objects if YAML was weird
+                            if (!conf) return; 
+
                             const isHighlight = (tFilter !== 'all' && conf.tier === tFilter);
                             const textClass = isHighlight ? "text-green-400 font-bold" : "text-slate-300";
                             
@@ -193,7 +192,7 @@
                                         ${key.replace('vdc_', '').replace('_', ' ').toUpperCase()} 
                                     </span>
                                     <span class="text-slate-500 ml-2 text-[10px] bg-slate-800 px-1 rounded border border-slate-700">
-                                        ${conf.edition} (${conf.tier})
+                                        ${conf.edition || 'Std'} (${conf.tier || 'N/A'})
                                     </span>
                                 </li>
                             `;
@@ -224,8 +223,6 @@
                         </div>
                     `;
 
-                    // Create Marker
-                    // Use a simple circle marker for clean look, or use L.icon for custom pin
                     const marker = L.circleMarker(region.coords, {
                         radius: 8,
                         fillColor: region.provider === 'Azure' ? '#0078D4' : '#FF9900',
@@ -241,12 +238,10 @@
             });
         }
 
-        // --- 5. EVENTS ---
         document.getElementById('providerFilter').addEventListener('change', renderMap);
         document.getElementById('serviceFilter').addEventListener('change', renderMap);
         document.getElementById('tierFilter').addEventListener('change', renderMap);
 
-        // Initial Load
         renderMap();
 
     </script>
