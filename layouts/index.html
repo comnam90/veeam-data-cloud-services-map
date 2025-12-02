@@ -81,7 +81,8 @@
 
     <script>
         // --- 1. HUGO DATA INJECTION ---
-        const regions = [
+        // We inject the raw data first, then clean it up immediately below.
+        const rawRegions = [
             {{ range $key, $data := .Site.Data.regions }}
             {
                 id: "{{ $key }}",
@@ -93,13 +94,48 @@
             {{ end }}
         ];
 
+        // --- 2. DATA CLEANING / PARSING ---
+        // This fixes the issue where data comes in as strings "[-33, 151]" instead of arrays [-33, 151]
+        const regions = rawRegions.map(region => {
+            let cleanCoords = region.coords;
+            let cleanServices = region.services;
+
+            // Fix Coords if it is a string
+            if (typeof cleanCoords === 'string') {
+                try { 
+                    cleanCoords = JSON.parse(cleanCoords); 
+                } catch(e) {
+                    // Fallback for simple "lat,long" strings without brackets
+                    if (cleanCoords.includes(',')) cleanCoords = cleanCoords.split(',').map(Number);
+                }
+            }
+
+            // Fix Services if it is a string
+            if (typeof cleanServices === 'string') {
+                try { 
+                    cleanServices = JSON.parse(cleanServices); 
+                } catch(e) { 
+                    console.error("Bad JSON in services for:", region.name); 
+                    cleanServices = {}; 
+                }
+            }
+
+            return {
+                ...region,
+                coords: cleanCoords,
+                services: cleanServices || {} // Ensure it's never null
+            };
+        });
+
+        console.log("Processed Regions Data:", regions);
+
         // --- HELPER: Ensure data is always an array to prevent crashes ---
         function ensureArray(input) {
             if (!input) return [];
             return Array.isArray(input) ? input : [input];
         }
 
-        // --- 2. ICON HELPER ---
+        // --- 3. ICON HELPER ---
         function getServiceIcon(serviceKey) {
             const icons = {
                 'vdc_m365': `<svg class="w-6 h-6 text-[#EA3E23]" fill="currentColor" viewBox="0 0 24 24"><path d="M11.5 12.5H6V7h5.5v5.5zm0 6H6v-5.5h5.5v5.5zm6-6h-5.5V7h5.5v5.5zm0 6h-5.5v-5.5h5.5v5.5z"/></svg>`, 
@@ -116,7 +152,7 @@
             return 'bg-slate-600';
         }
 
-        // --- 3. MAP INITIALIZATION ---
+        // --- 4. MAP INITIALIZATION ---
         const map = L.map('map', {
             center: [-25, 140], 
             zoom: 3,
@@ -132,7 +168,7 @@
 
         let markers = [];
 
-        // --- 4. RENDER LOGIC ---
+        // --- 5. RENDER LOGIC ---
         function renderMap() {
             markers.forEach(m => map.removeLayer(m));
             markers = [];
@@ -142,10 +178,10 @@
             const tFilter = document.getElementById('tierFilter').value;
 
             regions.forEach(region => {
-                // --- SAFETY CHECK 1: INVALID COORDS ---
-                if (!region.coords || !Array.isArray(region.coords) || region.coords.length < 2) {
-                    console.warn(`Skipping ${region.name}: Missing or invalid coordinates.`);
-                    return; // Skip this iteration
+                // Since we cleaned the data at the top, we trust these coords now
+                if (!region.coords || !Array.isArray(region.coords)) {
+                    console.warn(`Skipping ${region.name}: Missing valid coordinates.`);
+                    return; 
                 }
 
                 // --- FILTERING ---
@@ -155,7 +191,6 @@
                 if (sFilter === 'all') {
                     matchesService = true; 
                 } else if (region.services && region.services[sFilter]) {
-                    // FIX: Ensure it is an array before checking .some()
                     const serviceConfigs = ensureArray(region.services[sFilter]);
                     
                     if (tFilter === 'all') {
@@ -177,7 +212,6 @@
                     // Guard if services are empty/undefined
                     if (region.services) {
                         Object.keys(region.services).forEach(key => {
-                            // FIX: Ensure configs is always an array
                             const configs = ensureArray(region.services[key]);
                             
                             iconGrid += `
@@ -188,7 +222,6 @@
                             `;
 
                             configs.forEach(conf => {
-                                // Guard against empty config objects if YAML was weird
                                 if (!conf) return; 
 
                                 const isHighlight = (tFilter !== 'all' && conf.tier === tFilter);
