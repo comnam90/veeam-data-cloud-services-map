@@ -142,13 +142,19 @@
             const tFilter = document.getElementById('tierFilter').value;
 
             regions.forEach(region => {
+                // --- SAFETY CHECK 1: INVALID COORDS ---
+                if (!region.coords || !Array.isArray(region.coords) || region.coords.length < 2) {
+                    console.warn(`Skipping ${region.name}: Missing or invalid coordinates.`);
+                    return; // Skip this iteration
+                }
+
                 // --- FILTERING ---
                 let matchesProvider = (pFilter === 'all' || region.provider === pFilter);
                 let matchesService = false;
                 
                 if (sFilter === 'all') {
                     matchesService = true; 
-                } else if (region.services[sFilter]) {
+                } else if (region.services && region.services[sFilter]) {
                     // FIX: Ensure it is an array before checking .some()
                     const serviceConfigs = ensureArray(region.services[sFilter]);
                     
@@ -168,36 +174,39 @@
                     let serviceList = '';
                     const providerColor = getProviderBadgeColor(region.provider);
 
-                    Object.keys(region.services).forEach(key => {
-                        // FIX: Ensure configs is always an array
-                        const configs = ensureArray(region.services[key]);
-                        
-                        iconGrid += `
-                            <div class="flex flex-col items-center justify-center w-10">
-                                ${getServiceIcon(key)}
-                                <span class="text-[9px] mt-1 text-slate-400 font-mono uppercase">${key.replace('vdc_', '').substring(0,4)}</span>
-                            </div>
-                        `;
-
-                        configs.forEach(conf => {
-                            // Guard against empty config objects if YAML was weird
-                            if (!conf) return; 
-
-                            const isHighlight = (tFilter !== 'all' && conf.tier === tFilter);
-                            const textClass = isHighlight ? "text-green-400 font-bold" : "text-slate-300";
+                    // Guard if services are empty/undefined
+                    if (region.services) {
+                        Object.keys(region.services).forEach(key => {
+                            // FIX: Ensure configs is always an array
+                            const configs = ensureArray(region.services[key]);
                             
-                            serviceList += `
-                                <li class="flex items-start text-xs py-1 border-b border-slate-700 last:border-0">
-                                    <span class="${textClass} flex-1">
-                                        ${key.replace('vdc_', '').replace('_', ' ').toUpperCase()} 
-                                    </span>
-                                    <span class="text-slate-500 ml-2 text-[10px] bg-slate-800 px-1 rounded border border-slate-700">
-                                        ${conf.edition || 'Std'} (${conf.tier || 'N/A'})
-                                    </span>
-                                </li>
+                            iconGrid += `
+                                <div class="flex flex-col items-center justify-center w-10">
+                                    ${getServiceIcon(key)}
+                                    <span class="text-[9px] mt-1 text-slate-400 font-mono uppercase">${key.replace('vdc_', '').substring(0,4)}</span>
+                                </div>
                             `;
+
+                            configs.forEach(conf => {
+                                // Guard against empty config objects if YAML was weird
+                                if (!conf) return; 
+
+                                const isHighlight = (tFilter !== 'all' && conf.tier === tFilter);
+                                const textClass = isHighlight ? "text-green-400 font-bold" : "text-slate-300";
+                                
+                                serviceList += `
+                                    <li class="flex items-start text-xs py-1 border-b border-slate-700 last:border-0">
+                                        <span class="${textClass} flex-1">
+                                            ${key.replace('vdc_', '').replace('_', ' ').toUpperCase()} 
+                                        </span>
+                                        <span class="text-slate-500 ml-2 text-[10px] bg-slate-800 px-1 rounded border border-slate-700">
+                                            ${conf.edition || 'Std'} (${conf.tier || 'N/A'})
+                                        </span>
+                                    </li>
+                                `;
+                            });
                         });
-                    });
+                    }
 
                     const popupHTML = `
                         <div class="w-80 p-4 font-sans">
