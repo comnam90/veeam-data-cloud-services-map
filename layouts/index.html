@@ -22,13 +22,33 @@
         .dark body { background-color: #0f172a; color: white; }
         .light body { background-color: #f1f5f9; color: #0f172a; }
         
+        /* Full height layout using flexbox */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+        }
+        
+        .map-container {
+            flex: 1;
+            min-height: 0;
+        }
+        
         #map { 
-            height: calc(85vh - 2rem); 
+            height: 100%;
             width: 100%; 
             border-radius: 0.75rem; 
             border: 1px solid #334155;
             box-shadow: 0 0 40px rgba(0, 209, 95, 0.08), 0 4px 20px rgba(0, 0, 0, 0.3);
             transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        @media (max-width: 640px) {
+            #map { 
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
         }
         .light #map { 
             border: 1px solid #cbd5e1;
@@ -125,6 +145,16 @@
             width: auto !important;
         }
         
+        /* Mobile popup adjustments */
+        @media (max-width: 640px) {
+            .leaflet-popup-content-wrapper {
+                max-width: calc(100vw - 40px) !important;
+            }
+            .leaflet-popup {
+                max-width: calc(100vw - 20px) !important;
+            }
+        }
+        
         /* Popup inner content - light mode overrides */
         .light .leaflet-popup-content h3 { color: #0f172a !important; }
         .light .leaflet-popup-content .bg-slate-900\/50,
@@ -194,32 +224,32 @@
     </style>
 </head>
 <body class="font-sans antialiased overflow-hidden">
-
-    <div class="h-[15vh] header-gradient border-b border-slate-800/50 light:border-slate-200 flex flex-col justify-center px-6 lg:px-8">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-[1800px] mx-auto w-full">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg shadow-green-500/20">
-                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+<div class="app-container">
+    <header class="header-gradient border-b border-slate-800/50 light:border-slate-200 flex flex-col justify-center px-3 sm:px-6 lg:px-8 py-2 sm:py-3 flex-shrink-0">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 max-w-[1800px] mx-auto w-full">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg shadow-green-500/20 flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
                     </svg>
                 </div>
-                <div>
-                    <h1 class="text-2xl font-bold">
+                <div class="min-w-0">
+                    <h1 class="text-lg sm:text-2xl font-bold truncate">
                         <span class="bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">Veeam</span>
                         <span class="text-white light:text-slate-900"> Service Map</span>
                     </h1>
-                    <p class="text-xs text-slate-400 light:text-slate-500 tracking-wide">Interactive Global Availability</p>
+                    <p class="text-[10px] sm:text-xs text-slate-400 light:text-slate-500 tracking-wide hidden sm:block">Interactive Global Availability</p>
                 </div>
             </div>
 
-            <div class="flex gap-2 lg:gap-3 items-center flex-wrap">
-                <select id="providerFilter" class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-3 py-2 text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm">
+            <div class="flex gap-1.5 sm:gap-2 lg:gap-3 items-center flex-wrap">
+                <select id="providerFilter" class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm min-w-0">
                     <option value="all">All Providers</option>
                     <option value="Azure">Azure</option>
                     <option value="AWS">AWS</option>
                 </select>
 
-                <select id="serviceFilter" class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-3 py-2 text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm">
+                <select id="serviceFilter" class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm min-w-0 max-w-[120px] sm:max-w-none">
                     <option value="all">All Services</option>
                     <option value="vdc_vault">VDC Vault</option>
                     <option value="vdc_m365">VDC for M365</option>
@@ -228,30 +258,31 @@
                     <option value="vdc_azure_backup">VDC for Azure</option>
                 </select>
 
-                <select id="tierFilter" class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-3 py-2 text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm">
+                <select id="tierFilter" class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm min-w-0">
                     <option value="all">All Tiers</option>
                     <option value="Core">Core Regions</option>
                     <option value="Non-Core">Non-Core</option>
                 </select>
 
-                <button id="themeToggle" class="p-2.5 rounded-lg bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-100 hover:border-green-500/50 shadow-sm backdrop-blur-sm" title="Toggle theme">
-                    <svg id="iconSystem" class="w-5 h-5 text-slate-300 light:text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+                <button id="themeToggle" class="p-2 sm:p-2.5 rounded-lg bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-100 hover:border-green-500/50 shadow-sm backdrop-blur-sm flex-shrink-0" title="Toggle theme">
+                    <svg id="iconSystem" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 light:text-slate-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/>
                     </svg>
-                    <svg id="iconLight" class="w-5 h-5 text-yellow-400 hidden" fill="currentColor" viewBox="0 0 20 20">
+                    <svg id="iconLight" class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 hidden" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
                     </svg>
-                    <svg id="iconDark" class="w-5 h-5 text-slate-300 hidden" fill="currentColor" viewBox="0 0 20 20">
+                    <svg id="iconDark" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 hidden" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
                     </svg>
                 </button>
             </div>
         </div>
-    </div>
+    </header>
 
-    <div class="p-4 lg:p-6 bg-gradient-to-b from-slate-950 to-slate-900 light:from-slate-100 light:to-slate-50 transition-colors duration-300">
+    <div class="map-container p-0 sm:p-4 lg:p-6 bg-gradient-to-b from-slate-950 to-slate-900 light:from-slate-100 light:to-slate-50 transition-colors duration-300">
         <div id="map"></div>
     </div>
+</div>
 
     <script>
         // Hugo injects YAML data as JSON; may produce strings instead of arrays in some edge cases
@@ -527,23 +558,23 @@
                     }
 
                     const popupHTML = `
-                        <div class="w-80 p-5 font-sans">
-                            <div class="flex justify-between items-start mb-4">
-                                <h3 class="font-bold text-lg text-white leading-tight pr-3">${region.name}</h3>
-                                <span class="${providerColor} text-white text-[10px] font-bold px-2.5 py-1 rounded-md shadow-md flex-shrink-0">
+                        <div class="w-[calc(100vw-60px)] sm:w-80 max-w-80 p-3 sm:p-5 font-sans">
+                            <div class="flex justify-between items-start mb-3 sm:mb-4">
+                                <h3 class="font-bold text-base sm:text-lg text-white leading-tight pr-2 sm:pr-3">${region.name}</h3>
+                                <span class="${providerColor} text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md shadow-md flex-shrink-0">
                                     ${region.provider.toUpperCase()}
                                 </span>
                             </div>
 
-                            <div class="flex gap-1 mb-4 p-2.5 bg-slate-900/60 rounded-xl border border-slate-700/30 overflow-x-auto">
+                            <div class="flex gap-1 mb-3 sm:mb-4 p-2 sm:p-2.5 bg-slate-900/60 rounded-xl border border-slate-700/30 overflow-x-auto -mx-1 px-1" style="scrollbar-width: thin;">
                                 ${iconGrid}
                             </div>
 
                             <div class="bg-slate-800/80 rounded-xl border border-slate-700/50 overflow-hidden shadow-inner">
-                                <div class="bg-gradient-to-r from-slate-700/60 to-slate-700/30 px-3.5 py-2 border-b border-slate-700/50">
-                                    <span class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">Available Services</span>
+                                <div class="bg-gradient-to-r from-slate-700/60 to-slate-700/30 px-3 sm:px-3.5 py-1.5 sm:py-2 border-b border-slate-700/50">
+                                    <span class="text-[9px] sm:text-[10px] font-semibold text-slate-400 tracking-wider uppercase">Available Services</span>
                                 </div>
-                                <ul class="px-3.5 py-2.5 space-y-0">
+                                <ul class="px-3 sm:px-3.5 py-2 sm:py-2.5 space-y-0">
                                     ${serviceList}
                                 </ul>
                             </div>
