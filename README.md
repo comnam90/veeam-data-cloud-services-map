@@ -37,7 +37,7 @@ The map is data-driven. You do not need to touch the HTML to add a new location.
 
 ### Adding a New Region
 
-1. Copy the template file: `data/regions/_template.yaml`
+1. Copy the template file: `.github/region-template.yaml`
 2. Place it in the appropriate folder: `data/regions/aws/` or `data/regions/azure/`
 3. Rename following the convention: `{provider}_{region_code}.yaml` (e.g., `aws_us_east_1.yaml`)
 4. Fill in the details and delete any services not available in that region

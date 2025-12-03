@@ -1,4 +1,4 @@
-# Region Template - Copy this file to aws/ or azure/ and rename it
+# Region Template - Copy this file to data/regions/aws/ or data/regions/azure/
 # File naming: {provider}_{region_code}.yaml (e.g., aws_us_east_1.yaml)
 # Delete this comment block and any services not available in this region
 
