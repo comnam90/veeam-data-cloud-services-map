@@ -1,7 +1,5 @@
-baseURL: "http://localhost/"
+baseURL: "https://comnam90.github.io/veeam-data-cloud-services-map/"
 languageCode: "en-us"
 title: "Veeam Cloud Service Map"
-#theme: "" 
 
-# We don't need fancy strict settings for this, keep it simple
 disableKinds: ["taxonomy", "term"]
