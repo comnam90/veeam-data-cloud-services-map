@@ -424,8 +424,8 @@
                     </svg>
                 </button>
 
-                <button id="infoBtn" class="p-2 sm:p-2.5 rounded-lg bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-100 hover:border-green-500/50 shadow-sm backdrop-blur-sm flex-shrink-0" title="About this map">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 light:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button id="infoBtn" class="p-2 sm:p-2.5 rounded-lg bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-100 hover:border-green-500/50 shadow-sm backdrop-blur-sm flex-shrink-0" title="About this map" aria-label="Open about panel" aria-expanded="false" aria-controls="infoPanel">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 light:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </button>
@@ -442,12 +442,12 @@
 <div id="infoPanelOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[2000] hidden opacity-0 transition-opacity duration-300"></div>
 
 <!-- Info Side Panel -->
-<div id="infoPanel" class="fixed top-0 right-0 h-full w-full sm:w-96 max-w-full bg-slate-900 light:bg-white border-l border-slate-700 light:border-slate-200 shadow-2xl z-[2001] overflow-y-auto">
+<div id="infoPanel" class="fixed top-0 right-0 h-full w-full sm:w-96 max-w-full bg-slate-900 light:bg-white border-l border-slate-700 light:border-slate-200 shadow-2xl z-[2001] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="infoPanelTitle">
     <div class="p-5 sm:p-6">
         <!-- Header -->
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-white light:text-slate-900">About This Map</h2>
-            <button id="closeInfoPanel" class="p-2 rounded-lg hover:bg-slate-800 light:hover:bg-slate-100 transition-colors">
+            <h2 id="infoPanelTitle" class="text-xl font-bold text-white light:text-slate-900">About This Map</h2>
+            <button id="closeInfoPanel" class="p-2 rounded-lg hover:bg-slate-800 light:hover:bg-slate-100 transition-colors" aria-label="Close panel">
                 <svg class="w-5 h-5 text-slate-400 light:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -975,6 +975,13 @@
         const infoPanelOverlay = document.getElementById('infoPanelOverlay');
         const closeInfoPanel = document.getElementById('closeInfoPanel');
 
+        // Get all focusable elements within the panel for focus trapping
+        function getFocusableElements() {
+            return infoPanel.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+        }
+
         function openInfoPanel() {
             infoPanelOverlay.classList.remove('hidden');
             requestAnimationFrame(() => {
@@ -982,11 +989,17 @@
                 infoPanel.classList.add('open');
             });
             document.getElementById('infoTotalRegions').textContent = regions.length;
+            infoBtn.setAttribute('aria-expanded', 'true');
+            // Focus the close button after panel opens
+            setTimeout(() => closeInfoPanel.focus(), 300);
         }
 
         function closeInfoPanelFn() {
             infoPanelOverlay.classList.remove('open');
             infoPanel.classList.remove('open');
+            infoBtn.setAttribute('aria-expanded', 'false');
+            // Restore focus to the info button
+            infoBtn.focus();
             setTimeout(() => {
                 infoPanelOverlay.classList.add('hidden');
             }, 300);
@@ -996,10 +1009,28 @@
         closeInfoPanel.addEventListener('click', closeInfoPanelFn);
         infoPanelOverlay.addEventListener('click', closeInfoPanelFn);
 
-        // Close panel with Escape key
+        // Keyboard handling: Escape to close, Tab to trap focus
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && infoPanel.classList.contains('open')) {
+            if (!infoPanel.classList.contains('open')) return;
+
+            if (e.key === 'Escape') {
                 closeInfoPanelFn();
+                return;
+            }
+
+            // Focus trap within panel
+            if (e.key === 'Tab') {
+                const focusable = getFocusableElements();
+                const firstEl = focusable[0];
+                const lastEl = focusable[focusable.length - 1];
+
+                if (e.shiftKey && document.activeElement === firstEl) {
+                    e.preventDefault();
+                    lastEl.focus();
+                } else if (!e.shiftKey && document.activeElement === lastEl) {
+                    e.preventDefault();
+                    firstEl.focus();
+                }
             }
         });
 
