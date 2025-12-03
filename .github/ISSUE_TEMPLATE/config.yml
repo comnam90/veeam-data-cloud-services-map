@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Veeam Official Documentation
+    url: https://www.veeam.com/products/data-cloud.html
+    about: Check Veeam's official documentation for the latest service availability information.

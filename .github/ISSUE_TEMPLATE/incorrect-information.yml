@@ -1,0 +1,85 @@
+name: Incorrect Information
+description: Report incorrect data about an existing region or service on the map
+title: "[Correction]: "
+labels: ["data-correction", "incorrect-info"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping keep the Veeam Data Cloud Services Map accurate!
+        Use this template to report incorrect information about a region or service that's already on the map.
+
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Cloud Provider
+      description: Which cloud provider is this region in?
+      options:
+        - AWS
+        - Azure
+    validations:
+      required: true
+
+  - type: input
+    id: region-name
+    attributes:
+      label: Region Name
+      description: The name of the region as shown on the map
+      placeholder: "US East 1 (N. Virginia)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: What is incorrect?
+      description: Select the type of information that needs correction
+      options:
+        - Region name
+        - Region coordinates (marker position)
+        - Service should not be listed (service not actually available)
+        - VDC Vault edition is wrong
+        - VDC Vault tier is wrong (Core vs Non-Core)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-info
+    attributes:
+      label: Current (Incorrect) Information
+      description: What does the map currently show?
+      placeholder: "The map shows VDC Vault Advanced as Core tier"
+    validations:
+      required: true
+
+  - type: textarea
+    id: correct-info
+    attributes:
+      label: Correct Information
+      description: What should it show instead?
+      placeholder: "VDC Vault Advanced should be Non-Core tier"
+    validations:
+      required: true
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Source / Evidence
+      description: |
+        Please provide a link or reference to where you found the correct information.
+        This helps us verify the data before updating the map.
+      placeholder: |
+        - Link to Veeam documentation
+        - Screenshot from Veeam console
+        - Other source
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other information that might be helpful
+    validations:
+      required: false

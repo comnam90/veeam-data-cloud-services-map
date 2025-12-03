@@ -1,0 +1,109 @@
+name: Missing Region
+description: Report a cloud region that is completely missing from the map
+title: "[Missing Region]: "
+labels: ["data-correction", "missing-region"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping keep the Veeam Data Cloud Services Map accurate!
+        Use this template to report a region that doesn't exist on the map at all.
+
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Cloud Provider
+      description: Which cloud provider is this region in?
+      options:
+        - AWS
+        - Azure
+    validations:
+      required: true
+
+  - type: input
+    id: region-name
+    attributes:
+      label: Region Display Name
+      description: The human-readable name for this region
+      placeholder: "US East 1 (N. Virginia)"
+    validations:
+      required: true
+
+  - type: input
+    id: region-code
+    attributes:
+      label: Region Code
+      description: The provider's region code (e.g., "us-east-1" for AWS or "eastus" for Azure)
+      placeholder: "us-east-1"
+    validations:
+      required: true
+
+  - type: input
+    id: coordinates
+    attributes:
+      label: Approximate Coordinates (if known)
+      description: Latitude and longitude of the region's data center location
+      placeholder: "[38.9, -77.4]"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: services-available
+    attributes:
+      label: Services Available in This Region
+      description: Select all services that are available in this region
+      options:
+        - label: VDC Vault
+        - label: VDC for Microsoft 365
+        - label: VDC for Entra ID
+        - label: VDC for Salesforce
+        - label: VDC for Azure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: vault-edition
+    attributes:
+      label: VDC Vault Edition (if applicable)
+      description: If VDC Vault is available, which edition(s)?
+      multiple: true
+      options:
+        - N/A - VDC Vault not available
+        - Foundation
+        - Advanced
+    validations:
+      required: false
+
+  - type: dropdown
+    id: vault-tier
+    attributes:
+      label: VDC Vault Tier (if applicable)
+      description: If VDC Vault is available, is this a Core or Non-Core region?
+      options:
+        - N/A - VDC Vault not available
+        - Core
+        - Non-Core
+    validations:
+      required: false
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Source / Evidence
+      description: |
+        Please provide a link or reference to where you found this information.
+        This helps us verify the data before updating the map.
+      placeholder: |
+        - Link to Veeam documentation
+        - Screenshot from Veeam console
+        - Other source
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other information that might be helpful
+    validations:
+      required: false
