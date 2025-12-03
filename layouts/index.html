@@ -258,12 +258,6 @@
                     <option value="vdc_azure_backup">VDC for Azure</option>
                 </select>
 
-                <select id="tierFilter" class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm min-w-0">
-                    <option value="all">All Tiers</option>
-                    <option value="Core">Core Regions</option>
-                    <option value="Non-Core">Non-Core</option>
-                </select>
-
                 <button id="themeToggle" class="p-2 sm:p-2.5 rounded-lg bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-100 hover:border-green-500/50 shadow-sm backdrop-blur-sm flex-shrink-0" title="Toggle theme">
                     <svg id="iconSystem" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 light:text-slate-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/>
@@ -474,7 +468,6 @@
 
             const pFilter = document.getElementById('providerFilter').value;
             const sFilter = document.getElementById('serviceFilter').value;
-            const tFilter = document.getElementById('tierFilter').value;
 
             regions.forEach(region => {
                 if (!region.coords || !Array.isArray(region.coords)) {
@@ -483,25 +476,7 @@
                 }
 
                 let matchesProvider = (pFilter === 'all' || region.provider === pFilter);
-                let matchesService = false;
-                
-                if (sFilter === 'all') {
-                    matchesService = true; 
-                } else if (region.services && region.services[sFilter]) {
-                    const serviceValue = region.services[sFilter];
-                    
-                    // Boolean services (vdc_m365: true) have no tiers, so ignore tier filter
-                    if (serviceValue === true) {
-                        matchesService = (tFilter === 'all');
-                    } else {
-                        const serviceConfigs = ensureArray(serviceValue);
-                        if (tFilter === 'all') {
-                            matchesService = true;
-                        } else {
-                            matchesService = serviceConfigs.some(config => config.tier === tFilter);
-                        }
-                    }
-                }
+                let matchesService = (sFilter === 'all' || (region.services && region.services[sFilter]));
 
                 if (matchesProvider && matchesService) {
                     
@@ -536,15 +511,13 @@
                                 configs.forEach(conf => {
                                     if (!conf) return; 
 
-                                    const isHighlight = (tFilter !== 'all' && conf.tier === tFilter);
-                                    const textClass = isHighlight ? "text-green-400 font-semibold" : "text-slate-300 font-medium";
                                     const badgeClass = conf.tier === 'Core' 
                                         ? 'text-blue-400 bg-blue-500/10 border-blue-500/30' 
                                         : 'text-amber-400 bg-amber-500/10 border-amber-500/30';
                                     
                                     serviceList += `
                                         <li class="flex items-center text-xs py-1.5 border-b border-slate-700/50 last:border-0">
-                                            <span class="${textClass} flex-1">
+                                            <span class="text-slate-300 font-medium flex-1">
                                                 ${getServiceDisplayName(key, 'full')} 
                                             </span>
                                             <span class="${badgeClass} ml-2 text-[10px] px-2 py-0.5 rounded-full border font-medium">
@@ -605,7 +578,6 @@
 
         document.getElementById('providerFilter').addEventListener('change', renderMap);
         document.getElementById('serviceFilter').addEventListener('change', renderMap);
-        document.getElementById('tierFilter').addEventListener('change', renderMap);
 
         renderMap();
 
