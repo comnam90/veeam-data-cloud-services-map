@@ -64,7 +64,7 @@ hugo                 # Build to public/ directory
 ## Modifying the Map UI
 All UI code lives in `layouts/index.html`:
 - **Service icons**: `getServiceIcon()` function (~line 130) - inline SVGs keyed by service name
-- **Provider colors**: `getProviderBadgeColor()` function (~line 145) - returns Tailwind classes
+- **Provider colors**: `getProviderBadgeColor()` function (~line 145) - returns Tailwind v4 classes
 - **Filters**: Dropdowns in navbar section (~lines 55-70) - add `<option>` for new services
 - **Map styling**: CartoDB Dark Matter tiles; change `L.tileLayer` URL for different theme
 
