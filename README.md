@@ -1,5 +1,7 @@
 # Veeam Cloud Service Map 🗺️
 
+> ⚠️ **Community Project Disclaimer:** This is an unofficial, community-maintained project and is **not affiliated with, endorsed by, or supported by Veeam Software**. The information provided may be incomplete or outdated. Always refer to [official Veeam documentation](https://www.veeam.com/) for authoritative service availability information. Use at your own risk—no warranty or liability is provided.
+
 A lightweight, interactive map to visualize Veeam Data Cloud (VDC) services across AWS and Azure regions. Designed to quickly answer "Where is X available?" without navigating complex spreadsheets.
 
 ## 🚀 Tech Stack
