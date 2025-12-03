@@ -1,5 +1,5 @@
 id: "azure-canada-east"
-name: "Canada East"
+name: "Canada East (Quebec)"
 provider: "Azure"
 coords: [46.8139, -71.2082]
 services:

@@ -1,5 +1,5 @@
 id: "azure-switzerland-north"
-name: "Switzerland North"
+name: "Switzerland North (Zurich)"
 provider: "Azure"
 coords: [47.4515, 8.5644]
 services:

@@ -1,5 +1,5 @@
 id: "azure-south-africa-west"
-name: "South Africa West"
+name: "South Africa West (Cape Town)"
 provider: "Azure"
 coords: [-33.9249, 18.4241]
 services:

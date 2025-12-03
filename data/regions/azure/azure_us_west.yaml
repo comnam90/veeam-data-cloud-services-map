@@ -1,5 +1,5 @@
 id: "azure-us-west"
-name: "West US"
+name: "West US (California)"
 provider: "Azure"
 coords: [37.783, -122.417]
 services:

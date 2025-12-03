@@ -1,5 +1,5 @@
 id: "azure-korea-central"
-name: "Korea Central"
+name: "Korea Central (Seoul)"
 provider: "Azure"
 coords: [37.5665, 126.978]
 services:

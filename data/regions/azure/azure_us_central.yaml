@@ -1,5 +1,5 @@
 id: "azure-us-central"
-name: "Central US"
+name: "Central US (Iowa)"
 provider: "Azure"
 coords: [41.5908, -93.6208]
 services:

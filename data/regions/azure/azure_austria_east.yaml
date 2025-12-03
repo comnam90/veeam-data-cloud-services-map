@@ -1,5 +1,5 @@
 id: "azure-austria-east"
-name: "Austria East"
+name: "Austria East (Vienna)"
 provider: "Azure"
 coords: [48.2082, 16.3738]
 services:

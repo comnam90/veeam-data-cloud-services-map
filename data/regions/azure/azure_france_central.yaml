@@ -1,5 +1,5 @@
 id: "azure-france-central"
-name: "France Central"
+name: "France Central (Paris)"
 provider: "Azure"
 coords: [46.3772, 2.373]
 services:

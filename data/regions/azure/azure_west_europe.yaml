@@ -1,5 +1,5 @@
 id: "azure-west-europe"
-name: "West Europe"
+name: "West Europe (Netherlands)"
 provider: "Azure"
 coords: [52.3676, 4.9041]
 services:

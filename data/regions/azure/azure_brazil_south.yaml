@@ -1,5 +1,5 @@
 id: "azure-brazil-south"
-name: "Brazil South"
+name: "Brazil South (São Paulo)"
 provider: "Azure"
 coords: [-23.5505, -46.6333]
 services:

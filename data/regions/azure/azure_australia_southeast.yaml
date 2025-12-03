@@ -1,5 +1,5 @@
 id: "azure-australia-southeast"
-name: "Australia Southeast"
+name: "Australia Southeast (Victoria)"
 provider: "Azure"
 coords: [-37.8136, 144.9631]
 services:

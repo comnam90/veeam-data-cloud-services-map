@@ -1,5 +1,5 @@
 id: "azure-us-north-central"
-name: "North Central US"
+name: "North Central US (Illinois)"
 provider: "Azure"
 coords: [41.8819, -87.6278]
 services:

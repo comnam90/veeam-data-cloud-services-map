@@ -1,5 +1,5 @@
 id: "azure-japan-east"
-name: "Japan East"
+name: "Japan East (Tokyo)"
 provider: "Azure"
 coords: [35.6762, 139.6503]
 services:

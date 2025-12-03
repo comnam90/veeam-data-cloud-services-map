@@ -1,5 +1,5 @@
 id: "azure-us-east"
-name: "East US"
+name: "East US (Virginia)"
 provider: "Azure"
 coords: [37.3719, -79.8164]
 services:

@@ -1,5 +1,5 @@
 id: "azure-southeast-asia"
-name: "Southeast Asia"
+name: "Southeast Asia (Singapore)"
 provider: "Azure"
 coords: [1.3521, 103.8198]
 services:

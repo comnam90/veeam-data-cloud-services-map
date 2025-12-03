@@ -1,5 +1,5 @@
 id: "azure-israel-central"
-name: "Israel Central"
+name: "Israel Central (Tel Aviv)"
 provider: "Azure"
 coords: [32.0853, 34.7818]
 services:

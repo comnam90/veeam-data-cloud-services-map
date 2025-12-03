@@ -1,5 +1,5 @@
 id: "azure-east-asia"
-name: "East Asia"
+name: "East Asia (Hong Kong)"
 provider: "Azure"
 coords: [22.3193, 114.1694]
 services:

@@ -1,5 +1,5 @@
 id: "azure-north-europe"
-name: "North Europe"
+name: "North Europe (Ireland)"
 provider: "Azure"
 coords: [53.3498, -6.2603]
 services:

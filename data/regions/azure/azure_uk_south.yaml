@@ -1,5 +1,5 @@
 id: "azure-uk-south"
-name: "UK South"
+name: "UK South (London)"
 provider: "Azure"
 coords: [51.5074, -0.1278]
 services:
