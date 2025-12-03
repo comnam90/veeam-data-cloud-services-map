@@ -305,6 +305,8 @@
         #infoPanel {
             scrollbar-width: thin;
             scrollbar-color: #475569 transparent;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
         }
         #infoPanel::-webkit-scrollbar {
             width: 6px;
@@ -321,10 +323,6 @@
         }
         .light #infoPanel::-webkit-scrollbar-thumb {
             background: #cbd5e1;
-        }
-        #infoPanel {
-            transform: translateX(100%);
-            transition: transform 0.3s ease-out;
         }
         #infoPanelOverlay.open {
             opacity: 1;
