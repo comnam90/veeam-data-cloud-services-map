@@ -354,6 +354,21 @@
                     </div>
                 </div>
 
+                <div id="regionCount" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/60 light:bg-slate-100 rounded-lg border border-slate-600/30 light:border-slate-300 text-xs text-slate-300 light:text-slate-600">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span><span id="visibleCount" class="font-semibold text-white light:text-slate-900">0</span> of <span id="totalCount" class="font-semibold">0</span> regions</span>
+                </div>
+
+                <button id="resetFilters" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/20 light:bg-amber-100 border border-amber-500/40 light:border-amber-400 text-amber-400 light:text-amber-700 hover:bg-amber-500/30 light:hover:bg-amber-200 text-xs font-medium transition-all duration-200 flex-shrink-0" title="Reset all filters">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    <span class="hidden sm:inline">Reset</span>
+                </button>
+
                 <button id="themeToggle" class="p-2 sm:p-2.5 rounded-lg bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-100 hover:border-green-500/50 shadow-sm backdrop-blur-sm flex-shrink-0" title="Toggle theme">
                     <svg id="iconSystem" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 light:text-slate-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/>
@@ -724,10 +739,54 @@
                     markers.push(marker);
                 }
             });
+
+            updateRegionCount(markers.length, regions.length);
+            updateResetButtonVisibility();
         }
 
         document.getElementById('providerFilter').addEventListener('change', renderMap);
 
+        function updateRegionCount(visible, total) {
+            document.getElementById('visibleCount').textContent = visible;
+            document.getElementById('totalCount').textContent = total;
+            
+            const countEl = document.getElementById('visibleCount');
+            if (visible < total) {
+                countEl.classList.add('text-amber-400');
+                countEl.classList.remove('text-white', 'light:text-slate-900');
+            } else {
+                countEl.classList.remove('text-amber-400');
+                countEl.classList.add('text-white', 'light:text-slate-900');
+            }
+        }
+
+        function hasActiveFilters() {
+            const providerFilter = document.getElementById('providerFilter').value;
+            const selectedServices = getSelectedServices();
+            return providerFilter !== 'all' || selectedServices.length > 0;
+        }
+
+        function updateResetButtonVisibility() {
+            const resetBtn = document.getElementById('resetFilters');
+            if (hasActiveFilters()) {
+                resetBtn.classList.remove('hidden');
+                resetBtn.classList.add('flex');
+            } else {
+                resetBtn.classList.add('hidden');
+                resetBtn.classList.remove('flex');
+            }
+        }
+
+        function resetAllFilters() {
+            document.getElementById('providerFilter').value = 'all';
+            serviceCheckboxes.forEach(cb => cb.checked = false);
+            updateServiceLabel();
+            renderMap();
+        }
+
+        document.getElementById('resetFilters').addEventListener('click', resetAllFilters);
+
+        updateRegionCount(0, regions.length);
         renderMap();
 
     </script>

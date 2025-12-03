@@ -1,0 +1,46 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test Hugo Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: 'latest'
+          extended: true
+
+      - name: Build with Hugo
+        env:
+          HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
+          TZ: America/Los_Angeles
+        run: |
+          hugo \
+            --gc \
+            --minify
+
+      - name: Verify build output
+        run: |
+          if [ -f "./public/index.html" ]; then
+            echo "✅ Build successful - index.html generated"
+          else
+            echo "❌ Build failed - index.html not found"
+            exit 1
+          fi
