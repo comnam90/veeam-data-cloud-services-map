@@ -460,7 +460,10 @@
         const map = L.map('map', {
             center: [-25, 140],
             zoom: 3,
-            zoomControl: false
+            zoomControl: false,
+            worldCopyJump: true,
+            maxBoundsViscosity: 1.0,
+            maxBounds: [[-90, -190], [90, 190]]
         });
         
         L.control.zoom({ position: 'bottomright' }).addTo(map);
