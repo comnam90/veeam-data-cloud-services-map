@@ -2,4 +2,6 @@ baseURL: "https://comnam90.github.io/veeam-data-cloud-services-map/"
 languageCode: "en-us"
 title: "Veeam Cloud Service Map"
 
+enableGitInfo: true
+
 disableKinds: ["taxonomy", "term"]
