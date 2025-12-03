@@ -82,6 +82,85 @@
             border-color: #0078D4 !important;
         }
 
+        /* Multi-select dropdown */
+        .multiselect {
+            position: relative;
+            display: inline-block;
+        }
+        .multiselect-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .multiselect-btn:hover {
+            border-color: #00d15f !important;
+        }
+        .light .multiselect-btn:hover {
+            border-color: #0078D4 !important;
+        }
+        .multiselect-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            min-width: 180px;
+            margin-top: 4px;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s ease;
+        }
+        .multiselect-dropdown.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .light .multiselect-dropdown {
+            background: white;
+            border-color: #e2e8f0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .multiselect-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            font-size: 0.75rem;
+        }
+        .multiselect-option:first-child {
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        .multiselect-option:last-child {
+            border-radius: 0 0 0.5rem 0.5rem;
+        }
+        .multiselect-option:hover {
+            background: #334155;
+        }
+        .light .multiselect-option:hover {
+            background: #f1f5f9;
+        }
+        .multiselect-option input[type="checkbox"] {
+            accent-color: #00d15f;
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+        }
+        .multiselect-chevron {
+            transition: transform 0.2s ease;
+        }
+        .multiselect-btn[aria-expanded="true"] .multiselect-chevron {
+            transform: rotate(180deg);
+        }
+
         /* Theme toggle button */
         #themeToggle {
             transition: all 0.2s ease;
@@ -249,14 +328,31 @@
                     <option value="AWS">AWS</option>
                 </select>
 
-                <select id="serviceFilter" class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm min-w-0 max-w-[120px] sm:max-w-none">
-                    <option value="all">All Services</option>
-                    <option value="vdc_vault">VDC Vault</option>
-                    <option value="vdc_m365">VDC for M365</option>
-                    <option value="vdc_entra_id">VDC for Entra ID</option>
-                    <option value="vdc_salesforce">VDC for Salesforce</option>
-                    <option value="vdc_azure_backup">VDC for Azure</option>
-                </select>
+                <div class="multiselect" id="serviceMultiselect">
+                    <button type="button" id="serviceFilterBtn" aria-expanded="false" class="multiselect-btn bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 shadow-sm backdrop-blur-sm min-w-0">
+                        <span id="serviceFilterLabel">All Services</span>
+                        <svg class="multiselect-chevron w-3 h-3 sm:w-4 sm:h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="multiselect-dropdown" id="serviceDropdown">
+                        <label class="multiselect-option text-white light:text-slate-900">
+                            <input type="checkbox" value="vdc_vault"> Vault
+                        </label>
+                        <label class="multiselect-option text-white light:text-slate-900">
+                            <input type="checkbox" value="vdc_m365"> M365
+                        </label>
+                        <label class="multiselect-option text-white light:text-slate-900">
+                            <input type="checkbox" value="vdc_entra_id"> Entra ID
+                        </label>
+                        <label class="multiselect-option text-white light:text-slate-900">
+                            <input type="checkbox" value="vdc_salesforce"> Salesforce
+                        </label>
+                        <label class="multiselect-option text-white light:text-slate-900">
+                            <input type="checkbox" value="vdc_azure_backup"> Azure
+                        </label>
+                    </div>
+                </div>
 
                 <button id="themeToggle" class="p-2 sm:p-2.5 rounded-lg bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-100 hover:border-green-500/50 shadow-sm backdrop-blur-sm flex-shrink-0" title="Toggle theme">
                     <svg id="iconSystem" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 light:text-slate-600" fill="currentColor" viewBox="0 0 20 20">
@@ -462,12 +558,58 @@
 
         let markers = [];
 
+        // Multi-select dropdown logic
+        const serviceBtn = document.getElementById('serviceFilterBtn');
+        const serviceDropdown = document.getElementById('serviceDropdown');
+        const serviceLabel = document.getElementById('serviceFilterLabel');
+        const serviceCheckboxes = serviceDropdown.querySelectorAll('input[type="checkbox"]');
+
+        serviceBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = serviceDropdown.classList.toggle('open');
+            serviceBtn.setAttribute('aria-expanded', isOpen);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#serviceMultiselect')) {
+                serviceDropdown.classList.remove('open');
+                serviceBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        function getSelectedServices() {
+            const selected = [];
+            serviceCheckboxes.forEach(cb => {
+                if (cb.checked) selected.push(cb.value);
+            });
+            return selected;
+        }
+
+        function updateServiceLabel() {
+            const selected = getSelectedServices();
+            if (selected.length === 0) {
+                serviceLabel.textContent = 'All Services';
+            } else if (selected.length === 1) {
+                const names = { vdc_vault: 'Vault', vdc_m365: 'M365', vdc_entra_id: 'Entra ID', vdc_salesforce: 'Salesforce', vdc_azure_backup: 'Azure' };
+                serviceLabel.textContent = names[selected[0]] || selected[0];
+            } else {
+                serviceLabel.textContent = `${selected.length} selected`;
+            }
+        }
+
+        serviceCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                updateServiceLabel();
+                renderMap();
+            });
+        });
+
         function renderMap() {
             markers.forEach(m => map.removeLayer(m));
             markers = [];
 
             const pFilter = document.getElementById('providerFilter').value;
-            const sFilter = document.getElementById('serviceFilter').value;
+            const selectedServices = getSelectedServices();
 
             regions.forEach(region => {
                 if (!region.coords || !Array.isArray(region.coords)) {
@@ -476,7 +618,12 @@
                 }
 
                 let matchesProvider = (pFilter === 'all' || region.provider === pFilter);
-                let matchesService = (sFilter === 'all' || (region.services && region.services[sFilter]));
+                
+                // If no services selected, show all; otherwise region must have ALL selected services
+                let matchesService = true;
+                if (selectedServices.length > 0) {
+                    matchesService = selectedServices.every(svc => region.services && region.services[svc]);
+                }
 
                 if (matchesProvider && matchesService) {
                     
@@ -577,7 +724,6 @@
         }
 
         document.getElementById('providerFilter').addEventListener('change', renderMap);
-        document.getElementById('serviceFilter').addEventListener('change', renderMap);
 
         renderMap();
 
