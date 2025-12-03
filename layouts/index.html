@@ -188,6 +188,20 @@
             return 'bg-slate-600';
         }
 
+        const serviceDisplayNames = {
+            'vdc_vault': { short: 'Vault', full: 'VAULT' },
+            'vdc_m365': { short: 'M365', full: 'M365' },
+            'vdc_entra_id': { short: 'Entra', full: 'ENTRA ID' },
+            'vdc_salesforce': { short: 'SF', full: 'SALESFORCE' },
+            'vdc_azure_backup': { short: 'Azure', full: 'AZURE BACKUP' }
+        };
+
+        function getServiceDisplayName(key, type = 'short') {
+            const names = serviceDisplayNames[key];
+            if (names) return type === 'short' ? names.short : names.full;
+            return key.replace('vdc_', '').replace('_', ' ').toUpperCase();
+        }
+
         const map = L.map('map', {
             center: [-25, 140],
             zoom: 3,
@@ -337,7 +351,7 @@
                             iconGrid += `
                                 <div class="flex flex-col items-center justify-center w-10">
                                     ${getServiceIcon(key)}
-                                    <span class="text-[9px] mt-1 text-slate-400 font-mono uppercase">${key.replace('vdc_', '').substring(0,4)}</span>
+                                    <span class="text-[9px] mt-1 text-slate-400 font-mono uppercase">${getServiceDisplayName(key, 'short')}</span>
                                 </div>
                             `;
 
@@ -345,7 +359,7 @@
                                 serviceList += `
                                     <li class="flex items-start text-xs py-1 border-b border-slate-700 last:border-0">
                                         <span class="text-slate-300 flex-1">
-                                            ${key.replace('vdc_', '').replace('_', ' ').toUpperCase()} 
+                                            ${getServiceDisplayName(key, 'full')} 
                                         </span>
                                         <span class="text-green-400 ml-2 text-[10px] bg-slate-800 px-1 rounded border border-slate-700">
                                             Available
@@ -363,7 +377,7 @@
                                     serviceList += `
                                         <li class="flex items-start text-xs py-1 border-b border-slate-700 last:border-0">
                                             <span class="${textClass} flex-1">
-                                                ${key.replace('vdc_', '').replace('_', ' ').toUpperCase()} 
+                                                ${getServiceDisplayName(key, 'full')} 
                                             </span>
                                             <span class="text-slate-500 ml-2 text-[10px] bg-slate-800 px-1 rounded border border-slate-700">
                                                 ${conf.edition || 'Std'} (${conf.tier || 'N/A'})
