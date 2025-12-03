@@ -1,8 +1,0 @@
-id: "aws-us-gov-west"
-name: "US Gov West"
-provider: "AWS"
-coords: [37.5, -122.0]
-services:
-  vdc_vault:
-    - edition: "Foundation"
-      tier: "Non-Core"

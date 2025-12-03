@@ -1,8 +1,0 @@
-id: "aws-us-gov-east"
-name: "US Gov East"
-provider: "AWS"
-coords: [38.5, -79.0]
-services:
-  vdc_vault:
-    - edition: "Foundation"
-      tier: "Non-Core"
