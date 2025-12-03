@@ -57,9 +57,20 @@ hugo                 # Build to public/ directory
 ```
 
 ## Deployment
-- **Target**: GitHub Pages (via GitHub Actions - not yet configured)
-- **TODO**: Create `.github/workflows/hugo.yml` for automated deployment
+- **Target**: GitHub Pages via GitHub Actions
+- **Workflow**: `.github/workflows/hugo.yml` builds and deploys on push to `main`
 - Region data is manually maintained—no external sync or validation required
+
+## Contributing (Issue & PR Templates)
+GitHub issue templates exist for community contributions:
+- **Missing Service**: Report a service missing from an existing region
+- **Missing Region**: Report an entirely missing region
+- **Incorrect Information**: Report wrong data (coordinates, tier, etc.)
+
+PR template ensures contributors:
+- Provide source/evidence for data changes
+- Follow YAML conventions (case-sensitive provider, correct coords format)
+- Link related issues
 
 ## Modifying the Map UI
 All UI code lives in `layouts/index.html`:
@@ -77,10 +88,16 @@ All UI code lives in `layouts/index.html`:
 
 ## File Structure Reference
 ```
-data/regions/          # Region YAML files (main data source)
+data/regions/
+  aws/                 # AWS region YAML files
+  azure/               # Azure region YAML files
 layouts/index.html     # Single template with all HTML, CSS, JS
 static/icons/          # Static assets (currently unused)
 config.yaml            # Hugo config (minimal settings)
+.github/
+  workflows/hugo.yml   # GitHub Actions deployment
+  ISSUE_TEMPLATE/      # Issue templates for data corrections
+  PULL_REQUEST_TEMPLATE.md
 ```
 
 ## Keeping Instructions Current

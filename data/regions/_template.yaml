@@ -1,0 +1,23 @@
+# Region Template - Copy this file to aws/ or azure/ and rename it
+# File naming: {provider}_{region_code}.yaml (e.g., aws_us_east_1.yaml)
+# Delete this comment block and any services not available in this region
+
+id: "provider-region-code"           # Unique identifier (e.g., "aws-us-east-1")
+name: "Human Readable Name"          # Display name (e.g., "US East 1 (N. Virginia)")
+provider: "AWS"                      # MUST be exactly "AWS" or "Azure" (case-sensitive!)
+coords: [0.0, 0.0]                   # [latitude, longitude] - use https://www.latlong.net/
+
+services:
+  # --- TIERED SERVICE (delete if not available) ---
+  # VDC Vault - include each available edition
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"                   # "Core" = standard pricing, "Non-Core" = price uplift
+    - edition: "Advanced"
+      tier: "Core"
+
+  # --- BOOLEAN SERVICES (delete any not available) ---
+  vdc_m365: true                     # VDC for Microsoft 365
+  vdc_entra_id: true                 # VDC for Entra ID
+  vdc_salesforce: true               # VDC for Salesforce
+  vdc_azure_backup: true             # VDC for Azure

@@ -35,9 +35,12 @@ Navigate to `http://localhost:1313/`. The site will auto-reload when you edit fi
 
 The map is data-driven. You do not need to touch the HTML to add a new location. Just add a new YAML file to `data/regions/`.
 
-### File Structure
+### Adding a New Region
 
-Create a new file: `data/regions/your_region_name.yaml`
+1. Copy the template file: `data/regions/_template.yaml`
+2. Place it in the appropriate folder: `data/regions/aws/` or `data/regions/azure/`
+3. Rename following the convention: `{provider}_{region_code}.yaml` (e.g., `aws_us_east_1.yaml`)
+4. Fill in the details and delete any services not available in that region
 
 ```yaml
 id: "aws-us-east-1"                 # Unique ID
@@ -76,6 +79,16 @@ services:
 2. **Normalization:** A script runs on page load to fix common data entry errors (like strings wrapped in quotes) so the map doesn't crash.
 3. **Rendering:** Leaflet.js loops through this data. If a region matches the active filters (Provider/Service/Tier), it draws a circle marker.
 4. **Popups:** Clicking a marker generates an HTML popup on the fly using the data attributes.
+
+## 🤝 Contributing
+
+Found incorrect or missing data? We have issue templates to make reporting easy:
+
+* **[Report Missing Service](../../issues/new?template=missing-service.yml)** - Service missing from an existing region
+* **[Report Missing Region](../../issues/new?template=missing-region.yml)** - Entire region not on the map
+* **[Report Incorrect Info](../../issues/new?template=incorrect-information.yml)** - Wrong coordinates, tier, etc.
+
+Want to submit a fix directly? PRs welcome! The PR template will guide you through providing source verification.
 
 ## 🎨 Customization
 
