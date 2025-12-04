@@ -8,7 +8,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 
     <style type="text/tailwindcss">
         @custom-variant dark (&:where(.dark, .dark *));
@@ -341,6 +344,97 @@
         #infoBtn:active {
             transform: scale(0.95);
         }
+
+        /* Custom cluster marker styles */
+        .marker-cluster {
+            background: transparent !important;
+        }
+        .marker-cluster div {
+            background: transparent !important;
+        }
+        .custom-cluster-marker {
+            background: transparent !important;
+        }
+        .cluster-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 12px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        .cluster-marker:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(255, 255, 255, 0.2);
+        }
+        .cluster-small {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 2px solid #00d15f;
+            font-size: 11px;
+        }
+        .cluster-medium {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+            border: 2px solid #10b981;
+            font-size: 13px;
+        }
+        .cluster-large {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #047857 0%, #00d15f 100%);
+            border: 3px solid #34d399;
+            font-size: 14px;
+        }
+        /* Provider indicator bar at bottom of cluster */
+        .cluster-providers {
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .cluster-providers .azure-bar {
+            height: 4px;
+            background: #0078D4;
+        }
+        .cluster-providers .aws-bar {
+            height: 4px;
+            background: #FF9900;
+        }
+        /* Light mode cluster styles */
+        .light .cluster-small {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-color: #16a34a;
+            color: #0f172a;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+        .light .cluster-medium {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-color: #059669;
+            color: #064e3b;
+        }
+        .light .cluster-large {
+            background: linear-gradient(135deg, #6ee7b7 0%, #34d399 100%);
+            border-color: #047857;
+            color: #022c22;
+        }
+        .light .cluster-marker:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 0 4px rgba(0, 0, 0, 0.1);
+        }
+        /* Cluster spiderfy leg styles */
+        .leaflet-cluster-anim .leaflet-marker-icon, .leaflet-cluster-anim .leaflet-marker-shadow {
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
     </style>
 </head>
 <body class="font-sans antialiased">
@@ -647,7 +741,7 @@
             zoomControl: false,
             worldCopyJump: true,
             maxBoundsViscosity: 1.0,
-            maxBounds: [[-60, -190], [90, 190]]
+            maxBounds: [[-60, -185], [90, 185]]
         });
         
         L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -743,7 +837,67 @@
         // Apply saved theme on load (default to system)
         setTheme(currentMode);
 
-        let markers = [];
+        const CLUSTER_CONFIG = {
+            MAX_RADIUS: 60,
+            DISABLE_AT_ZOOM: 6,
+            SPIDERFY_DISTANCE: 1.5
+        };
+
+        const CLUSTER_SIZE_THRESHOLDS = {
+            MEDIUM: 5,
+            LARGE: 20
+        };
+
+        const PROVIDER_BAR = {
+            MIN_WIDTH: 4,
+            MAX_WIDTH: 24
+        };
+
+        function createClusterIcon(cluster) {
+            const count = cluster.getChildCount();
+            const markers = cluster.getAllChildMarkers();
+            
+            let azureCount = 0;
+            let awsCount = 0;
+            markers.forEach(m => {
+                if (m.options.provider === 'Azure') azureCount++;
+                else if (m.options.provider === 'AWS') awsCount++;
+            });
+            
+            let sizeClass = 'cluster-small';
+            if (count > CLUSTER_SIZE_THRESHOLDS.LARGE) sizeClass = 'cluster-large';
+            else if (count > CLUSTER_SIZE_THRESHOLDS.MEDIUM) sizeClass = 'cluster-medium';
+            
+            // Minimum 4px width prevents bars from being invisible at high zoom levels or with uneven provider distributions
+            const total = azureCount + awsCount;
+            const azureWidth = azureCount > 0 ? Math.max(PROVIDER_BAR.MIN_WIDTH, Math.round((azureCount / total) * PROVIDER_BAR.MAX_WIDTH)) : 0;
+            const awsWidth = awsCount > 0 ? Math.max(PROVIDER_BAR.MIN_WIDTH, Math.round((awsCount / total) * PROVIDER_BAR.MAX_WIDTH)) : 0;
+            
+            return L.divIcon({
+                html: `<div class="cluster-marker ${sizeClass}">
+                    <span>${count}</span>
+                    <div class="cluster-providers">
+                        ${azureCount > 0 ? `<div class="azure-bar" style="width: ${azureWidth}px"></div>` : ''}
+                        ${awsCount > 0 ? `<div class="aws-bar" style="width: ${awsWidth}px"></div>` : ''}
+                    </div>
+                </div>`,
+                className: 'custom-cluster-marker',
+                iconSize: L.point(52, 52),
+                iconAnchor: L.point(26, 26)
+            });
+        }
+
+        let clusterGroup = L.markerClusterGroup({
+            maxClusterRadius: CLUSTER_CONFIG.MAX_RADIUS,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            disableClusteringAtZoom: CLUSTER_CONFIG.DISABLE_AT_ZOOM,
+            iconCreateFunction: createClusterIcon,
+            spiderfyDistanceMultiplier: CLUSTER_CONFIG.SPIDERFY_DISTANCE,
+            animate: true
+        });
+        map.addLayer(clusterGroup);
 
         // Multi-select dropdown logic
         const serviceBtn = document.getElementById('serviceFilterBtn');
@@ -792,8 +946,8 @@
         });
 
         function renderMap() {
-            markers.forEach(m => map.removeLayer(m));
-            markers = [];
+            clusterGroup.clearLayers();
+            let visibleCount = 0;
 
             const pFilter = document.getElementById('providerFilter').value;
             const selectedServices = getSelectedServices();
@@ -894,7 +1048,8 @@
                         color: region.provider === 'Azure' ? '#60a5fa' : '#fcd34d',
                         weight: 2,
                         opacity: 0.8,
-                        fillOpacity: 0.9
+                        fillOpacity: 0.9,
+                        provider: region.provider
                     }).bindPopup(popupHTML);
 
                     marker.on('mouseover', function() {
@@ -904,12 +1059,12 @@
                         this.setStyle({ radius: 9, weight: 2, opacity: 0.8 });
                     });
 
-                    marker.addTo(map);
-                    markers.push(marker);
+                    clusterGroup.addLayer(marker);
+                    visibleCount++;
                 }
             });
 
-            updateRegionCount(markers.length, regions.length);
+            updateRegionCount(visibleCount, regions.length);
             updateResetButtonVisibility();
         }
 
