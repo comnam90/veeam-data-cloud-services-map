@@ -837,6 +837,22 @@
         // Apply saved theme on load (default to system)
         setTheme(currentMode);
 
+        const CLUSTER_CONFIG = {
+            MAX_RADIUS: 60,
+            DISABLE_AT_ZOOM: 6,
+            SPIDERFY_DISTANCE: 1.5
+        };
+
+        const CLUSTER_SIZE_THRESHOLDS = {
+            MEDIUM: 5,
+            LARGE: 20
+        };
+
+        const PROVIDER_BAR = {
+            MIN_WIDTH: 4,
+            MAX_WIDTH: 24
+        };
+
         function createClusterIcon(cluster) {
             const count = cluster.getChildCount();
             const markers = cluster.getAllChildMarkers();
@@ -849,13 +865,13 @@
             });
             
             let sizeClass = 'cluster-small';
-            if (count > 20) sizeClass = 'cluster-large';
-            else if (count > 5) sizeClass = 'cluster-medium';
+            if (count > CLUSTER_SIZE_THRESHOLDS.LARGE) sizeClass = 'cluster-large';
+            else if (count > CLUSTER_SIZE_THRESHOLDS.MEDIUM) sizeClass = 'cluster-medium';
             
-            // Min 4px ensures visibility even with few markers of one provider
+            // Minimum 4px width prevents bars from being invisible at high zoom levels or with uneven provider distributions
             const total = azureCount + awsCount;
-            const azureWidth = azureCount > 0 ? Math.max(4, Math.round((azureCount / total) * 24)) : 0;
-            const awsWidth = awsCount > 0 ? Math.max(4, Math.round((awsCount / total) * 24)) : 0;
+            const azureWidth = azureCount > 0 ? Math.max(PROVIDER_BAR.MIN_WIDTH, Math.round((azureCount / total) * PROVIDER_BAR.MAX_WIDTH)) : 0;
+            const awsWidth = awsCount > 0 ? Math.max(PROVIDER_BAR.MIN_WIDTH, Math.round((awsCount / total) * PROVIDER_BAR.MAX_WIDTH)) : 0;
             
             return L.divIcon({
                 html: `<div class="cluster-marker ${sizeClass}">
@@ -872,13 +888,13 @@
         }
 
         let clusterGroup = L.markerClusterGroup({
-            maxClusterRadius: 60,
+            maxClusterRadius: CLUSTER_CONFIG.MAX_RADIUS,
             spiderfyOnMaxZoom: true,
             showCoverageOnHover: false,
             zoomToBoundsOnClick: true,
-            disableClusteringAtZoom: 6,
+            disableClusteringAtZoom: CLUSTER_CONFIG.DISABLE_AT_ZOOM,
             iconCreateFunction: createClusterIcon,
-            spiderfyDistanceMultiplier: 1.5,
+            spiderfyDistanceMultiplier: CLUSTER_CONFIG.SPIDERFY_DISTANCE,
             animate: true
         });
         map.addLayer(clusterGroup);
