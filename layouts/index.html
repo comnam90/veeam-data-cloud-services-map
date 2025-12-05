@@ -1360,7 +1360,7 @@
             highlightedIndex = -1;
             
             if (results.length === 0) {
-                searchResults.innerHTML = '<div class="search-no-results">No regions found</div>';
+                searchResults.innerHTML = '<div class="search-no-results" role="status">No regions found</div>';
                 return;
             }
             
@@ -1445,7 +1445,7 @@
                 updateHighlight(Math.min(highlightedIndex + 1, currentResults.length - 1));
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
-                updateHighlight(Math.max(highlightedIndex - 1, 0));
+                updateHighlight(highlightedIndex - 1);
             } else if (e.key === 'Enter' && highlightedIndex >= 0) {
                 e.preventDefault();
                 selectSearchResult(highlightedIndex);
