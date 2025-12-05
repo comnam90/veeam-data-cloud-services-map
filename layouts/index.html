@@ -435,6 +435,29 @@
         .leaflet-cluster-anim .leaflet-marker-icon, .leaflet-cluster-anim .leaflet-marker-shadow {
             transition: transform 0.3s ease-out, opacity 0.3s ease-out;
         }
+
+        /* Loading overlay */
+        #mapLoading {
+            transition: opacity 0.3s ease-out;
+        }
+        #mapLoading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Error state */
+        #mapError {
+            display: none;
+        }
+        #mapError.visible {
+            display: flex;
+        }
     </style>
 </head>
 <body class="font-sans antialiased">
@@ -525,12 +548,38 @@
         </div>
     </header>
 
-    <div class="map-container p-0 sm:p-4 lg:p-6 bg-gradient-to-b from-slate-950 to-slate-900 light:from-slate-100 light:to-slate-50 transition-colors duration-300">
+    <div class="map-container p-0 sm:p-4 lg:p-6 bg-gradient-to-b from-slate-950 to-slate-900 light:from-slate-100 light:to-slate-50 transition-colors duration-300 relative">
         <div id="map"></div>
+        
+        <div id="mapLoading" class="absolute inset-0 sm:m-4 lg:m-6 flex items-center justify-center bg-slate-900/90 light:bg-slate-100/90 backdrop-blur-sm rounded-xl z-[1000]">
+            <div class="flex flex-col items-center gap-3">
+                <svg class="loading-spinner w-10 h-10 text-green-500" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-slate-300 light:text-slate-600 text-sm font-medium">Loading map...</span>
+            </div>
+        </div>
+        
+        <div id="mapError" class="absolute inset-0 sm:m-4 lg:m-6 items-center justify-center bg-slate-900 light:bg-slate-100 rounded-xl z-[1000]">
+            <div class="flex flex-col items-center gap-4 p-6 text-center">
+                <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-white light:text-slate-900 mb-1">Failed to Load Map</h3>
+                    <p class="text-slate-400 light:text-slate-500 text-sm max-w-xs">There was a problem loading the map. Please check your internet connection and try refreshing the page.</p>
+                </div>
+                <button onclick="location.reload()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors">
+                    Refresh Page
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Info Panel Overlay -->
 <div id="infoPanelOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[2000] hidden opacity-0 transition-opacity duration-300"></div>
 
 <div id="infoPanel" class="fixed top-0 right-0 h-full w-full sm:w-96 max-w-full bg-slate-900 light:bg-white border-l border-slate-700 light:border-slate-200 shadow-2xl z-[2001] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="infoPanelTitle">
@@ -735,16 +784,39 @@
             return key.replace('vdc_', '').replace('_', ' ').toUpperCase();
         }
 
-        const map = L.map('map', {
-            center: [-25, 140],
-            minZoom: 3.0,
-            maxZoom: 6.0,
-            zoom: 3,
-            zoomControl: false,
-            worldCopyJump: true,
-            maxBoundsViscosity: 1.0,
-            maxBounds: [[-60, -185], [90, 185]]
-        });
+        function hideLoading() {
+            const loadingEl = document.getElementById('mapLoading');
+            if (loadingEl) loadingEl.classList.add('hidden');
+        }
+
+        function showError() {
+            const loadingEl = document.getElementById('mapLoading');
+            const errorEl = document.getElementById('mapError');
+            if (loadingEl) loadingEl.classList.add('hidden');
+            if (errorEl) errorEl.classList.add('visible');
+        }
+
+        let map;
+        try {
+            if (typeof L === 'undefined') {
+                throw new Error('Leaflet library failed to load');
+            }
+
+            map = L.map('map', {
+                center: [-25, 140],
+                minZoom: 3.0,
+                maxZoom: 6.0,
+                zoom: 3,
+                zoomControl: false,
+                worldCopyJump: true,
+                maxBoundsViscosity: 1.0,
+                maxBounds: [[-60, -185], [90, 185]]
+            });
+        } catch (e) {
+            console.error('Map initialization failed:', e);
+            showError();
+            throw e;
+        }
         
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
@@ -1113,6 +1185,10 @@
 
         updateRegionCount(0, regions.length);
         renderMap();
+
+        // Hide loading overlay once tiles are loaded
+        currentTiles.once('load', hideLoading);
+        setTimeout(hideLoading, 5000);
 
         // Info panel logic
         const infoBtn = document.getElementById('infoBtn');
