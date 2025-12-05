@@ -47,6 +47,9 @@ id: "aws-us-east-1"                 # Unique ID
 name: "US East (N. Virginia)"       # Display Name
 provider: "AWS"                     # "AWS" or "Azure" (Case sensitive for icon/color)
 coords: [38.0339, -78.5079]         # [Latitude, Longitude]
+aliases:                            # Optional: searchable alternative names
+  - "Virginia"
+  - "US East"
 
 services:
   # Boolean Service - just mark as available (editions are universal)

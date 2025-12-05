@@ -2,6 +2,11 @@ id: "azure-nz-north"
 name: "New Zealand North (Auckland)"
 provider: "Azure"
 coords: [-36.8485, 174.7633]
+aliases:
+  - "Auckland"
+  - "NZ North"
+  - "New Zealand"
+  - "Aotearoa"
 services:
   vdc_vault:
     - edition: "Foundation"

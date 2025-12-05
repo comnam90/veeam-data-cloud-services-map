@@ -2,6 +2,10 @@ id: "azure-au-east"
 name: "Australia East (Sydney)"
 provider: "Azure"
 coords: [-33.8688, 151.5]
+aliases:
+  - "Sydney"
+  - "NSW"
+  - "New South Wales"
 services:
   vdc_vault:
     - edition: "Foundation"
