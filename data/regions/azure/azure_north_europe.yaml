@@ -2,6 +2,11 @@ id: "azure-north-europe"
 name: "North Europe (Ireland)"
 provider: "Azure"
 coords: [53.3498, -6.2603]
+aliases:
+  - "Dublin"
+  - "Ireland"
+  - "IE"
+  - "DUB"
 services:
   vdc_vault:
     - edition: "Foundation"

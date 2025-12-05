@@ -2,6 +2,13 @@ id: "aws-sa-east-1"
 name: "SA East 1 (São Paulo)"
 provider: "AWS"
 coords: [-23.5505, -46.2]
+aliases:
+  - "São Paulo"
+  - "Sao Paulo"
+  - "Brazil"
+  - "BR"
+  - "GRU"
+  - "South America"
 services:
   vdc_vault:
     - edition: "Advanced"

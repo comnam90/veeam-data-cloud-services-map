@@ -2,6 +2,11 @@ id: "azure-austria-east"
 name: "Austria East (Vienna)"
 provider: "Azure"
 coords: [48.2082, 16.3738]
+aliases:
+  - "Vienna"
+  - "Austria"
+  - "AT"
+  - "VIE"
 services:
   vdc_vault:
     - edition: "Foundation"

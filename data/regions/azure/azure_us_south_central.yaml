@@ -2,6 +2,15 @@ id: "azure-us-south-central"
 name: "South Central US (Texas)"
 provider: "Azure"
 coords: [29.4167, -98.5]
+aliases:
+  - "San Antonio"
+  - "Texas"
+  - "United States"
+  - "USA"
+  - "US"
+  - "SAT"
+  - "TX"
+  - "US South"
 services:
   vdc_vault:
     - edition: "Foundation"

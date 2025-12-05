@@ -2,6 +2,13 @@ id: "aws-ap-southeast-2"
 name: "AP Southeast 2 (Sydney)"
 provider: "AWS"
 coords: [-33.8688, 150.9]
+aliases:
+  - "Sydney"
+  - "Australia"
+  - "AU"
+  - "NSW"
+  - "New South Wales"
+  - "SYD"
 services:
   vdc_vault:
     - edition: "Advanced"

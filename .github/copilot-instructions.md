@@ -16,12 +16,25 @@ id: "provider-region-code"           # Unique identifier
 name: "Human Readable Name"          # Display name for popup
 provider: "AWS"                      # MUST be exactly "AWS" or "Azure" (case-sensitive)
 coords: [-33.8688, 151.2093]         # [latitude, longitude] as array
+aliases:                             # Optional: searchable alternative names
+  - "Sydney"
+  - "NSW"
+  - "New South Wales"
 services:
   vdc_vault:                         # Tiered service (see below)
     - edition: "Advanced"
       tier: "Core"                   # "Core" or "Non-Core"
   vdc_m365: true                     # Boolean service (available or not listed)
 ```
+
+### Aliases (Optional)
+The `aliases` field enables users to find regions via the search bar using alternative names:
+- City names (e.g., "Auckland", "Sydney", "London")
+- Country/state names (e.g., "New Zealand", "NSW")
+- Common abbreviations (e.g., "NZ North", "US East")
+- Local names (e.g., "Aotearoa" for New Zealand)
+
+Aliases are case-insensitive during search. Add aliases that users might naturally type when looking for a region.
 
 ### Service Types
 **Tiered services** (edition + tier matter per region):

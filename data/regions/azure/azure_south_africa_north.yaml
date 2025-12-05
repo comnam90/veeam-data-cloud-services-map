@@ -2,6 +2,13 @@ id: "azure-south-africa-north"
 name: "South Africa North (Johannesburg)"
 provider: "Azure"
 coords: [-25.7479, 28.2293]
+aliases:
+  - "Johannesburg"
+  - "South Africa"
+  - "ZA"
+  - "JNB"
+  - "Gauteng"
+  - "Africa"
 services:
   vdc_vault:
     - edition: "Foundation"

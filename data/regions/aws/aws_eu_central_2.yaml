@@ -2,6 +2,11 @@ id: "aws-eu-central-2"
 name: "EU Central 2 (Zurich)"
 provider: "AWS"
 coords: [47.3769, 8.1]
+aliases:
+  - "Zurich"
+  - "Switzerland"
+  - "CH"
+  - "ZRH"
 services:
   vdc_vault:
     - edition: "Advanced"

@@ -2,6 +2,13 @@ id: "azure-canada-east"
 name: "Canada East (Quebec)"
 provider: "Azure"
 coords: [46.8139, -71.2082]
+aliases:
+  - "Quebec City"
+  - "Quebec"
+  - "Canada"
+  - "CA"
+  - "YQB"
+  - "QC"
 services:
   vdc_vault:
     - edition: "Foundation"

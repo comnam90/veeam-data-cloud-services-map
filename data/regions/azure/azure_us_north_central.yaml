@@ -2,6 +2,16 @@ id: "azure-us-north-central"
 name: "North Central US (Illinois)"
 provider: "Azure"
 coords: [41.8819, -87.6278]
+aliases:
+  - "Chicago"
+  - "Illinois"
+  - "United States"
+  - "USA"
+  - "US"
+  - "ORD"
+  - "IL"
+  - "US Central"
+  - "Midwest"
 services:
   vdc_vault:
     - edition: "Foundation"

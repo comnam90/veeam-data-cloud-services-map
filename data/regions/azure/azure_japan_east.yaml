@@ -2,6 +2,13 @@ id: "azure-japan-east"
 name: "Japan East (Tokyo)"
 provider: "Azure"
 coords: [35.6762, 139.6503]
+aliases:
+  - "Tokyo"
+  - "Japan"
+  - "JP"
+  - "NRT"
+  - "HND"
+  - "Kanto"
 services:
   vdc_vault:
     - edition: "Foundation"

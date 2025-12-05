@@ -2,6 +2,15 @@ id: "azure-us-west3"
 name: "West US 3 (Phoenix)"
 provider: "Azure"
 coords: [33.448, -112.074]
+aliases:
+  - "Phoenix"
+  - "Arizona"
+  - "United States"
+  - "USA"
+  - "US"
+  - "PHX"
+  - "AZ"
+  - "US West"
 services:
   vdc_m365: true
   vdc_azure_backup: true

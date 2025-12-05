@@ -2,6 +2,13 @@ id: "azure-japan-west"
 name: "Japan West (Osaka)"
 provider: "Azure"
 coords: [34.6937, 135.5023]
+aliases:
+  - "Osaka"
+  - "Japan"
+  - "JP"
+  - "KIX"
+  - "ITM"
+  - "Kansai"
 services:
   vdc_vault:
     - edition: "Foundation"

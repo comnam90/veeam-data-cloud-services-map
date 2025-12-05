@@ -2,6 +2,13 @@ id: "aws-eu-north-1"
 name: "EU North 1 (Stockholm)"
 provider: "AWS"
 coords: [59.3293, 17.5]
+aliases:
+  - "Stockholm"
+  - "Sweden"
+  - "SE"
+  - "ARN"
+  - "Scandinavia"
+  - "Nordic"
 services:
   vdc_vault:
     - edition: "Foundation"

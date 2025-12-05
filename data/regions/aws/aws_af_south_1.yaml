@@ -2,6 +2,13 @@ id: "aws-af-south-1"
 name: "AF South 1 (Cape Town)"
 provider: "AWS"
 coords: [-33.9249, 18.0]
+aliases:
+  - "Cape Town"
+  - "South Africa"
+  - "ZA"
+  - "CPT"
+  - "Western Cape"
+  - "Africa"
 services:
   vdc_vault:
     - edition: "Advanced"

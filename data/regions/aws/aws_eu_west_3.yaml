@@ -2,6 +2,12 @@ id: "aws-eu-west-3"
 name: "EU West 3 (Paris)"
 provider: "AWS"
 coords: [48.8566, 2.3522]
+aliases:
+  - "Paris"
+  - "France"
+  - "FR"
+  - "CDG"
+  - "ORY"
 services:
   vdc_vault:
     - edition: "Advanced"

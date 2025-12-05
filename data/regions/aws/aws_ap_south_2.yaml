@@ -2,6 +2,12 @@ id: "aws-ap-south-2"
 name: "AP South 2 (Hyderabad)"
 provider: "AWS"
 coords: [17.385, 78.4867]
+aliases:
+  - "Hyderabad"
+  - "India"
+  - "IN"
+  - "HYD"
+  - "Telangana"
 services:
   vdc_vault:
     - edition: "Advanced"

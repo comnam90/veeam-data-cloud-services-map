@@ -2,6 +2,16 @@ id: "azure-us-central"
 name: "Central US (Iowa)"
 provider: "Azure"
 coords: [41.5908, -93.6208]
+aliases:
+  - "Iowa"
+  - "Des Moines"
+  - "United States"
+  - "USA"
+  - "US"
+  - "DSM"
+  - "IA"
+  - "US Central"
+  - "Midwest"
 services:
   vdc_vault:
     - edition: "Foundation"

@@ -2,6 +2,12 @@ id: "azure-india-central"
 name: "Central India (Pune)"
 provider: "Azure"
 coords: [18.5204, 73.8567]
+aliases:
+  - "Pune"
+  - "India"
+  - "IN"
+  - "PNQ"
+  - "Maharashtra"
 services:
   vdc_vault:
     - edition: "Foundation"

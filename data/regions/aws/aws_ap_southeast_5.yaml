@@ -2,6 +2,12 @@ id: "aws-ap-southeast-5"
 name: "AP Southeast 5 (Malaysia)"
 provider: "AWS"
 coords: [3.139, 101.2]
+aliases:
+  - "Kuala Lumpur"
+  - "Malaysia"
+  - "MY"
+  - "KUL"
+  - "KL"
 services:
   vdc_vault:
     - edition: "Advanced"

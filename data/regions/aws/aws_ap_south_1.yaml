@@ -2,6 +2,13 @@ id: "aws-ap-south-1"
 name: "AP South 1 (Mumbai)"
 provider: "AWS"
 coords: [19.076, 72.8777]
+aliases:
+  - "Mumbai"
+  - "India"
+  - "IN"
+  - "BOM"
+  - "Maharashtra"
+  - "Bombay"
 services:
   vdc_vault:
     - edition: "Advanced"

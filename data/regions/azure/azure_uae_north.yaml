@@ -2,6 +2,13 @@ id: "azure-uae-north"
 name: "UAE North (Dubai)"
 provider: "Azure"
 coords: [25.2048, 55.2708]
+aliases:
+  - "Dubai"
+  - "UAE"
+  - "United Arab Emirates"
+  - "AE"
+  - "DXB"
+  - "Middle East"
 services:
   vdc_vault:
     - edition: "Foundation"

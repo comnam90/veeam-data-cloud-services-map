@@ -2,6 +2,13 @@ id: "aws-ca-central-1"
 name: "Canada Central 1 (Montreal)"
 provider: "AWS"
 coords: [45.5, -73.6]
+aliases:
+  - "Montreal"
+  - "Canada"
+  - "CA"
+  - "YUL"
+  - "Quebec"
+  - "QC"
 services:
   vdc_vault:
     - edition: "Advanced"

@@ -2,6 +2,12 @@ id: "azure-west-europe"
 name: "West Europe (Netherlands)"
 provider: "Azure"
 coords: [52.3676, 4.9041]
+aliases:
+  - "Amsterdam"
+  - "Netherlands"
+  - "NL"
+  - "AMS"
+  - "Holland"
 services:
   vdc_vault:
     - edition: "Foundation"

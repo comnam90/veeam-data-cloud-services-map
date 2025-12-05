@@ -2,6 +2,11 @@ id: "aws-ap-east-1-taipei"
 name: "Taipei"
 provider: "AWS"
 coords: [25.033, 121.5654]
+aliases:
+  - "Taipei"
+  - "Taiwan"
+  - "TW"
+  - "TPE"
 services:
   vdc_vault:
     - edition: "Advanced"

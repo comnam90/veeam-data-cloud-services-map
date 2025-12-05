@@ -2,6 +2,16 @@ id: "azure-us-west2"
 name: "West US 2 (Washington)"
 provider: "Azure"
 coords: [47.233, -119.852]
+aliases:
+  - "Washington"
+  - "Seattle"
+  - "United States"
+  - "USA"
+  - "US"
+  - "SEA"
+  - "WA"
+  - "US West"
+  - "Pacific Northwest"
 services:
   vdc_vault:
     - edition: "Foundation"

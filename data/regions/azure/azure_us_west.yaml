@@ -2,6 +2,16 @@ id: "azure-us-west"
 name: "West US (California)"
 provider: "Azure"
 coords: [37.783, -122.417]
+aliases:
+  - "San Francisco"
+  - "California"
+  - "United States"
+  - "USA"
+  - "US"
+  - "SFO"
+  - "CA"
+  - "US West"
+  - "Bay Area"
 services:
   vdc_vault:
     - edition: "Foundation"

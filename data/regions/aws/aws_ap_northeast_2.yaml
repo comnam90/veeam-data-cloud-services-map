@@ -2,6 +2,13 @@ id: "aws-ap-northeast-2"
 name: "AP Northeast 2 (Seoul)"
 provider: "AWS"
 coords: [37.5665, 126.5]
+aliases:
+  - "Seoul"
+  - "South Korea"
+  - "Korea"
+  - "KR"
+  - "ICN"
+  - "Gyeonggi"
 services:
   vdc_vault:
     - edition: "Advanced"

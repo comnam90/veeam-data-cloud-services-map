@@ -2,6 +2,13 @@ id: "azure-australia-southeast"
 name: "Australia Southeast (Victoria)"
 provider: "Azure"
 coords: [-37.8136, 144.9631]
+aliases:
+  - "Melbourne"
+  - "Victoria"
+  - "Australia"
+  - "AU"
+  - "VIC"
+  - "MEL"
 services:
   vdc_vault:
     - edition: "Foundation"

@@ -2,6 +2,13 @@ id: "azure-korea-central"
 name: "Korea Central (Seoul)"
 provider: "Azure"
 coords: [37.5665, 126.978]
+aliases:
+  - "Seoul"
+  - "South Korea"
+  - "Korea"
+  - "KR"
+  - "ICN"
+  - "Gyeonggi"
 services:
   vdc_vault:
     - edition: "Foundation"

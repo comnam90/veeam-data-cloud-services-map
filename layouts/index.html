@@ -458,6 +458,97 @@
         #mapError.visible {
             display: flex;
         }
+
+        /* Search input and dropdown */
+        .search-container {
+            position: relative;
+        }
+        #regionSearch {
+            transition: all 0.2s ease;
+            width: 140px;
+        }
+        #regionSearch:focus {
+            width: 200px;
+        }
+        @media (max-width: 640px) {
+            #regionSearch, #regionSearch:focus {
+                width: 120px;
+            }
+        }
+        #searchResults {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            min-width: 250px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 4px;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s ease;
+        }
+        #searchResults.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .light #searchResults {
+            background: white;
+            border-color: #e2e8f0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0.75rem;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            border-bottom: 1px solid #334155;
+        }
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        .search-result-item:hover, .search-result-item.highlighted {
+            background: #334155;
+        }
+        .light .search-result-item {
+            border-bottom-color: #e2e8f0;
+        }
+        .light .search-result-item:hover, .light .search-result-item.highlighted {
+            background: #f1f5f9;
+        }
+        .search-result-item .provider-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .search-result-item .region-name {
+            font-size: 0.875rem;
+            color: white;
+            font-weight: 500;
+        }
+        .light .search-result-item .region-name {
+            color: #0f172a;
+        }
+        .search-result-item .match-text {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+        .search-no-results {
+            padding: 1rem;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body class="font-sans antialiased">
@@ -480,6 +571,18 @@
             </div>
 
             <div class="flex gap-1.5 sm:gap-2 lg:gap-3 items-center flex-wrap">
+                <!-- Search Input -->
+                <div class="search-container">
+                    <div class="relative">
+                        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input type="text" id="regionSearch" placeholder="Search regions..." autocomplete="off"
+                               class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg pl-8 pr-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 placeholder-slate-400 light:placeholder-slate-500 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm">
+                    </div>
+                    <div id="searchResults"></div>
+                </div>
+
                 <select id="providerFilter" class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm min-w-0">
                     <option value="all">All Providers</option>
                     <option value="Azure">Azure</option>
@@ -711,11 +814,26 @@
                 name: "{{ $data.name }}",
                 provider: "{{ $data.provider }}",
                 coords: {{ $data.coords | jsonify }}, 
-                services: {{ $data.services | jsonify }} 
+                services: {{ $data.services | jsonify }},
+                aliases: {{ $data.aliases | default (slice) | jsonify }}
             },
             {{ end }}
             {{ end }}
         ];
+
+        function ensureArray(input) {
+            if (!input) return [];
+            if (Array.isArray(input)) return input;
+            if (typeof input === 'string') {
+                try {
+                    const parsed = JSON.parse(input);
+                    return Array.isArray(parsed) ? parsed : [input];
+                } catch(e) {
+                    return [input];
+                }
+            }
+            return [input];
+        }
 
         // Normalize data types to handle YAML edge cases like coords: "[-33, 151]" as string
         const regions = rawRegions.map(region => {
@@ -742,16 +860,12 @@
             return {
                 ...region,
                 coords: cleanCoords,
-                services: cleanServices || {}
+                services: cleanServices || {},
+                aliases: ensureArray(region.aliases)
             };
         });
 
         if (DEBUG) console.log("Processed Regions Data:", regions);
-
-        function ensureArray(input) {
-            if (!input) return [];
-            return Array.isArray(input) ? input : [input];
-        }
 
         function getServiceIcon(serviceKey) {
             const icons = {
@@ -1189,6 +1303,146 @@
         // Hide loading overlay once tiles are loaded
         currentTiles.once('load', hideLoading);
         setTimeout(hideLoading, 5000);
+
+        // Region search functionality
+        const searchInput = document.getElementById('regionSearch');
+        const searchResults = document.getElementById('searchResults');
+        let highlightedIndex = -1;
+        let currentResults = [];
+
+        function searchRegions(query) {
+            if (!query || query.length < 2) return [];
+            const q = query.toLowerCase();
+            
+            return regions
+                .map(region => {
+                    let matchType = null;
+                    let matchText = null;
+                    
+                    if (region.name.toLowerCase().includes(q)) {
+                        matchType = 'name';
+                    } else if (region.aliases && Array.isArray(region.aliases) && region.aliases.length > 0) {
+                        const matchingAlias = region.aliases.find(a => a.toLowerCase().includes(q));
+                        if (matchingAlias) {
+                            matchType = 'alias';
+                            matchText = matchingAlias;
+                        }
+                    }
+                    
+                    if (matchType) {
+                        return { region, matchType, matchText };
+                    }
+                    return null;
+                })
+                .filter(Boolean)
+                .slice(0, 10);
+        }
+
+        function renderSearchResults(results) {
+            currentResults = results;
+            highlightedIndex = -1;
+            
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="search-no-results">No regions found</div>';
+                return;
+            }
+            
+            searchResults.innerHTML = results.map((item, index) => {
+                const providerColor = item.region.provider === 'Azure' ? '#0078D4' : '#FF9900';
+                const matchInfo = item.matchType === 'alias' ? `<span class="match-text">via "${item.matchText}"</span>` : '';
+                
+                return `
+                    <div class="search-result-item" data-index="${index}">
+                        <span class="provider-dot" style="background-color: ${providerColor}"></span>
+                        <div>
+                            <div class="region-name">${item.region.name}</div>
+                            ${matchInfo}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectSearchResult(index) {
+            if (index < 0 || index >= currentResults.length) return;
+            
+            const item = currentResults[index];
+            const region = item.region;
+            
+            if (region.coords && Array.isArray(region.coords)) {
+                map.setView(region.coords, 5, { animate: true });
+                
+                clusterGroup.eachLayer(marker => {
+                    if (marker.getLatLng().lat === region.coords[0] && 
+                        marker.getLatLng().lng === region.coords[1]) {
+                        setTimeout(() => marker.openPopup(), 300);
+                    }
+                });
+            }
+            
+            searchInput.value = '';
+            searchResults.classList.remove('open');
+            currentResults = [];
+        }
+
+        function updateHighlight(newIndex) {
+            const items = searchResults.querySelectorAll('.search-result-item');
+            items.forEach(item => item.classList.remove('highlighted'));
+            
+            if (newIndex >= 0 && newIndex < items.length) {
+                highlightedIndex = newIndex;
+                items[newIndex].classList.add('highlighted');
+                items[newIndex].scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        if (DEBUG) console.log('Search elements:', { searchInput, searchResults });
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (DEBUG) console.log('Search query:', query);
+            
+            if (query.length < 2) {
+                searchResults.classList.remove('open');
+                return;
+            }
+            
+            const results = searchRegions(query);
+            if (DEBUG) console.log('Search results:', results);
+            renderSearchResults(results);
+            searchResults.classList.add('open');
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (!searchResults.classList.contains('open')) return;
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                updateHighlight(Math.min(highlightedIndex + 1, currentResults.length - 1));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                updateHighlight(Math.max(highlightedIndex - 1, 0));
+            } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+                e.preventDefault();
+                selectSearchResult(highlightedIndex);
+            } else if (e.key === 'Escape') {
+                searchResults.classList.remove('open');
+                searchInput.blur();
+            }
+        });
+
+        searchResults.addEventListener('click', (e) => {
+            const item = e.target.closest('.search-result-item');
+            if (item) {
+                selectSearchResult(parseInt(item.dataset.index));
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                searchResults.classList.remove('open');
+            }
+        });
 
         // Info panel logic
         const infoBtn = document.getElementById('infoBtn');

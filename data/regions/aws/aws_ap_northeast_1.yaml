@@ -2,6 +2,13 @@ id: "aws-ap-northeast-1"
 name: "AP Northeast 1 (Tokyo)"
 provider: "AWS"
 coords: [35.6762, 139.2]
+aliases:
+  - "Tokyo"
+  - "Japan"
+  - "JP"
+  - "NRT"
+  - "HND"
+  - "Kanto"
 services:
   vdc_vault:
     - edition: "Advanced"

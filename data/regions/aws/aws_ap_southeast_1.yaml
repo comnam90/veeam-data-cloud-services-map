@@ -2,6 +2,11 @@ id: "aws-ap-southeast-1"
 name: "AP Southeast 1 (Singapore)"
 provider: "AWS"
 coords: [1.3521, 103.4]
+aliases:
+  - "Singapore"
+  - "SG"
+  - "SIN"
+  - "Southeast Asia"
 services:
   vdc_vault:
     - edition: "Advanced"
