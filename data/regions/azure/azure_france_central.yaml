@@ -2,6 +2,12 @@ id: "azure-france-central"
 name: "France Central (Paris)"
 provider: "Azure"
 coords: [46.3772, 2.373]
+aliases:
+  - "Paris"
+  - "France"
+  - "FR"
+  - "CDG"
+  - "ORY"
 services:
   vdc_vault:
     - edition: "Foundation"

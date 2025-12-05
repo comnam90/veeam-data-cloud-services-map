@@ -2,6 +2,13 @@ id: "azure-canada-central"
 name: "Canada Central (Toronto)"
 provider: "Azure"
 coords: [43.6532, -79.3832]
+aliases:
+  - "Toronto"
+  - "Canada"
+  - "CA"
+  - "YYZ"
+  - "Ontario"
+  - "ON"
 services:
   vdc_vault:
     - edition: "Foundation"

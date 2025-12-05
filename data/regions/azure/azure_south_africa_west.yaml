@@ -2,6 +2,13 @@ id: "azure-south-africa-west"
 name: "South Africa West (Cape Town)"
 provider: "Azure"
 coords: [-33.9249, 18.4241]
+aliases:
+  - "Cape Town"
+  - "South Africa"
+  - "ZA"
+  - "CPT"
+  - "Western Cape"
+  - "Africa"
 services:
   vdc_vault:
     - edition: "Foundation"

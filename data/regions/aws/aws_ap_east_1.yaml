@@ -2,6 +2,11 @@ id: "aws-ap-east-1"
 name: "AP East 1 (Hong Kong)"
 provider: "AWS"
 coords: [22.3193, 113.9]
+aliases:
+  - "Hong Kong"
+  - "HK"
+  - "HKG"
+  - "China"
 services:
   vdc_vault:
     - edition: "Advanced"

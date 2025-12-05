@@ -4,9 +4,11 @@ provider: "Azure"
 coords: [-36.8485, 174.7633]
 aliases:
   - "Auckland"
-  - "NZ North"
   - "New Zealand"
+  - "NZ"
+  - "NZ North"
   - "Aotearoa"
+  - "AKL"
 services:
   vdc_vault:
     - edition: "Foundation"

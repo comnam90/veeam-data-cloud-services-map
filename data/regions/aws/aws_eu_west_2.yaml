@@ -2,6 +2,13 @@ id: "aws-eu-west-2"
 name: "EU West 2 (London)"
 provider: "AWS"
 coords: [51.5074, -0.6]
+aliases:
+  - "London"
+  - "United Kingdom"
+  - "UK"
+  - "GB"
+  - "LHR"
+  - "England"
 services:
   vdc_vault:
     - edition: "Advanced"

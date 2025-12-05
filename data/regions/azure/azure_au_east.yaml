@@ -4,8 +4,11 @@ provider: "Azure"
 coords: [-33.8688, 151.5]
 aliases:
   - "Sydney"
+  - "Australia"
+  - "AU"
   - "NSW"
   - "New South Wales"
+  - "SYD"
 services:
   vdc_vault:
     - edition: "Foundation"

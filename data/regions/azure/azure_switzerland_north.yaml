@@ -2,6 +2,11 @@ id: "azure-switzerland-north"
 name: "Switzerland North (Zurich)"
 provider: "Azure"
 coords: [47.4515, 8.5644]
+aliases:
+  - "Zurich"
+  - "Switzerland"
+  - "CH"
+  - "ZRH"
 services:
   vdc_vault:
     - edition: "Foundation"

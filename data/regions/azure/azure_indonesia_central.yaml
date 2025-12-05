@@ -2,6 +2,12 @@ id: "azure-indonesia-central"
 name: "Indonesia Central (Jakarta)"
 provider: "Azure"
 coords: [-6.2088, 106.8456]
+aliases:
+  - "Jakarta"
+  - "Indonesia"
+  - "ID"
+  - "CGK"
+  - "Java"
 services:
   vdc_vault:
     - edition: "Foundation"

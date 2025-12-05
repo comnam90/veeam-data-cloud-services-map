@@ -5,7 +5,10 @@ coords: [-33.8688, 150.9]
 aliases:
   - "Sydney"
   - "Australia"
+  - "AU"
   - "NSW"
+  - "New South Wales"
+  - "SYD"
 services:
   vdc_vault:
     - edition: "Advanced"

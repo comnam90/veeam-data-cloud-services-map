@@ -2,6 +2,12 @@ id: "aws-il-central-1"
 name: "Israel (Tel Aviv)"
 provider: "AWS"
 coords: [32.0853, 34.3]
+aliases:
+  - "Tel Aviv"
+  - "Israel"
+  - "IL"
+  - "TLV"
+  - "Middle East"
 services:
   vdc_vault:
     - edition: "Advanced"

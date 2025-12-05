@@ -2,6 +2,12 @@ id: "azure-malaysia-west"
 name: "Malaysia West (Kuala Lumpur)"
 provider: "Azure"
 coords: [3.139, 101.6869]
+aliases:
+  - "Kuala Lumpur"
+  - "Malaysia"
+  - "MY"
+  - "KUL"
+  - "KL"
 services:
   vdc_vault:
     - edition: "Foundation"
