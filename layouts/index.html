@@ -651,6 +651,8 @@
 </div>
 
     <script>
+        const DEBUG = false;
+
         // Hugo injects YAML data as JSON; may produce strings instead of arrays in some edge cases
         const rawRegions = [
             {{ range $provider, $regions := .Site.Data.regions }}
@@ -695,7 +697,7 @@
             };
         });
 
-        console.log("Processed Regions Data:", regions);
+        if (DEBUG) console.log("Processed Regions Data:", regions);
 
         function ensureArray(input) {
             if (!input) return [];
