@@ -1416,6 +1416,7 @@
                 items[newIndex].scrollIntoView({ block: 'nearest' });
                 searchInput.setAttribute('aria-activedescendant', `search-result-${newIndex}`);
             } else {
+                highlightedIndex = -1;
                 searchInput.setAttribute('aria-activedescendant', '');
             }
         }
