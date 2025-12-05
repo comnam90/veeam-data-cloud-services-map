@@ -933,8 +933,7 @@
             if (selected.length === 0) {
                 serviceLabel.textContent = 'All Services';
             } else if (selected.length === 1) {
-                const names = { vdc_vault: 'Vault', vdc_m365: 'M365', vdc_entra_id: 'Entra ID', vdc_salesforce: 'Salesforce', vdc_azure_backup: 'Azure' };
-                serviceLabel.textContent = names[selected[0]] || selected[0];
+                serviceLabel.textContent = serviceDisplayNames[selected[0]]?.short || selected[0];
             } else {
                 serviceLabel.textContent = `${selected.length} selected`;
             }
