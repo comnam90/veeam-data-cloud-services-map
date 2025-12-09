@@ -1439,7 +1439,7 @@
         });
 
         searchInput.addEventListener('keydown', (e) => {
-            if (!searchResults.classList.contains('open')) return;
+            if (!searchResults.classList.contains('open') || currentResults.length === 0) return;
             
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
