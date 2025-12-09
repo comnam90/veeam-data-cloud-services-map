@@ -1393,13 +1393,16 @@
             
             const item = currentResults[index];
             const region = item.region;
+            const EPSILON = 0.0001;
             
             if (region.coords && Array.isArray(region.coords)) {
                 map.setView(region.coords, 5, { animate: true });
                 
                 clusterGroup.eachLayer(marker => {
-                    if (marker.getLatLng().lat === region.coords[0] && 
-                        marker.getLatLng().lng === region.coords[1]) {
+                    const markerLat = marker.getLatLng().lat;
+                    const markerLng = marker.getLatLng().lng;
+                    if (Math.abs(markerLat - region.coords[0]) < EPSILON && 
+                        Math.abs(markerLng - region.coords[1]) < EPSILON) {
                         setTimeout(() => marker.openPopup(), 300);
                     }
                 });
