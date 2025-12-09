@@ -2,6 +2,10 @@ id: "azure-east-asia"
 name: "East Asia (Hong Kong)"
 provider: "Azure"
 coords: [22.3193, 114.1694]
+aliases:
+  - "Hong Kong"
+  - "HK"
+  - "HKG"
 services:
   vdc_vault:
     - edition: "Foundation"

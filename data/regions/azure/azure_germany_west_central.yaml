@@ -2,6 +2,12 @@ id: "azure-germany-west-central"
 name: "Germany West Central (Frankfurt)"
 provider: "Azure"
 coords: [50.1109, 8.6821]
+aliases:
+  - "Frankfurt"
+  - "Germany"
+  - "DE"
+  - "FRA"
+  - "Hesse"
 services:
   vdc_vault:
     - edition: "Foundation"

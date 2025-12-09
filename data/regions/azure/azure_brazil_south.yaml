@@ -2,6 +2,13 @@ id: "azure-brazil-south"
 name: "Brazil South (São Paulo)"
 provider: "Azure"
 coords: [-23.5505, -46.6333]
+aliases:
+  - "São Paulo"
+  - "Sao Paulo"
+  - "Brazil"
+  - "BR"
+  - "GRU"
+  - "South America"
 services:
   vdc_vault:
     - edition: "Foundation"

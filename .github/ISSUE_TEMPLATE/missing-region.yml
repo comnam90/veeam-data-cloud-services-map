@@ -47,6 +47,15 @@ body:
     validations:
       required: false
 
+  - type: input
+    id: aliases
+    attributes:
+      label: Search Aliases (optional)
+      description: Alternative names users might search for (city names, abbreviations, etc.)
+      placeholder: "Sydney, NSW, New South Wales"
+    validations:
+      required: false
+
   - type: checkboxes
     id: services-available
     attributes:

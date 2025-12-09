@@ -2,6 +2,12 @@ id: "azure-italy-north"
 name: "Italy North (Milan)"
 provider: "Azure"
 coords: [45.4642, 9.19]
+aliases:
+  - "Milan"
+  - "Italy"
+  - "IT"
+  - "MXP"
+  - "Lombardy"
 services:
   vdc_vault:
     - edition: "Foundation"

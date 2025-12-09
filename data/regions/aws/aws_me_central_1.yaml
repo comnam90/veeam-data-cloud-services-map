@@ -2,6 +2,15 @@ id: "aws-me-central-1"
 name: "Middle East (UAE)"
 provider: "AWS"
 coords: [25.2048, 54.8]
+aliases:
+  - "Dubai"
+  - "Abu Dhabi"
+  - "UAE"
+  - "United Arab Emirates"
+  - "AE"
+  - "DXB"
+  - "AUH"
+  - "Middle East"
 services:
   vdc_vault:
     - edition: "Advanced"

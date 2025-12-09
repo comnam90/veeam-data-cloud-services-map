@@ -2,6 +2,13 @@ id: "azure-south-india"
 name: "South India (Chennai)"
 provider: "Azure"
 coords: [13.0827, 80.2707]
+aliases:
+  - "Chennai"
+  - "India"
+  - "IN"
+  - "MAA"
+  - "Tamil Nadu"
+  - "TN"
 services:
   vdc_vault:
     - edition: "Foundation"

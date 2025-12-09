@@ -2,6 +2,13 @@ id: "azure-us-east2"
 name: "East US 2 (Virginia)"
 provider: "Azure"
 coords: [36.6681, -78.3876]
+aliases:
+  - "Virginia"
+  - "United States"
+  - "USA"
+  - "US"
+  - "VA"
+  - "US East"
 services:
   vdc_vault:
     - edition: "Foundation"

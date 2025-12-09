@@ -2,6 +2,13 @@ id: "aws-ap-northeast-3"
 name: "AP Northeast 3 (Osaka)"
 provider: "AWS"
 coords: [34.6937, 135.1]
+aliases:
+  - "Osaka"
+  - "Japan"
+  - "JP"
+  - "KIX"
+  - "ITM"
+  - "Kansai"
 services:
   vdc_vault:
     - edition: "Advanced"

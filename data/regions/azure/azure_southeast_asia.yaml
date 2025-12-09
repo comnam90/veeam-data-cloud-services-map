@@ -2,6 +2,11 @@ id: "azure-southeast-asia"
 name: "Southeast Asia (Singapore)"
 provider: "Azure"
 coords: [1.3521, 103.8198]
+aliases:
+  - "Singapore"
+  - "SG"
+  - "SIN"
+  - "Southeast Asia"
 services:
   vdc_vault:
     - edition: "Foundation"

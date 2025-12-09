@@ -2,6 +2,12 @@ id: "aws-ap-southeast-3"
 name: "AP Southeast 3 (Jakarta)"
 provider: "AWS"
 coords: [-6.2088, 106.4]
+aliases:
+  - "Jakarta"
+  - "Indonesia"
+  - "ID"
+  - "CGK"
+  - "Java"
 services:
   vdc_vault:
     - edition: "Advanced"

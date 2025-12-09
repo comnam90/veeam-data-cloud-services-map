@@ -2,6 +2,12 @@ id: "aws-eu-south-1"
 name: "EU South 1 (Milan)"
 provider: "AWS"
 coords: [45.4642, 9.6]
+aliases:
+  - "Milan"
+  - "Italy"
+  - "IT"
+  - "MXP"
+  - "Lombardy"
 services:
   vdc_vault:
     - edition: "Advanced"
