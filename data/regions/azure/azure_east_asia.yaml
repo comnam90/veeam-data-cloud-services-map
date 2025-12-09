@@ -6,7 +6,6 @@ aliases:
   - "Hong Kong"
   - "HK"
   - "HKG"
-  - "China"
 services:
   vdc_vault:
     - edition: "Foundation"
