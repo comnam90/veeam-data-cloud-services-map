@@ -1345,7 +1345,9 @@
                     if (region.name.toLowerCase().includes(q)) {
                         matchType = 'name';
                     } else if (region.aliases && Array.isArray(region.aliases) && region.aliases.length > 0) {
-                        const matchingAlias = region.aliases.find(a => a.toLowerCase().includes(q));
+                        const matchingAlias = region.aliases.find(a => 
+                            a && typeof a === 'string' && a.toLowerCase().includes(q)
+                        );
                         if (matchingAlias) {
                             matchType = 'alias';
                             matchText = matchingAlias;
