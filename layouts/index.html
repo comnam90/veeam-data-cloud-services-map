@@ -1432,7 +1432,22 @@
             }
         }
 
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func(...args), wait);
+            };
+        }
+
         if (DEBUG) console.log('Search elements:', { searchInput, searchResults });
+
+        const debouncedSearch = debounce((query) => {
+            const results = searchRegions(query);
+            if (DEBUG) console.log('Search results:', results);
+            renderSearchResults(results);
+            setSearchDropdownOpen(true);
+        }, 150);
 
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.trim();
@@ -1443,10 +1458,7 @@
                 return;
             }
             
-            const results = searchRegions(query);
-            if (DEBUG) console.log('Search results:', results);
-            renderSearchResults(results);
-            setSearchDropdownOpen(true);
+            debouncedSearch(query);
         });
 
         searchInput.addEventListener('keydown', (e) => {
