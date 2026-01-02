@@ -1,38 +1,34 @@
-# Cloudflare Workers Migration & API Implementation Plan
+# Cloudflare Pages Migration & API Implementation Plan
 
 ## Overview
 
-Migrate from GitHub Pages to Cloudflare Workers with Static Assets and implement a REST API with Swagger UI for querying Veeam Data Cloud service availability across regions.
+Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swagger UI for querying Veeam Data Cloud service availability across regions.
 
 ## Goals
 
-1. Migrate Hugo site from GitHub Pages to Cloudflare Workers (zero downtime)
-2. Implement REST API at `/api/v1/` with query parameters
+1. Migrate Hugo site from GitHub Pages to Cloudflare Pages (zero downtime)
+2. Implement REST API at `/api/v1/` with query parameters using Pages Functions
 3. Add interactive Swagger UI documentation at `/api-docs/`
 4. Maintain all existing map functionality
 5. Enable external services to query region/service availability programmatically
-6. Leverage Workers' advanced features (observability, Durable Objects access, Cron Triggers)
+6. Keep it simple with file-based routing
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ Cloudflare Worker (Single Domain)                       │
+│ Cloudflare Pages (Single Domain)                        │
 │                                                          │
-│  Worker Script (src/index.js):                          │
-│  ├─ Request Router                                      │
-│  │   ├─ /api/v1/*       → API Handler                   │
-│  │   └─ /*              → Static Assets (Hugo)          │
-│                                                          │
-│  Static Assets (public/):                               │
+│  Static Site (Hugo - public/):                          │
 │  ├─ /                    → Interactive Map              │
 │  ├─ /api-docs/           → Swagger UI                   │
 │  └─ /api/openapi.yaml    → OpenAPI Specification        │
 │                                                          │
-│  API Routes:                                            │
-│  ├─ /api/v1/regions      → List/filter regions          │
-│  ├─ /api/v1/regions/{id} → Get specific region          │
-│  └─ /api/v1/services     → List available services      │
+│  Functions (file-based routing):                        │
+│  ├─ /api/v1/regions.js      → List/filter regions       │
+│  ├─ /api/v1/regions/[id].js → Get specific region       │
+│  ├─ /api/v1/services.js     → List available services   │
+│  └─ /api/v1/health.js       → Health check              │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -75,36 +71,27 @@ Migrate from GitHub Pages to Cloudflare Workers with Static Assets and implement
   }
   ```
 
-#### 1.3 Create Wrangler Configuration (Required)
+#### 1.3 Create Wrangler Configuration (Optional but Recommended)
 - [ ] Create `wrangler.toml` in project root:
   ```toml
   name = "veeam-data-cloud-services-map"
-  main = "src/index.js"
   compatibility_date = "2025-01-01"
-
-  [assets]
-  directory = "./public"
-  html_handling = "auto-trailing-slash"
-  not_found_handling = "404-page"
+  pages_build_output_dir = "public"
 
   [build]
   command = "npm run build:data && hugo --gc --minify"
 
-  [observability]
-  enabled = true
-
-  [[env.production.vars]]
+  [env.production.vars]
   ENVIRONMENT = "production"
 
-  [[env.staging.vars]]
-  ENVIRONMENT = "staging"
+  [env.preview.vars]
+  ENVIRONMENT = "preview"
   ```
 - **Key configuration:**
-  - `main`: Worker entry point that handles API routes
-  - `assets.directory`: Hugo build output (static files)
+  - `pages_build_output_dir`: Hugo build output directory
   - `build.command`: Runs data conversion + Hugo build automatically
-  - `observability`: Enables logs and monitoring
-  - Static assets served automatically, API routes handled by worker
+  - Can also configure build settings in Pages dashboard
+  - Environment variables for production and preview environments
 
 #### 1.4 Create OpenAPI Specification
 - [ ] Create `static/api/openapi.yaml`
@@ -121,101 +108,168 @@ Migrate from GitHub Pages to Cloudflare Workers with Static Assets and implement
   - Customize branding (Veeam colors)
   - Add header with disclaimer matching README
 
-### Phase 2: Implement Worker API Handler
+### Phase 2: Implement Pages Functions
 
 **Estimated Time: 2-3 hours**
 
-#### 2.1 Create Worker Entry Point
-- [ ] Create `src/index.js` with main request router:
+#### 2.1 Create Shared Data Module
+- [ ] Create `functions/_shared/data.js`:
   ```javascript
-  import regionsData from './data/regions.json';
+  import regionsData from './regions.json';
 
-  export default {
-    async fetch(request, env, ctx) {
-      const url = new URL(request.url);
+  export function getRegions() {
+    return regionsData;
+  }
 
-      // API routes
-      if (url.pathname.startsWith('/api/v1/')) {
-        return handleAPI(request, url, env);
-      }
-
-      // Serve static assets (Hugo site, Swagger UI, etc.)
-      return env.ASSETS.fetch(request);
-    }
-  };
+  export function getRegionById(id) {
+    return regionsData.find(r => r.id === id);
+  }
   ```
 
-#### 2.2 Implement API Router
-- [ ] Create `src/api/router.js`:
-  - Route `/api/v1/regions` → listRegions()
-  - Route `/api/v1/regions/{id}` → getRegion()
-  - Route `/api/v1/services` → listServices()
-  - Route `/api/v1/health` → healthCheck()
-  - Return 404 for unknown API routes
-  - Add CORS headers to all responses
-
-#### 2.3 Implement Region Endpoints
-- [ ] Create `src/api/regions.js`:
-  - **listRegions(request, regionsData)**
-    - Parse query parameters:
-      - `provider` (AWS | Azure)
-      - `service` (vdc_vault | vdc_m365 | vdc_entra_id | vdc_salesforce | vdc_azure_backup)
-      - `tier` (Core | Non-Core) - only for vdc_vault
-      - `edition` (Foundation | Advanced) - only for vdc_vault
-    - Filter regions based on parameters
-    - Return JSON response with data array and metadata
-  - **getRegion(regionId, regionsData)**
-    - Find region by ID
-    - Return 404 if not found
-    - Return single region object
-
-#### 2.4 Implement Services Endpoint
-- [ ] Create `src/api/services.js`:
-  - **listServices()**
-    - Return metadata about available services:
-      ```json
-      {
-        "services": [
-          {
-            "id": "vdc_vault",
-            "name": "Veeam Data Cloud Vault",
-            "type": "tiered",
-            "editions": ["Foundation", "Advanced"],
-            "tiers": ["Core", "Non-Core"]
-          },
-          {
-            "id": "vdc_m365",
-            "name": "VDC for Microsoft 365",
-            "type": "boolean",
-            "editions": ["Flex", "Express", "Premium"]
-          }
-        ]
-      }
-      ```
-
-#### 2.5 Implement Health Check
-- [ ] Create `src/api/health.js`:
-  - Return API version, compatibility date
-  - Include region count, service count
-  - Return data last updated timestamp (from build)
-  - Use for monitoring and uptime checks
-
-#### 2.6 Add CORS and Error Handling
-- [ ] Create `src/utils/response.js`:
-  - **jsonResponse(data, status = 200)** - Format JSON with CORS
+#### 2.2 Create Shared Response Utilities
+- [ ] Create `functions/_shared/response.js`:
+  - **jsonResponse(data, status = 200)** - Format JSON with CORS headers
   - **errorResponse(message, code, status = 400)** - Standard error format
-  - **addCorsHeaders(headers)** - Add CORS headers
-  - **addSecurityHeaders(headers)** - Add security headers
+  - **corsHeaders()** - Return CORS headers object
+
+#### 2.3 Implement `/api/v1/regions` Endpoint
+- [ ] Create `functions/api/v1/regions.js`:
+  ```javascript
+  import { getRegions } from '../../../_shared/data.js';
+  import { jsonResponse, errorResponse } from '../../../_shared/response.js';
+
+  export async function onRequestGet(context) {
+    const { searchParams } = new URL(context.request.url);
+    const provider = searchParams.get('provider');
+    const service = searchParams.get('service');
+    const tier = searchParams.get('tier');
+    const edition = searchParams.get('edition');
+
+    let regions = getRegions();
+
+    // Filter by provider
+    if (provider) {
+      regions = regions.filter(r => r.provider === provider);
+    }
+
+    // Filter by service
+    if (service) {
+      regions = regions.filter(r => r.services[service]);
+    }
+
+    // Filter by tier (vdc_vault only)
+    if (tier && service === 'vdc_vault') {
+      regions = regions.filter(r =>
+        r.services.vdc_vault?.some(v => v.tier === tier)
+      );
+    }
+
+    // Filter by edition (vdc_vault only)
+    if (edition && service === 'vdc_vault') {
+      regions = regions.filter(r =>
+        r.services.vdc_vault?.some(v => v.edition === edition)
+      );
+    }
+
+    return jsonResponse({
+      data: regions,
+      count: regions.length,
+      filters: { provider, service, tier, edition }
+    });
+  }
+  ```
+
+#### 2.4 Implement `/api/v1/regions/[id]` Endpoint
+- [ ] Create `functions/api/v1/regions/[id].js`:
+  ```javascript
+  import { getRegionById } from '../../../../_shared/data.js';
+  import { jsonResponse, errorResponse } from '../../../../_shared/response.js';
+
+  export async function onRequestGet(context) {
+    const { id } = context.params;
+    const region = getRegionById(id);
+
+    if (!region) {
+      return errorResponse('Region not found', 'REGION_NOT_FOUND', 404);
+    }
+
+    return jsonResponse(region);
+  }
+  ```
+
+#### 2.5 Implement `/api/v1/services` Endpoint
+- [ ] Create `functions/api/v1/services.js`:
+  ```javascript
+  import { jsonResponse } from '../../../_shared/response.js';
+
+  export async function onRequestGet() {
+    return jsonResponse({
+      services: [
+        {
+          id: "vdc_vault",
+          name: "Veeam Data Cloud Vault",
+          type: "tiered",
+          editions: ["Foundation", "Advanced"],
+          tiers: ["Core", "Non-Core"]
+        },
+        {
+          id: "vdc_m365",
+          name: "VDC for Microsoft 365",
+          type: "boolean",
+          editions: ["Flex", "Express", "Premium"]
+        },
+        {
+          id: "vdc_entra_id",
+          name: "VDC for Entra ID",
+          type: "boolean"
+        },
+        {
+          id: "vdc_salesforce",
+          name: "VDC for Salesforce",
+          type: "boolean"
+        },
+        {
+          id: "vdc_azure_backup",
+          name: "VDC for Azure",
+          type: "boolean"
+        }
+      ]
+    });
+  }
+  ```
+
+#### 2.6 Implement `/api/v1/health` Endpoint
+- [ ] Create `functions/api/v1/health.js`:
+  ```javascript
+  import { getRegions } from '../../../_shared/data.js';
+  import { jsonResponse } from '../../../_shared/response.js';
+
+  export async function onRequestGet() {
+    const regions = getRegions();
+    return jsonResponse({
+      status: "healthy",
+      version: "1.0.0",
+      timestamp: new Date().toISOString(),
+      stats: {
+        totalRegions: regions.length,
+        awsRegions: regions.filter(r => r.provider === 'AWS').length,
+        azureRegions: regions.filter(r => r.provider === 'Azure').length
+      }
+    });
+  }
+  ```
 
 ### Phase 3: Testing Locally
 
 **Estimated Time: 1 hour**
 
-#### 3.1 Run Local Development Server
-- [ ] Run `wrangler dev`
-  - Wrangler will automatically run the build command
-  - Starts local server (default: http://localhost:8787)
-  - Hot reload on file changes
+#### 3.1 Build and Run Local Development Server
+- [ ] Build the site: `npm run build` (runs data conversion + Hugo)
+- [ ] Run Pages dev server: `wrangler pages dev public`
+  - Serves static files from `public/`
+  - Runs Functions from `functions/`
+  - Local server at http://localhost:8788
+  - Hot reload for Functions (rebuild needed for Hugo changes)
 
 #### 3.2 Test Each Endpoint
 - [ ] Test static site:
@@ -239,52 +293,68 @@ Migrate from GitHub Pages to Cloudflare Workers with Static Assets and implement
 - [ ] Make fetch requests from different origin
 - [ ] Verify CORS headers present
 
-### Phase 4: Cloudflare Workers Deployment
+### Phase 4: Cloudflare Pages Deployment
 
-**Estimated Time: 15 minutes**
+**Estimated Time: 30 minutes**
 
-#### 4.1 Deploy to Production
-- [ ] Run `wrangler deploy`
-  - Wrangler runs build command automatically
-  - Uploads worker script and static assets
-  - Deploys to Cloudflare's global network
-  - Returns worker URL (e.g., `veeam-data-cloud-services-map.workers.dev`)
+#### 4.1 Connect GitHub Repository
+- [ ] Go to Cloudflare dashboard → Pages
+- [ ] Click "Create a project"
+- [ ] Click "Connect to Git"
+- [ ] Select your GitHub repository
+- [ ] Authorize Cloudflare to access the repo
 
-#### 4.2 Verify Deployment
+#### 4.2 Configure Build Settings
+- [ ] **Project name:** veeam-data-cloud-services-map
+- [ ] **Production branch:** main (or your default branch)
+- [ ] **Framework preset:** Hugo
+- [ ] **Build command:** `npm run build:data && hugo --gc --minify`
+- [ ] **Build output directory:** `public`
+- [ ] **Root directory:** `/` (leave blank)
+- [ ] **Environment variables:**
+  - `HUGO_VERSION` = `0.139.3` (check your version with `hugo version`)
+  - `NODE_VERSION` = `18` (or your preferred version)
+
+#### 4.3 Deploy
+- [ ] Click "Save and Deploy"
+- [ ] Wait for build to complete (~2-3 minutes)
+- [ ] Pages will provide a URL: `https://veeam-data-cloud-services-map.pages.dev`
+
+#### 4.4 Verify Deployment
 - [ ] Check map loads at root URL
 - [ ] Check API endpoints respond:
-  - `curl https://veeam-data-cloud-services-map.workers.dev/api/v1/regions`
-  - `curl https://veeam-data-cloud-services-map.workers.dev/api/v1/health`
-- [ ] Check Swagger UI loads and functions
+  - `curl https://veeam-data-cloud-services-map.pages.dev/api/v1/regions`
+  - `curl https://veeam-data-cloud-services-map.pages.dev/api/v1/health`
+- [ ] Check Swagger UI loads at `/api-docs/`
 - [ ] Test API queries from Swagger UI
-- [ ] Verify data accuracy (compare to GitHub Pages version)
+- [ ] Verify data accuracy (spot check against GitHub Pages version)
 
-#### 4.3 Monitor Deployment
-- [ ] Check Cloudflare dashboard for worker status
-- [ ] Review worker logs: `wrangler tail`
-- [ ] Verify no errors in deployment
+#### 4.5 Monitor Deployment
+- [ ] Check Functions logs in Cloudflare dashboard
+- [ ] Verify no errors in build or runtime logs
+- [ ] Note the deployment URL for documentation
 
 ### Phase 5: Custom Domain Setup (Optional)
 
-**Estimated Time: 15 minutes + propagation time**
+**Estimated Time: 15 minutes + DNS propagation**
 
-#### 5.1 Add Custom Route (Optional)
-- [ ] In Cloudflare dashboard, go to Workers & Pages
-- [ ] Select your worker
-- [ ] Go to "Settings" → "Triggers"
-- [ ] Add custom domain or route:
-  - Option A: Custom domain (e.g., `api.veeam-cloud-map.dev`)
-  - Option B: Route on existing zone (e.g., `veeam-cloud-map.dev/*)
+#### 5.1 Add Custom Domain in Pages
+- [ ] In Cloudflare Pages project, go to "Custom domains"
+- [ ] Click "Set up a custom domain"
+- [ ] Enter your domain (e.g., `veeam-cloud-map.dev`)
+- [ ] Follow DNS instructions provided
 
-#### 5.2 Update DNS (if using custom domain)
-- [ ] Add DNS record pointing to worker
-- [ ] Wait for SSL provisioning (~5 min)
-- [ ] Verify HTTPS works
+#### 5.2 Configure DNS
+- [ ] Add CNAME record pointing to `<project>.pages.dev`
+- [ ] Or add A/AAAA records if provided
+- [ ] Wait for DNS propagation (~5-15 minutes)
+- [ ] SSL certificate provisioned automatically
 
-#### 5.3 Update Documentation
-- [ ] Update README with new worker URL
-- [ ] Update any hardcoded links
-- [ ] Update GitHub repo description and URL
+#### 5.3 Verify and Update
+- [ ] Test custom domain loads correctly
+- [ ] Verify HTTPS works (automatic SSL)
+- [ ] Update README with production URL
+- [ ] Update GitHub repo description
 
 ### Phase 6: Documentation & Finalization
 
@@ -321,25 +391,25 @@ Migrate from GitHub Pages to Cloudflare Workers with Static Assets and implement
 - [ ] Document v1.0.0 initial release
 - [ ] Define versioning strategy
 
-#### 6.4 Set Up Automated Deployment (Optional)
-- [ ] Option A: Manual deployment with `wrangler deploy`
-- [ ] Option B: GitHub Action for auto-deploy on push:
-  - Create `.github/workflows/deploy-worker.yml`
-  - Use Cloudflare's official wrangler action
-  - Add `CLOUDFLARE_API_TOKEN` secret to repo
-  - Deploy on push to main branch
-- [ ] Remove `.github/workflows/hugo.yml` (old GitHub Pages deployment)
-- [ ] Keep `pr-validation.yml` if exists
+#### 6.4 Verify Automated Deployment
+- [ ] Cloudflare Pages automatically deploys on git push to main
+- [ ] Test by making a small change and pushing
+- [ ] Verify build triggers in Pages dashboard
+- [ ] Check deployment completes successfully
+- [ ] Remove `.github/workflows/hugo.yml` (old GitHub Pages workflow)
+- [ ] Keep `pr-validation.yml` if it exists
+- [ ] Note: Pages also creates preview deployments for PRs automatically
 
 ### Phase 7: Monitoring & Polish
 
 **Estimated Time: 30 minutes**
 
 #### 7.1 Set Up Monitoring
-- [ ] Enable Workers Analytics in Cloudflare dashboard
-- [ ] Monitor with `wrangler tail` for real-time logs
-- [ ] Set up alerts for errors (optional)
-- [ ] Enable Logpush for long-term storage (optional)
+- [ ] Review Pages Analytics in Cloudflare dashboard
+- [ ] Monitor Functions logs: Pages → your-project → Functions
+- [ ] Use `wrangler pages deployment tail` for real-time logs (optional)
+- [ ] Enable Web Analytics for visitor tracking (optional)
+- [ ] Set up Cloudflare Notifications for build failures (optional)
 
 #### 7.2 Add API Response Headers
 - [ ] `X-API-Version: 1.0.0`
@@ -365,20 +435,21 @@ veeam-data-cloud-services-map/
 │       │   └── *.yaml (unchanged - source of truth)
 │       └── azure/
 │           └── *.yaml (unchanged - source of truth)
-├── src/
-│   ├── index.js (Worker entry point - main router)
-│   ├── api/
-│   │   ├── router.js (API route handler)
-│   │   ├── regions.js (Region endpoints logic)
-│   │   ├── services.js (Services endpoint)
-│   │   └── health.js (Health check endpoint)
-│   ├── utils/
+├── functions/
+│   ├── _shared/
+│   │   ├── data.js (region data loader)
+│   │   ├── regions.json (generated from YAML)
 │   │   └── response.js (CORS, error handling, JSON helpers)
-│   └── data/
-│       └── regions.json (generated from YAML, imported by worker)
+│   └── api/
+│       └── v1/
+│           ├── regions.js (GET /api/v1/regions)
+│           ├── regions/
+│           │   └── [id].js (GET /api/v1/regions/:id)
+│           ├── services.js (GET /api/v1/services)
+│           └── health.js (GET /api/v1/health)
 ├── public/
-│   └── (Hugo build output - generated)
-│       ├── index.html
+│   └── (Hugo build output - generated by build command)
+│       ├── index.html (interactive map)
 │       ├── api/
 │       │   └── openapi.yaml
 │       └── api-docs/
@@ -401,12 +472,11 @@ veeam-data-cloud-services-map/
 │   └── terraform.tf
 ├── .github/
 │   └── workflows/
-│       ├── deploy-worker.yml (optional - auto-deploy)
 │       └── pr-validation.yml (unchanged)
 ├── plans/
 │   └── cloudflare-api-migration.md (this document)
 ├── API_CHANGELOG.md
-├── wrangler.toml (Cloudflare Workers config - REQUIRED)
+├── wrangler.toml (Cloudflare Pages config - optional)
 ├── package.json (build scripts)
 ├── config.yaml (Hugo config - unchanged)
 └── README.md (updated with API docs)
@@ -527,22 +597,22 @@ GET /api/v1/regions?provider=Azure&service=vdc_m365
 
 If issues arise during migration:
 
-1. **Worker deployment issues:**
+1. **Pages deployment issues:**
    - GitHub Pages remains active during migration
-   - Simply don't update DNS/links until Worker is verified
+   - Simply don't update DNS/links until Pages is verified
    - No downtime risk
 
-2. **API errors:**
-   - Static assets continue to work (Hugo site served by worker)
-   - API can be debugged/fixed in src/
-   - Deploy fixes with `wrangler deploy`
-   - Use `wrangler rollback` to revert to previous version
+2. **Function errors:**
+   - Static site continues to work (Hugo site)
+   - Functions can be debugged/fixed in `functions/`
+   - Push fixes to trigger automatic redeployment
+   - Use Pages deployment history to rollback if needed
 
 3. **Complete rollback:**
-   - Revert DNS changes (if custom domain/route used)
-   - Disable worker in Cloudflare dashboard
+   - Revert DNS changes (if custom domain used)
+   - Delete Cloudflare Pages project
    - Continue using GitHub Pages
-   - Keep worker code for future retry
+   - Keep Functions code for future retry
 
 ## Success Criteria
 
@@ -551,31 +621,33 @@ If issues arise during migration:
 - [ ] Swagger UI loads and allows testing
 - [ ] CORS headers allow cross-origin requests
 - [ ] API response time < 200ms (global average)
-- [ ] Zero errors in Worker logs (`wrangler tail`)
-- [ ] Worker analytics show successful requests
+- [ ] Zero errors in Functions logs
+- [ ] Pages Analytics shows successful requests
 - [ ] README documents API usage
 - [ ] At least 3 example use cases provided
 
 ## Cost Analysis
 
-**Cloudflare Workers Free Tier:**
-- 100,000 requests/day
+**Cloudflare Pages Free Tier:**
+- 500 builds/month
+- Unlimited requests
 - Unlimited bandwidth
-- 10ms CPU time per request
+- 100,000 Functions requests/day
 - Built-in DDoS protection
-- Global edge network (300+ locations)
+- Global CDN (300+ locations)
+- Automatic preview deployments
 
 **Expected usage (conservative):**
-- ~1000 API requests/day initially
-- ~500 map page views/day
-- Average 1-2ms CPU time per request
+- ~30 builds/month (assuming daily updates)
+- ~1000 API requests/day (Functions)
+- ~500 map page views/day (static)
 - Well within free tier
 
-**Paid tier (if needed - $5/month):**
-- 10 million requests/month included
-- Then $0.50 per additional million requests
-- 30s CPU time limit (vs 10ms free tier)
-- Additional features unlocked
+**Paid tier (Pages Pro - $20/month, if needed):**
+- Concurrent builds
+- Advanced collaborator seats
+- Analytics
+- Priority support
 
 **Cost: $0/month** (free tier sufficient for foreseeable usage)
 
@@ -595,29 +667,29 @@ If issues arise during migration:
 | Phase | Duration | Dependencies |
 |-------|----------|--------------|
 | Phase 1: Pre-Migration Setup | 1-2 hours | None |
-| Phase 2: Worker Implementation | 2-3 hours | Phase 1 complete |
+| Phase 2: Functions Implementation | 2-3 hours | Phase 1 complete |
 | Phase 3: Local Testing | 1 hour | Phase 2 complete |
-| Phase 4: Deployment | 15 min | Phase 3 passing |
+| Phase 4: Pages Deployment | 30 min | Phase 3 passing |
 | Phase 5: Custom Domain (optional) | 15 min + propagation | Phase 4 verified |
 | Phase 6: Documentation | 1 hour | Phase 4 complete |
 | Phase 7: Polish | 30 min | Phase 6 complete |
 
-**Total Estimated Time: 5-7 hours** (can be done over a weekend)
+**Total Estimated Time: 6-8 hours** (can be done over a weekend)
 
 ## Questions to Answer Before Starting
 
-1. Do you want to use a custom domain/route, or use `.workers.dev` subdomain?
+1. Do you want to use a custom domain, or use `.pages.dev` subdomain?
 2. Should API responses be cached by CDN, or always fresh?
 3. Do you need rate limiting on the API?
-4. Should there be usage analytics/tracking for API calls? (Workers Analytics enabled by default)
+4. Should there be usage analytics/tracking for API calls? (Pages Analytics available)
 5. Do you want API versioning in URLs (`/v1/`, `/v2/`) or headers? (Plan uses URL versioning)
-6. Do you want automated deployment via GitHub Actions, or manual `wrangler deploy`?
+6. Pages auto-deploys from GitHub - is this acceptable, or do you need manual control?
 
 ## References
 
-- [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
-- [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)
+- [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages/)
+- [Pages Functions](https://developers.cloudflare.com/pages/functions/)
 - [Wrangler CLI Documentation](https://developers.cloudflare.com/workers/wrangler/)
 - [OpenAPI 3.0 Specification](https://swagger.io/specification/)
 - [Swagger UI Documentation](https://swagger.io/tools/swagger-ui/)
-- [Migration from Pages to Workers](https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/)
+- [Hugo Documentation](https://gohugo.io/documentation/)
