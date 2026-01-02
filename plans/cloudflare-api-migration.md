@@ -68,7 +68,26 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
   }
   ```
 
-#### 1.3 Create OpenAPI Specification
+#### 1.3 Create Wrangler Configuration (Optional but Recommended)
+- [ ] Create `wrangler.toml` in project root:
+  ```toml
+  name = "veeam-data-cloud-services-map"
+  compatibility_date = "2024-01-01"
+  pages_build_output_dir = "public"
+
+  [env.production]
+  vars = { ENVIRONMENT = "production" }
+
+  [env.preview]
+  vars = { ENVIRONMENT = "preview" }
+  ```
+- **Note:** This file is optional for Cloudflare Pages but useful for:
+  - Local development with `wrangler pages dev`
+  - Environment variables
+  - Compatibility date settings
+  - Future KV/Durable Objects bindings
+
+#### 1.4 Create OpenAPI Specification
 - [ ] Create `static/api/openapi.yaml`
   - Define all endpoints (`/regions`, `/regions/{id}`, `/services`)
   - Include query parameters (provider, service, tier, edition)
@@ -76,7 +95,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
   - Add examples from actual data
   - Version as `1.0.0`
 
-#### 1.4 Set Up Swagger UI
+#### 1.5 Set Up Swagger UI
 - [ ] Create `static/api-docs/index.html`
   - Use Swagger UI standalone bundle from CDN
   - Point to `/api/openapi.yaml`
@@ -322,6 +341,7 @@ veeam-data-cloud-services-map/
 ├── plans/
 │   └── cloudflare-api-migration.md (this document)
 ├── API_CHANGELOG.md
+├── wrangler.toml (Cloudflare config - optional)
 ├── package.json (add build scripts)
 └── README.md (updated with API docs)
 ```
