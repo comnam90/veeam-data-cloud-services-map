@@ -256,7 +256,7 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^(aws|azure)-[\w-]+$'
+            pattern: '^(aws|azure)-[a-z0-9-]+$'
           examples:
             aws_region:
               value: "aws-us-east-1"
@@ -473,7 +473,7 @@ components:
             Unique identifier for this cloud region in the format "provider-region-code".
             Use this ID when calling the /api/v1/regions/{id} endpoint to get details
             about a specific region. The ID is stable and will not change.
-          pattern: '^(aws|azure)-[\w-]+$'
+          pattern: '^(aws|azure)-[a-z0-9-]+$'
           example: "aws-us-east-1"
         name:
           type: string

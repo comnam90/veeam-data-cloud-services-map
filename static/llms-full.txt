@@ -177,8 +177,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
     ],
     "vdc_m365": true,
     "vdc_entra_id": true,
-    "vdc_salesforce": true,
-    "vdc_azure_backup": false
+    "vdc_salesforce": true
   }
 }
 ```
@@ -346,6 +345,15 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
   "environment": "production"
 }
 ```
+
+**Response Fields:**
+- `status`: Always "ok" if the endpoint is reachable
+- `message`: Confirmation message about API functionality
+- `timestamp`: Current server time in ISO 8601 format
+- `environment`: Deployment environment. Possible values:
+  - `"production"` - Production deployment
+  - `"preview"` - Preview/staging deployment (Cloudflare Pages preview branches)
+  - `"local"` - Local development environment
 
 **Response Codes:**
 - `200 OK` - API is reachable and responding
@@ -679,7 +687,7 @@ def find_nearest_region(user_lat, user_lon, service):
     """Find nearest region offering specified service"""
 
     # Get all regions with the service
-    response = requests.get(f'/api/v1/regions?service={service}')
+    response = requests.get(f"/api/v1/regions?service={service}")
     data = response.json()
 
     nearest = None
@@ -743,7 +751,7 @@ async function findCompliantRegions(country, requiredServices) {
     return requiredServices.every(service => {
       if (service === 'vdc_vault') {
         // Tiered service - check if array exists and has items
-        return region.services.vdc_vault && region.services.vdc_vault.length > 0;
+        return Array.isArray(region.services.vdc_vault) && region.services.vdc_vault.length > 0;
       } else {
         // Boolean service - check if true
         return region.services[service] === true;
@@ -961,7 +969,7 @@ This is an unofficial, community-maintained API and is not affiliated with, endo
 - **API Version:** 1.0.0
 - **OpenAPI Specification:** 3.1.0
 - **Last Updated:** 2026-01-03
-- **Total Regions:** 63 (27 AWS + 36 Azure)
+- **Total Regions:** 63 (27 AWS + 36 Azure as of 2026-01-03)
 
 ## Additional Resources
 
