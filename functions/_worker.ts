@@ -83,6 +83,17 @@ documentation for authoritative information.
   ],
 })
 
-// Routes will be added here in later phases
+// Register routes
+import { registerPingRoute } from './routes/v1/ping'
+import { registerServicesRoute } from './routes/v1/services'
+import { registerHealthRoute } from './routes/v1/health'
+import { registerRegionByIdRoute } from './routes/v1/regions-by-id'
+import { registerRegionsRoute } from './routes/v1/regions'
+
+registerPingRoute(app)
+registerServicesRoute(app)
+registerHealthRoute(app)
+registerRegionByIdRoute(app)
+registerRegionsRoute(app)
 
 export default app
