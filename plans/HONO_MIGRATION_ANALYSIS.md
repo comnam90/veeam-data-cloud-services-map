@@ -253,8 +253,9 @@ const route = createRoute({
 #### 5. Deployment (Low Complexity - 2/10)
 - No infrastructure changes required
 - Compatible with existing Cloudflare Pages setup
-- Can use Advanced mode with `_worker.js` entry point
-- Minimal wrangler.toml changes
+- Can use Advanced mode with `_worker.ts` entry point
+- No wrangler.toml changes needed (build command in package.json)
+- TypeScript compilation added to existing build pipeline
 
 #### 6. OpenAPI Documentation Porting (Medium Complexity - 6/10)
 - Port ~700 lines of LLM-optimized OpenAPI documentation to code
@@ -327,28 +328,37 @@ const route = createRoute({
    export default app
    ```
 
-4. Configure wrangler.toml for TypeScript
+4. Update package.json with TypeScript build scripts
+   ```json
+   {
+     "scripts": {
+       "build:data": "node scripts/build-api-data.js",
+       "build:api": "tsc",
+       "build": "npm run build:data && npm run build:api && hugo --gc --minify",
+       "typecheck": "tsc --noEmit",
+       "dev": "npm run build:data && wrangler pages dev public"
+     }
+   }
+   ```
+
+   **Note**: Cloudflare Pages runs `npm run build` (not wrangler.toml build command),
+   so the TypeScript compilation (`build:api`) is added to the existing build chain.
+
+5. Verify wrangler.toml (no changes needed to build section)
    ```toml
    name = "veeam-data-cloud-services-map"
    compatibility_date = "2025-01-01"
    pages_build_output_dir = "public"
 
-   [build]
-   command = "npm run build:data && npm run build:api && hugo --gc --minify"
-
    [env.production.vars]
    ENVIRONMENT = "production"
+
+   [env.preview.vars]
+   ENVIRONMENT = "preview"
    ```
 
-5. Add build scripts to package.json
-   ```json
-   {
-     "scripts": {
-       "build:api": "tsc",
-       "typecheck": "tsc --noEmit"
-     }
-   }
-   ```
+   **Note**: Pages doesn't use `[build]` section in wrangler.toml - build command
+   comes from package.json or Pages dashboard configuration.
 
 6. Create directory structure
    ```
@@ -1038,11 +1048,12 @@ export const regionsRoute = (app) => {
 
 ---
 
-**Document Version**: 2.0
+**Document Version**: 2.1
 **Date**: 2026-01-03
 **Author**: Claude
 **Status**: Ready for Review
 
 **Changelog**:
+- v2.1: Fixed build configuration - Cloudflare Pages uses package.json (not wrangler.toml [build] section) for build commands
 - v2.0: Updated requirements to mandate TypeScript and OpenAPI generation, added comprehensive OpenAPI analysis, updated complexity to MEDIUM (7/10), increased effort estimate to 15-23 hours
 - v1.0: Initial analysis with optional TypeScript
