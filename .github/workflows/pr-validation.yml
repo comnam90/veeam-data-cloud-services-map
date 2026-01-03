@@ -21,6 +21,27 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build API data
+        run: npm run build:data
+
+      - name: Verify API data generated
+        run: |
+          if [ -f "./functions/regions.json" ]; then
+            echo "✅ API data generated successfully"
+          else
+            echo "❌ API data generation failed"
+            exit 1
+          fi
+
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
@@ -44,3 +65,7 @@ jobs:
             echo "❌ Build failed - index.html not found"
             exit 1
           fi
+
+      - name: Run API tests
+        run: npm test
+        timeout-minutes: 2
