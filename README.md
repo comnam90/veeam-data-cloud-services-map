@@ -4,6 +4,8 @@
 
 A lightweight, interactive map to visualize Veeam Data Cloud (VDC) services across AWS and Azure regions. Designed to quickly answer "Where is X available?" without navigating complex spreadsheets.
 
+**🎉 New:** Now includes a REST API for programmatic access to service availability data! See the [API Documentation](#-api-documentation) section below.
+
 ## 🚀 Tech Stack
 
 * **Framework:** [Hugo](https://gohugo.io/) (Static Site Generator)
