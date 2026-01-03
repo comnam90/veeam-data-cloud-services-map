@@ -57,19 +57,30 @@ function getRegionStats() {
 }
 
 export async function onRequestGet(context) {
-  const stats = getRegionStats();
+  try {
+    const stats = getRegionStats();
 
-  return jsonResponse({
-    status: "healthy",
-    version: "1.0.0",
-    timestamp: new Date().toISOString(),
-    environment: context.env.ENVIRONMENT || "unknown",
-    stats: {
-      totalRegions: stats.totalRegions,
-      awsRegions: stats.awsRegions,
-      azureRegions: stats.azureRegions
-    }
-  });
+    return jsonResponse({
+      status: "healthy",
+      version: "1.0.0",
+      timestamp: new Date().toISOString(),
+      environment: context.env.ENVIRONMENT || "unknown",
+      stats: {
+        totalRegions: stats.totalRegions,
+        awsRegions: stats.awsRegions,
+        azureRegions: stats.azureRegions
+      }
+    });
+  } catch (error) {
+    console.error('[Health] Error:', error);
+    return jsonResponse({
+      status: "unhealthy",
+      version: "1.0.0",
+      timestamp: new Date().toISOString(),
+      error: "Failed to retrieve health status",
+      message: error.message
+    }, 500);
+  }
 }
 
 export async function onRequestOptions(context) {

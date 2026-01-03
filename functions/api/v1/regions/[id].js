@@ -68,26 +68,38 @@ function getRegionById(id) {
 }
 
 export async function onRequestGet(context) {
-  const { id } = context.params;
+  try {
+    const { id } = context.params;
 
-  // Get the region
-  const region = getRegionById(id);
+    // Get the region
+    const region = getRegionById(id);
 
-  // Return 404 if not found
-  if (!region) {
+    // Return 404 if not found
+    if (!region) {
+      return errorResponse(
+        'Region not found',
+        'REGION_NOT_FOUND',
+        404,
+        {
+          message: `No region found with ID: ${id}`,
+          requestedId: id
+        }
+      );
+    }
+
+    // Return the region
+    return jsonResponse(region);
+  } catch (error) {
+    console.error('[Region by ID] Error:', error);
     return errorResponse(
-      'Region not found',
-      'REGION_NOT_FOUND',
-      404,
+      'Failed to retrieve region',
+      'INTERNAL_ERROR',
+      500,
       {
-        message: `No region found with ID: ${id}`,
-        requestedId: id
+        message: error.message
       }
     );
   }
-
-  // Return the region
-  return jsonResponse(region);
 }
 
 export async function onRequestOptions(context) {
