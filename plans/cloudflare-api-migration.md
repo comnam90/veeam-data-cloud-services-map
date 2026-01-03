@@ -8,7 +8,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
 
 1. Migrate Hugo site from GitHub Pages to Cloudflare Pages (zero downtime)
 2. Implement REST API at `/api/v1/` with query parameters using Pages Functions
-3. Add interactive Swagger UI documentation at `/api-docs/`
+3. Add interactive Swagger UI documentation at `/api/docs/`
 4. Maintain all existing map functionality
 5. Enable external services to query region/service availability programmatically
 6. Keep it simple with file-based routing
@@ -21,7 +21,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
 │                                                          │
 │  Static Site (Hugo - public/):                          │
 │  ├─ /                    → Interactive Map              │
-│  ├─ /api-docs/           → Swagger UI                   │
+│  ├─ /api/docs/           → Swagger UI                   │
 │  └─ /api/openapi.yaml    → OpenAPI Specification        │
 │                                                          │
 │  Functions (file-based routing):                        │
@@ -37,7 +37,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
 | Endpoint | Method | Description | Example |
 |----------|--------|-------------|---------|
 | `/` | GET | Interactive map | Main site |
-| `/api-docs/` | GET | Swagger UI | API documentation |
+| `/api/docs/` | GET | Swagger UI | API documentation |
 | `/api/openapi.yaml` | GET | OpenAPI spec | Schema definition |
 | `/api/v1/regions` | GET | List regions with filters | `?provider=AWS&service=vdc_vault` |
 | `/api/v1/regions/{id}` | GET | Get specific region | `/api/v1/regions/aws-us-east-1` |
@@ -102,7 +102,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
   - Version as `1.0.0`
 
 #### 1.5 Set Up Swagger UI
-- [ ] Create `static/api-docs/index.html`
+- [ ] Create `static/api/docs/index.html`
   - Use Swagger UI standalone bundle from CDN
   - Point to `/api/openapi.yaml`
   - Customize branding (Veeam colors)
@@ -274,7 +274,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
 #### 3.2 Test Each Endpoint
 - [ ] Test static site:
   - `GET /` (map loads)
-  - `GET /api-docs/` (Swagger UI loads)
+  - `GET /api/docs/` (Swagger UI loads)
 - [ ] Test API endpoints:
   - `GET /api/v1/regions` (no params - all regions)
   - `GET /api/v1/regions?provider=AWS` (filter by provider)
@@ -325,7 +325,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
 - [ ] Check API endpoints respond:
   - `curl https://veeam-data-cloud-services-map.pages.dev/api/v1/regions`
   - `curl https://veeam-data-cloud-services-map.pages.dev/api/v1/health`
-- [ ] Check Swagger UI loads at `/api-docs/`
+- [ ] Check Swagger UI loads at `/api/docs/`
 - [ ] Test API queries from Swagger UI
 - [ ] Verify data accuracy (spot check against GitHub Pages version)
 
@@ -452,13 +452,13 @@ veeam-data-cloud-services-map/
 │       ├── index.html (interactive map)
 │       ├── api/
 │       │   └── openapi.yaml
-│       └── api-docs/
-│           └── index.html (Swagger UI)
+│       │   └── docs/
+│       │       └── index.html (Swagger UI)
 ├── static/
 │   ├── api/
 │   │   └── openapi.yaml (OpenAPI specification)
-│   └── api-docs/
-│       └── index.html (Swagger UI)
+│   │   └── docs/
+│   │       └── index.html (Swagger UI)
 ├── layouts/
 │   └── index.html (Hugo template - unchanged)
 ├── content/
