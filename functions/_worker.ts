@@ -1,0 +1,88 @@
+import { OpenAPIHono } from '@hono/zod-openapi'
+import { cors } from 'hono/cors'
+import { secureHeaders } from 'hono/secure-headers'
+import type { Env } from './types/env'
+
+// Create Hono app with OpenAPI support
+const app = new OpenAPIHono<{ Bindings: Env }>()
+
+// Global middleware
+app.use('*', secureHeaders())
+app.use('*', cors({
+  origin: '*',
+  allowMethods: ['GET', 'OPTIONS'],
+  allowHeaders: ['Content-Type'],
+  maxAge: 86400,
+}))
+
+// Add X-API-Version header to all responses
+app.use('*', async (c, next) => {
+  await next()
+  c.header('X-API-Version', '1.0.0')
+})
+
+// Add Cache-Control header to API responses
+app.use('/api/*', async (c, next) => {
+  await next()
+  if (!c.res.headers.has('Cache-Control')) {
+    c.header('Cache-Control', 'public, max-age=3600')
+  }
+})
+
+// OpenAPI documentation endpoint
+app.doc('/api/openapi.json', {
+  openapi: '3.1.0',
+  info: {
+    title: 'Veeam Data Cloud Service Availability API',
+    version: '1.0.0',
+    description: `
+Retrieves comprehensive information about Veeam Data Cloud (VDC) service availability
+across AWS and Azure cloud regions worldwide. Use this API to programmatically discover
+which VDC services are available in specific geographic locations, filter regions by
+cloud provider, search by country name, and understand service tier and edition
+availability for planning your data protection strategy.
+
+**Common use cases:**
+- Find all regions where a specific VDC service (like Vault or Microsoft 365 backup) is available
+- Identify which AWS or Azure regions support your required service tier and edition
+- Search for regions by country or geographic location to meet data residency requirements
+- Get complete service availability data for capacity planning and multi-region deployments
+
+**Disclaimer:** This is an unofficial, community-maintained API and is not affiliated
+with, endorsed by, or supported by Veeam Software. Always refer to official Veeam
+documentation for authoritative information.
+    `.trim(),
+    contact: {
+      name: 'GitHub Repository',
+      url: 'https://github.com/comnam90/veeam-data-cloud-services-map',
+    },
+    license: {
+      name: 'MIT',
+      url: 'https://opensource.org/licenses/MIT',
+    },
+  },
+  servers: [
+    {
+      url: '/',
+      description: 'Current environment (auto-detects production/preview/local)',
+    },
+  ],
+  tags: [
+    {
+      name: 'Regions',
+      description: 'Query cloud regions and their VDC service availability',
+    },
+    {
+      name: 'Services',
+      description: 'Information about available VDC services',
+    },
+    {
+      name: 'Health',
+      description: 'API health and status',
+    },
+  ],
+})
+
+// Routes will be added here in later phases
+
+export default app

@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "build:data": "node scripts/build-api-data.js",
-    "build": "npm run build:data && hugo --gc --minify",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run build:data && npm run typecheck && hugo --gc --minify",
     "dev": "npm run build:data && wrangler pages dev public",
     "test": "node scripts/test-api.js",
     "clean": "rm -rf public functions/regions.json"
@@ -20,9 +21,15 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "js-yaml": "^4.1.0"
+    "@hono/zod-openapi": "^1.2.0",
+    "hono": "^4.11.3",
+    "js-yaml": "^4.1.0",
+    "zod": "^4.3.4"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260103.0",
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3",
     "wrangler": "^4.54.0"
   }
 }
