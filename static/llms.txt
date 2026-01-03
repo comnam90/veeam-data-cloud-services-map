@@ -1,0 +1,127 @@
+# Veeam Data Cloud Service Availability API
+
+> Programmatic access to Veeam Data Cloud service availability across AWS and Azure regions
+
+## Overview
+
+This API provides comprehensive information about which Veeam Data Cloud (VDC) services are available in different cloud regions worldwide. Use it to discover service availability, filter by cloud provider, search by geographic location, and understand tier and edition options.
+
+## Quick Start
+
+**Base URL:** `/api/v1`
+
+**Key Endpoints:**
+- `GET /api/v1/regions` - List all regions with optional filtering
+- `GET /api/v1/regions/{id}` - Get specific region details
+- `GET /api/v1/services` - List all available VDC services
+- `GET /api/v1/health` - API health check with statistics
+
+**Example Query:**
+```
+GET /api/v1/regions?provider=AWS&service=vdc_vault&tier=Core
+```
+Returns all AWS regions offering VDC Vault in Core pricing tier.
+
+## VDC Services Covered
+
+1. **VDC Vault** - Object storage backup repository (tiered: Foundation/Advanced, Core/Non-Core)
+2. **VDC for Microsoft 365** - Backup for Exchange, SharePoint, OneDrive, Teams
+3. **VDC for Entra ID** - Azure Active Directory backup
+4. **VDC for Salesforce** - CRM data protection
+5. **VDC for Azure** - Azure VM and resource backup
+
+## Common Use Cases
+
+**Find regions by service:**
+```
+GET /api/v1/regions?service=vdc_m365
+```
+
+**Search by country/location:**
+```
+GET /api/v1/regions?country=Japan
+```
+
+**Filter by cloud provider:**
+```
+GET /api/v1/regions?provider=Azure
+```
+
+**Combine filters for precise results:**
+```
+GET /api/v1/regions?provider=AWS&service=vdc_vault&edition=Advanced&tier=Core
+```
+
+## Data Structure
+
+**Regions** (63 total: 27 AWS + 36 Azure)
+- Unique ID (e.g., "aws-us-east-1")
+- Human-readable name
+- Geographic coordinates
+- Alternative names/aliases for searching
+- Complete service availability catalog
+
+**Services**
+- Service metadata and type (tiered vs boolean)
+- Available editions and tiers
+- Service descriptions
+
+## Authentication & Rate Limiting
+
+- **Authentication:** None required (public API)
+- **Rate Limiting:** Cloudflare default limits apply
+- **CORS:** Enabled for all origins
+- **Response Format:** JSON only
+
+## Documentation
+
+- **OpenAPI Specification:** `/api/openapi.yaml` (OpenAPI 3.1.0)
+- **Interactive Docs:** `/api-docs/` (Swagger UI)
+- **Full Documentation:** `/llms-full.txt` (comprehensive guide)
+- **GitHub Repository:** https://github.com/comnam90/veeam-data-cloud-services-map
+
+## Response Characteristics
+
+- All responses are `application/json`
+- Consistent error format with descriptive messages
+- Includes metadata (count, applied filters)
+- Cache-Control headers for performance
+- Security headers enabled
+
+## Error Handling
+
+Errors return appropriate HTTP status codes (400, 404, 500) with structured JSON:
+```json
+{
+  "error": "Invalid parameter",
+  "code": "INVALID_PROVIDER",
+  "message": "Provider must be either 'AWS' or 'Azure'. Received: 'GCP'",
+  "parameter": "provider",
+  "value": "GCP"
+}
+```
+
+LLMs can use the detailed error messages to automatically correct and retry requests.
+
+## Important Notes
+
+**Disclaimer:** This is an unofficial, community-maintained API not affiliated with Veeam Software. Always refer to official Veeam documentation for authoritative information.
+
+**Data Accuracy:** Region data is maintained by the community and may not reflect real-time changes to service availability.
+
+**Version:** API v1.0.0
+
+## For AI Agents
+
+This API is optimized for programmatic access by AI agents and LLMs:
+- All endpoints have semantic, conversational descriptions
+- Every field includes business context and usage guidance
+- Error messages are designed for automatic retry logic
+- Consistent naming conventions throughout
+- Flat data structures for easy parsing
+- Examples provided for all endpoints
+
+## Support
+
+- Issues/Questions: https://github.com/comnam90/veeam-data-cloud-services-map/issues
+- OpenAPI Spec: Full machine-readable specification available at `/api/openapi.yaml`
