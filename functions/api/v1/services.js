@@ -57,8 +57,7 @@ export async function onRequestGet(context) {
       id: "vdc_m365",
       name: "VDC for Microsoft 365",
       type: "boolean",
-      description: "Backup and recovery for Microsoft 365 data",
-      editions: ["Flex", "Express", "Premium"]
+      description: "Backup and recovery for Microsoft 365 data"
     },
     {
       id: "vdc_entra_id",

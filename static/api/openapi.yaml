@@ -233,7 +233,6 @@ paths:
                   - id: "vdc_m365"
                     name: "VDC for Microsoft 365"
                     type: "boolean"
-                    editions: ["Flex", "Express", "Premium"]
                   - id: "vdc_entra_id"
                     name: "VDC for Entra ID"
                     type: "boolean"
