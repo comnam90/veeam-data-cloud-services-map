@@ -3,8 +3,8 @@
  * Health check endpoint with API statistics
  */
 
-import { getRegions, getRegionStats } from '../../../_shared/data.js';
-import { jsonResponse, handleOptions } from '../../../_shared/response.js';
+import { getRegions, getRegionStats } from '../../../shared/data.js';
+import { jsonResponse, handleOptions } from '../../../shared/response.js';
 
 export async function onRequestGet(context) {
   const stats = getRegionStats();

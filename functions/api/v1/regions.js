@@ -3,8 +3,8 @@
  * List all regions with optional filtering
  */
 
-import { getRegions } from '../../../_shared/data.js';
-import { jsonResponse, errorResponse, handleOptions, validateParam } from '../../../_shared/response.js';
+import { getRegions } from '../../../shared/data.js';
+import { jsonResponse, errorResponse, handleOptions, validateParam } from '../../../shared/response.js';
 
 export async function onRequestGet(context) {
   const { searchParams } = new URL(context.request.url);

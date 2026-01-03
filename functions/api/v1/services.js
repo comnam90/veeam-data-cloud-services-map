@@ -3,7 +3,7 @@
  * List available Veeam Data Cloud services with metadata
  */
 
-import { jsonResponse, handleOptions } from '../../../_shared/response.js';
+import { jsonResponse, handleOptions } from '../../../shared/response.js';
 
 export async function onRequestGet(context) {
   const services = [

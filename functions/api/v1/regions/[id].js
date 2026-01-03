@@ -3,8 +3,8 @@
  * Get a specific region by ID
  */
 
-import { getRegionById } from '../../../../_shared/data.js';
-import { jsonResponse, errorResponse, handleOptions } from '../../../../_shared/response.js';
+import { getRegionById } from '../../../../shared/data.js';
+import { jsonResponse, errorResponse, handleOptions } from '../../../../shared/response.js';
 
 export async function onRequestGet(context) {
   const { id } = context.params;

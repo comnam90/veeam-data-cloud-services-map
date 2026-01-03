@@ -10,7 +10,7 @@ const path = require('path');
 
 // Load regions data
 const regionsData = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../functions/_shared/regions.json'), 'utf8')
+  fs.readFileSync(path.join(__dirname, '../functions/shared/regions.json'), 'utf8')
 );
 
 console.log('🧪 Testing API Functions Logic\n');
