@@ -108,13 +108,13 @@ The map data is also exposed as a REST API for programmatic access. Perfect for 
 ### Base URL
 
 ```
-https://vcdmap.bcthomas.com
+https://vdcmap.bcthomas.com
 ```
 
 ### Interactive Documentation
 
-- **Swagger UI:** [/api/docs/](https://vcdmap.bcthomas.com/api/docs/)
-- **OpenAPI Spec:** [/api/openapi.yaml](https://vcdmap.bcthomas.com/api/openapi.yaml)
+- **Swagger UI:** [/api/docs/](https://vdcmap.bcthomas.com/api/docs/)
+- **OpenAPI Spec:** [/api/openapi.yaml](https://vdcmap.bcthomas.com/api/openapi.yaml)
 
 ### Endpoints
 
@@ -184,19 +184,19 @@ List all cloud regions with optional filters.
 
 ```bash
 # All regions
-curl https://vcdmap.bcthomas.com/api/v1/regions
+curl https://vdcmap.bcthomas.com/api/v1/regions
 
 # All AWS regions
-curl https://vcdmap.bcthomas.com/api/v1/regions?provider=AWS
+curl https://vdcmap.bcthomas.com/api/v1/regions?provider=AWS
 
 # Regions with VDC Vault
-curl https://vcdmap.bcthomas.com/api/v1/regions?service=vdc_vault
+curl https://vdcmap.bcthomas.com/api/v1/regions?service=vdc_vault
 
 # Japanese regions with VDC Vault Core tier
-curl https://vcdmap.bcthomas.com/api/v1/regions?country=Japan&service=vdc_vault&tier=Core
+curl https://vdcmap.bcthomas.com/api/v1/regions?country=Japan&service=vdc_vault&tier=Core
 
 # Azure regions with M365 protection
-curl https://vcdmap.bcthomas.com/api/v1/regions?provider=Azure&service=vdc_m365
+curl https://vdcmap.bcthomas.com/api/v1/regions?provider=Azure&service=vdc_m365
 ```
 
 **Response:**
@@ -241,7 +241,7 @@ Get details for a specific region by ID.
 
 **Example:**
 ```bash
-curl https://vcdmap.bcthomas.com/api/v1/regions/aws-us-east-1
+curl https://vdcmap.bcthomas.com/api/v1/regions/aws-us-east-1
 ```
 
 ### Response Codes
