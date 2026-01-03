@@ -100,3 +100,179 @@ Want to submit a fix directly? PRs welcome! The PR template will guide you throu
 * **Icons:** defined in the `getServiceIcon()` function in `layouts/index.html`. They are inline SVGs.
 * **Colors:** Provider badge colors are set in `getProviderBadgeColor()`.
 * **Map Style:** The base map is "CartoDB Dark Matter". You can change the `L.tileLayer` URL in `index.html` if you want a light mode map.
+
+## 📡 API Documentation
+
+The map data is also exposed as a REST API for programmatic access. Perfect for CI/CD pipelines, monitoring systems, mobile apps, or automation.
+
+### Base URL
+
+```
+https://veeam-data-cloud-services-map.pages.dev
+```
+
+### Interactive Documentation
+
+- **Swagger UI:** [/api/docs/](https://veeam-data-cloud-services-map.pages.dev/api/docs/)
+- **OpenAPI Spec:** [/api/openapi.yaml](https://veeam-data-cloud-services-map.pages.dev/api/openapi.yaml)
+
+### Endpoints
+
+#### `GET /api/v1/health`
+
+Health check with statistics.
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "version": "1.0.0",
+  "timestamp": "2025-01-03T10:30:00Z",
+  "environment": "production",
+  "stats": {
+    "totalRegions": 63,
+    "awsRegions": 27,
+    "azureRegions": 36
+  }
+}
+```
+
+#### `GET /api/v1/ping`
+
+Simple connectivity test (no data dependencies).
+
+#### `GET /api/v1/services`
+
+List all available VDC services with metadata.
+
+**Response:**
+```json
+{
+  "services": [
+    {
+      "id": "vdc_vault",
+      "name": "Veeam Data Cloud Vault",
+      "type": "tiered",
+      "description": "Immutable backup storage with configurable pricing tiers",
+      "editions": ["Foundation", "Advanced"],
+      "tiers": ["Core", "Non-Core"]
+    },
+    {
+      "id": "vdc_m365",
+      "name": "VDC for Microsoft 365",
+      "type": "boolean",
+      "description": "Backup and recovery for Microsoft 365 data"
+    }
+    // ... more services
+  ],
+  "count": 5
+}
+```
+
+#### `GET /api/v1/regions`
+
+List all cloud regions with optional filters.
+
+**Query Parameters:**
+- `provider` - Filter by cloud provider (`AWS` | `Azure`)
+- `country` - Filter by country name (searches region name and aliases)
+- `service` - Filter by VDC service availability (`vdc_vault` | `vdc_m365` | `vdc_entra_id` | `vdc_salesforce` | `vdc_azure_backup`)
+- `tier` - Filter by pricing tier (`Core` | `Non-Core`) - only for `vdc_vault`
+- `edition` - Filter by edition (`Foundation` | `Advanced`) - only for `vdc_vault`
+
+**Examples:**
+
+```bash
+# All regions
+curl https://veeam-data-cloud-services-map.pages.dev/api/v1/regions
+
+# All AWS regions
+curl https://veeam-data-cloud-services-map.pages.dev/api/v1/regions?provider=AWS
+
+# Regions with VDC Vault
+curl https://veeam-data-cloud-services-map.pages.dev/api/v1/regions?service=vdc_vault
+
+# Japanese regions with VDC Vault Core tier
+curl https://veeam-data-cloud-services-map.pages.dev/api/v1/regions?country=Japan&service=vdc_vault&tier=Core
+
+# Azure regions with M365 protection
+curl https://veeam-data-cloud-services-map.pages.dev/api/v1/regions?provider=Azure&service=vdc_m365
+```
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": "aws-us-east-1",
+      "name": "US East 1 (N. Virginia)",
+      "provider": "AWS",
+      "coords": [38.9, -77.4],
+      "aliases": ["Virginia", "N. Virginia", "US East", "IAD"],
+      "services": {
+        "vdc_vault": [
+          {
+            "edition": "Foundation",
+            "tier": "Core"
+          },
+          {
+            "edition": "Advanced",
+            "tier": "Core"
+          }
+        ]
+      }
+    }
+    // ... more regions
+  ],
+  "count": 63,
+  "filters": {
+    "provider": null,
+    "country": null,
+    "service": null,
+    "tier": null,
+    "edition": null
+  }
+}
+```
+
+#### `GET /api/v1/regions/{id}`
+
+Get details for a specific region by ID.
+
+**Example:**
+```bash
+curl https://veeam-data-cloud-services-map.pages.dev/api/v1/regions/aws-us-east-1
+```
+
+### Response Codes
+
+- `200 OK` - Successful request
+- `400 Bad Request` - Invalid query parameter
+- `404 Not Found` - Region not found
+- `500 Internal Server Error` - Server error
+
+### CORS
+
+All endpoints support CORS with `Access-Control-Allow-Origin: *` for public access.
+
+### Rate Limiting
+
+Currently no rate limiting. Please be respectful of the free hosting.
+
+### Development & Testing
+
+```bash
+# Install dependencies
+npm install
+
+# Start local development server with API
+npm run dev
+
+# Run API tests
+npm test
+
+# Build for production
+npm run build
+```
+
+The API is built with Cloudflare Pages Functions and automatically deployed on every push to `main`.
