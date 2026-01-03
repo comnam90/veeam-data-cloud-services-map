@@ -17,10 +17,8 @@ info:
     url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: https://veeam-data-cloud-services-map.pages.dev
-    description: Production
-  - url: http://localhost:8788
-    description: Local development
+  - url: /
+    description: Current environment (auto-detects production/preview/local)
 
 tags:
   - name: Regions
