@@ -99,7 +99,7 @@ All API endpoint logic has been tested and validated:
 ### Static Files
 ```
 ✅ static/api/openapi.yaml - OpenAPI 3.0 specification
-✅ static/api-docs/index.html - Swagger UI with branding
+✅ static/api/docs/index.html - Swagger UI with branding
 ```
 
 ### Configuration
@@ -176,7 +176,7 @@ wrangler pages dev public
 
 # Access locally
 http://localhost:8788/                # Interactive map
-http://localhost:8788/api-docs/       # Swagger UI
+http://localhost:8788/api/docs/       # Swagger UI
 http://localhost:8788/api/v1/regions  # API endpoint
 ```
 
@@ -190,7 +190,7 @@ http://localhost:8788/api/v1/regions  # API endpoint
 - [ ] GET /api/v1/regions/invalid-id - Returns 404 error
 - [ ] GET /api/v1/services - Returns service metadata
 - [ ] GET /api/v1/health - Returns health status
-- [ ] GET /api-docs/ - Swagger UI loads
+- [ ] GET /api/docs/ - Swagger UI loads
 - [ ] OPTIONS /api/v1/regions - Returns CORS headers
 
 ## Summary

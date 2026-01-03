@@ -1,9 +1,19 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
   title: Veeam Data Cloud Service Availability API
   version: 1.0.0
   description: |
-    Query Veeam Data Cloud (VDC) service availability across AWS and Azure regions.
+    Retrieves comprehensive information about Veeam Data Cloud (VDC) service availability
+    across AWS and Azure cloud regions worldwide. Use this API to programmatically discover
+    which VDC services are available in specific geographic locations, filter regions by
+    cloud provider, search by country name, and understand service tier and edition
+    availability for planning your data protection strategy.
+
+    **Common use cases:**
+    - Find all regions where a specific VDC service (like Vault or Microsoft 365 backup) is available
+    - Identify which AWS or Azure regions support your required service tier and edition
+    - Search for regions by country or geographic location to meet data residency requirements
+    - Get complete service availability data for capacity planning and multi-region deployments
 
     **Disclaimer:** This is an unofficial, community-maintained API and is not affiliated
     with, endorsed by, or supported by Veeam Software. Always refer to official Veeam
@@ -31,15 +41,41 @@ tags:
 paths:
   /api/v1/regions:
     get:
-      summary: List all regions
-      description: Get a list of all cloud regions, optionally filtered by provider, service, tier, or edition
+      summary: List all cloud regions with VDC service availability
+      description: |
+        Retrieves a comprehensive list of all AWS and Azure regions where Veeam Data Cloud
+        services are available, with powerful filtering capabilities to find exactly the
+        regions you need for your deployment.
+
+        **When to use this endpoint:**
+        - Planning a new VDC deployment and need to identify suitable regions
+        - Checking which regions support specific service combinations
+        - Finding regions that meet data residency requirements (use country filter)
+        - Comparing service availability across cloud providers
+        - Building a multi-region disaster recovery strategy
+
+        **How filtering works:**
+        - All filters are optional and can be combined for precise results
+        - Filtering by 'service' returns only regions where that service is available
+        - The 'tier' and 'edition' filters only apply to VDC Vault service
+        - Country search matches against region names and common aliases (e.g., "Japan" matches "Asia Pacific (Tokyo)")
+        - When no filters are provided, returns all 63 regions (27 AWS + 36 Azure)
+
+        **Response includes:**
+        - Complete region details with geographic coordinates
+        - All available services in each region with tier/edition information
+        - Applied filter values for reference
+        - Total count of matching regions
       operationId: listRegions
       tags:
         - Regions
       parameters:
         - name: provider
           in: query
-          description: Filter by cloud provider
+          description: |
+            Filters results to show only regions from the specified cloud provider.
+            Use "AWS" to see only Amazon Web Services regions, or "Azure" for Microsoft Azure regions.
+            Omit this parameter to see regions from both providers.
           required: false
           schema:
             type: string
@@ -47,14 +83,27 @@ paths:
           example: AWS
         - name: country
           in: query
-          description: Filter by country name (searches region name and aliases)
+          description: |
+            Searches for regions by country or geographic location name. The search matches
+            against both the official region name and common aliases. For example, searching
+            for "Japan" will find "Asia Pacific (Tokyo)" region. Case-insensitive partial
+            matching is supported, so "virgin" will match "US East 1 (N. Virginia)".
           required: false
           schema:
             type: string
           example: Japan
         - name: service
           in: query
-          description: Filter by VDC service availability
+          description: |
+            Filters to show only regions where the specified VDC service is available.
+            Valid service IDs:
+            - vdc_vault: Veeam Data Cloud Vault (object storage backup target)
+            - vdc_m365: VDC for Microsoft 365 (backup for Exchange, SharePoint, OneDrive, Teams)
+            - vdc_entra_id: VDC for Entra ID (Azure Active Directory backup)
+            - vdc_salesforce: VDC for Salesforce (CRM data protection)
+            - vdc_azure_backup: VDC for Azure (Azure VM and resource backup)
+
+            When filtering by service, only regions offering that service will be returned.
           required: false
           schema:
             type: string
@@ -62,7 +111,14 @@ paths:
           example: vdc_vault
         - name: tier
           in: query
-          description: Filter by pricing tier (only applicable to vdc_vault)
+          description: |
+            Filters VDC Vault regions by pricing tier. This parameter ONLY applies when
+            service=vdc_vault or when searching all services.
+
+            - Core: Premium tier regions with lowest latency and highest performance (higher cost)
+            - Non-Core: Standard tier regions optimized for cost-effective long-term retention
+
+            Note: Other VDC services (M365, Entra ID, Salesforce, Azure Backup) do not use tiers.
           required: false
           schema:
             type: string
@@ -70,7 +126,14 @@ paths:
           example: Core
         - name: edition
           in: query
-          description: Filter by service edition (only applicable to vdc_vault)
+          description: |
+            Filters VDC Vault regions by service edition. This parameter ONLY applies when
+            service=vdc_vault or when searching all services.
+
+            - Foundation: Entry-level edition with core backup and recovery features
+            - Advanced: Full-featured edition with advanced capabilities (compliance, ransomware protection, etc.)
+
+            A single region may offer both editions. Note: Other VDC services do not use editions.
           required: false
           schema:
             type: string
@@ -161,19 +224,46 @@ paths:
 
   /api/v1/regions/{id}:
     get:
-      summary: Get a specific region
-      description: Get detailed information about a specific region by its ID
+      summary: Get detailed information about a specific cloud region
+      description: |
+        Retrieves complete details about a single cloud region, including all available
+        VDC services, geographic coordinates, and alternative names for that region.
+
+        **When to use this endpoint:**
+        - You know the specific region ID and need detailed service availability
+        - Verifying whether a particular region supports your required services
+        - Getting geographic coordinates for mapping or distance calculations
+        - Looking up alternative names/aliases for a region
+
+        **Region ID format:**
+        - AWS regions: "aws-{region-code}" (e.g., "aws-us-east-1", "aws-eu-west-1")
+        - Azure regions: "azure-{location-name}" (e.g., "azure-us-east", "azure-europe-west")
+
+        **Response details:**
+        The response includes the region's complete service catalog. Services may be:
+        - Tiered services (VDC Vault): Shows array of available edition/tier combinations
+        - Boolean services (M365, Entra ID, Salesforce, Azure Backup): Shows true if available, absent if not
       operationId: getRegion
       tags:
         - Regions
       parameters:
         - name: id
           in: path
-          description: Region ID (e.g., aws-us-east-1, azure-us-east)
+          description: |
+            The unique identifier for the region. Must be in the format "provider-region-code".
+            Examples: "aws-us-east-1" for AWS US East (N. Virginia), "azure-us-east" for Azure East US.
+            If the region ID doesn't exist, the API returns a 404 error with a descriptive message.
           required: true
           schema:
             type: string
-          example: aws-us-east-1
+            pattern: '^(aws|azure)-[a-z0-9-]+$'
+          examples:
+            aws_region:
+              value: "aws-us-east-1"
+              summary: "AWS US East (N. Virginia)"
+            azure_region:
+              value: "azure-us-east"
+              summary: "Azure East US"
       responses:
         '200':
           description: Region details
@@ -206,8 +296,29 @@ paths:
 
   /api/v1/services:
     get:
-      summary: List available services
-      description: Get metadata about all available Veeam Data Cloud services
+      summary: List all available VDC services with metadata
+      description: |
+        Retrieves a complete catalog of all Veeam Data Cloud services tracked by this API,
+        including metadata about service types, available editions, and pricing tiers.
+
+        **When to use this endpoint:**
+        - Discovering what VDC services are tracked by this API
+        - Understanding service types before filtering regions (tiered vs boolean availability)
+        - Building a UI dropdown or selection menu of available services
+        - Learning which services support editions and tiers
+
+        **Service types explained:**
+        - **Tiered services** (VDC Vault): Availability varies by edition (Foundation/Advanced)
+          and pricing tier (Core/Non-Core). A single region may offer multiple combinations.
+        - **Boolean services** (M365, Entra ID, Salesforce, Azure Backup): Either available
+          (true) or not available in a region. No edition or tier variations.
+
+        **All 5 VDC services:**
+        1. VDC Vault - Object storage backup repository (tiered)
+        2. VDC for Microsoft 365 - Backup for Exchange, SharePoint, OneDrive, Teams (boolean)
+        3. VDC for Entra ID - Azure Active Directory backup (boolean)
+        4. VDC for Salesforce - CRM data protection (boolean)
+        5. VDC for Azure - Azure VM and resource backup (boolean)
       operationId: listServices
       tags:
         - Services
@@ -245,8 +356,22 @@ paths:
 
   /api/v1/ping:
     get:
-      summary: Simple ping test
-      description: Test if the API is responding (no data dependencies)
+      summary: Test API connectivity and responsiveness
+      description: |
+        A lightweight connectivity test endpoint that confirms the API is online and responding.
+        This endpoint has no data dependencies and will respond even if the region database
+        is unavailable.
+
+        **When to use this endpoint:**
+        - Testing network connectivity to the API
+        - Health checks in monitoring systems (lightweight alternative to /health)
+        - Verifying API is deployed and accessible
+        - CI/CD pipeline validation
+
+        **Response includes:**
+        - Status confirmation (always "ok" if reachable)
+        - Deployment environment (production/preview/local)
+        - Current server timestamp in ISO 8601 format
       operationId: ping
       tags:
         - Health
@@ -274,8 +399,28 @@ paths:
 
   /api/v1/health:
     get:
-      summary: Health check
-      description: Get API health status and statistics
+      summary: Get comprehensive API health status and statistics
+      description: |
+        Performs a comprehensive health check that validates data availability and returns
+        statistics about the region database. Use this endpoint to verify the API is fully
+        operational and has successfully loaded all region data.
+
+        **When to use this endpoint:**
+        - Comprehensive health monitoring that includes data validation
+        - Getting current statistics about available regions
+        - Troubleshooting data loading issues
+        - Dashboard displays showing API status and data counts
+
+        **Health status meanings:**
+        - "healthy": API is fully operational with all data loaded correctly
+        - "degraded": API is responding but with reduced functionality
+        - "unhealthy": Critical errors preventing normal operation
+
+        **Response includes:**
+        - Overall health status
+        - API version number
+        - Current timestamp
+        - Region statistics (total regions, AWS count, Azure count)
       operationId: healthCheck
       tags:
         - Health
@@ -324,59 +469,116 @@ components:
       properties:
         id:
           type: string
-          description: Unique region identifier
+          description: |
+            Unique identifier for this cloud region in the format "provider-region-code".
+            Use this ID when calling the /api/v1/regions/{id} endpoint to get details
+            about a specific region. The ID is stable and will not change.
+          pattern: '^(aws|azure)-[a-z0-9-]+$'
           example: "aws-us-east-1"
         name:
           type: string
-          description: Human-readable region name
+          description: |
+            Human-readable display name for the region, typically matching the official
+            name used by the cloud provider. This is what users will recognize when
+            selecting regions in a UI.
           example: "US East 1 (N. Virginia)"
         provider:
           type: string
           enum: [AWS, Azure]
-          description: Cloud provider
+          description: |
+            The cloud provider that operates this region. Currently supports Amazon Web
+            Services (AWS) and Microsoft Azure. Use this field to group or filter regions
+            by cloud provider when building multi-cloud solutions.
           example: "AWS"
         coords:
           type: array
-          description: Geographic coordinates [latitude, longitude]
+          description: |
+            Geographic coordinates of the region's approximate data center location,
+            provided as [latitude, longitude]. Use these coordinates for:
+            - Displaying regions on a map visualization
+            - Calculating distance from user location to find nearest region
+            - Meeting data residency requirements based on geography
+            Coordinates are approximate and represent the general area, not exact facility locations.
           items:
             type: number
+            format: float
           minItems: 2
           maxItems: 2
           example: [38.9, -77.4]
         aliases:
           type: array
-          description: Alternative names for searching
+          description: |
+            Alternative names and common abbreviations for this region that users might
+            search for. Includes country names, city names, airport codes, and colloquial
+            terms. When using the country parameter in /api/v1/regions, these aliases are
+            searched along with the official region name. For example, "IAD" is an alias
+            for "US East 1 (N. Virginia)".
           items:
             type: string
           example: ["Virginia", "N. Virginia", "US East", "IAD"]
         services:
           type: object
-          description: Available VDC services in this region
+          description: |
+            Complete catalog of Veeam Data Cloud services available in this region.
+            Services are included only if available; absent properties mean that service
+            is not offered in this region. Service availability determines where you can
+            deploy VDC workloads.
           properties:
             vdc_vault:
               type: array
-              description: VDC Vault availability with edition and tier
+              description: |
+                Veeam Data Cloud Vault availability in this region. This is a tiered service,
+                meaning different edition and tier combinations may be available. Each array
+                element represents one available combination.
+
+                - edition: Foundation (entry-level) or Advanced (full-featured)
+                - tier: Core (premium performance) or Non-Core (cost-optimized)
+
+                A region may offer multiple combinations (e.g., both Foundation/Core and Advanced/Core).
+                If this property is absent, VDC Vault is not available in this region.
               items:
                 type: object
+                required:
+                  - edition
+                  - tier
                 properties:
                   edition:
                     type: string
                     enum: [Foundation, Advanced]
+                    description: |
+                      Service edition level. Foundation provides core backup and recovery features.
+                      Advanced includes additional capabilities like compliance features and
+                      ransomware protection.
                   tier:
                     type: string
                     enum: [Core, Non-Core]
+                    description: |
+                      Pricing tier. Core tier offers premium performance and lower latency at higher
+                      cost. Non-Core tier is optimized for cost-effective long-term retention.
             vdc_m365:
               type: boolean
-              description: VDC for Microsoft 365 availability
+              description: |
+                Indicates whether VDC for Microsoft 365 is available in this region. This service
+                provides backup and recovery for Exchange Online, SharePoint Online, OneDrive for
+                Business, and Microsoft Teams. True means available, false or absent means not available.
             vdc_entra_id:
               type: boolean
-              description: VDC for Entra ID availability
+              description: |
+                Indicates whether VDC for Entra ID (formerly Azure Active Directory) is available
+                in this region. This service protects Azure AD identities, groups, and configurations.
+                True means available, false or absent means not available.
             vdc_salesforce:
               type: boolean
-              description: VDC for Salesforce availability
+              description: |
+                Indicates whether VDC for Salesforce is available in this region. This service
+                provides backup and recovery for Salesforce CRM data, metadata, and configurations.
+                True means available, false or absent means not available.
             vdc_azure_backup:
               type: boolean
-              description: VDC for Azure availability
+              description: |
+                Indicates whether VDC for Azure is available in this region. This service provides
+                backup and recovery for Azure virtual machines and other Azure resources.
+                True means available, false or absent means not available.
 
     Service:
       type: object
@@ -387,28 +589,61 @@ components:
       properties:
         id:
           type: string
-          description: Service identifier
+          description: |
+            Unique identifier for this VDC service. Use this value in the 'service' parameter
+            when filtering regions via /api/v1/regions endpoint. The ID format is standardized
+            as lowercase with underscores (e.g., vdc_vault, vdc_m365).
+          pattern: '^vdc_[a-z0-9_]+$'
           example: "vdc_vault"
         name:
           type: string
-          description: Human-readable service name
+          description: |
+            Human-readable display name for the service, suitable for showing in user interfaces.
+            This is the official marketing name for the Veeam Data Cloud service.
           example: "Veeam Data Cloud Vault"
         type:
           type: string
           enum: [tiered, boolean]
-          description: Service availability type
+          description: |
+            Indicates how service availability is represented in region data:
+
+            - "tiered": Service has multiple configuration options (editions and/or tiers).
+              In region data, this service appears as an array of available combinations.
+              Currently only VDC Vault uses tiered availability.
+
+            - "boolean": Service is either available or not, with no variation in features
+              or pricing. In region data, this service appears as true/false or is absent.
+              M365, Entra ID, Salesforce, and Azure Backup use boolean availability.
+
+            This field helps you understand how to parse the services object in region responses.
           example: "tiered"
         editions:
           type: array
-          description: Available editions (if applicable)
+          description: |
+            List of available service editions (feature levels). Only present for tiered services.
+            Each edition represents a different feature set:
+            - Foundation: Entry-level with core features
+            - Advanced: Full-featured with additional capabilities
+
+            When filtering regions, you can specify one of these edition values to find regions
+            offering that specific edition. Not all regions offer all editions.
           items:
             type: string
+            enum: [Foundation, Advanced]
           example: ["Foundation", "Advanced"]
         tiers:
           type: array
-          description: Available pricing tiers (if applicable)
+          description: |
+            List of available pricing tiers. Only present for tiered services. Each tier
+            represents a different pricing and performance level:
+            - Core: Premium tier with best performance and lowest latency (higher cost)
+            - Non-Core: Standard tier optimized for cost-effective long-term storage (lower cost)
+
+            When filtering regions, you can specify one of these tier values to find regions
+            offering that specific pricing tier. Many regions offer multiple tiers.
           items:
             type: string
+            enum: [Core, Non-Core]
           example: ["Core", "Non-Core"]
 
     Error:
@@ -420,21 +655,42 @@ components:
       properties:
         error:
           type: string
-          description: Short error description
+          description: |
+            Short, human-readable error title suitable for displaying to users.
+            This is a brief summary of what went wrong.
           example: "Region not found"
         code:
           type: string
-          description: Machine-readable error code
+          description: |
+            Machine-readable error code in SCREAMING_SNAKE_CASE format. Use this code
+            to programmatically handle specific error conditions. Common codes include:
+            - REGION_NOT_FOUND: Requested region ID doesn't exist
+            - INVALID_PARAMETER: Query parameter has invalid value
+            - INVALID_PROVIDER: Provider must be "AWS" or "Azure"
+            - INVALID_SERVICE: Service ID not recognized
+            - INVALID_TIER: Tier must be "Core" or "Non-Core"
+            - INVALID_EDITION: Edition must be "Foundation" or "Advanced"
+          pattern: '^[A-Z_]+$'
           example: "REGION_NOT_FOUND"
         message:
           type: string
-          description: Detailed error message
+          description: |
+            Detailed, developer-friendly error message explaining what went wrong and
+            how to fix it. This message includes specific details like the invalid value
+            provided and what values are acceptable. LLMs and automated systems can use
+            this message to automatically correct and retry requests.
           example: "No region found with ID: invalid-region-id"
         parameter:
           type: string
-          description: Parameter that caused the error (if applicable)
+          description: |
+            The name of the query parameter or path parameter that caused the error.
+            Only present when the error is related to a specific parameter. Use this
+            to highlight the problematic field in error messages or forms.
           example: "provider"
         value:
           type: string
-          description: Invalid value (if applicable)
+          description: |
+            The invalid value that was provided for the parameter. Only present when
+            the error is related to an invalid parameter value. Use this to show users
+            exactly what they sent that was incorrect.
           example: "GCP"

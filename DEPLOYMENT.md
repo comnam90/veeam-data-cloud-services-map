@@ -58,7 +58,7 @@ Once deployed, these endpoints should work:
 - `GET /api/v1/regions` - List all regions
 - `GET /api/v1/regions/{id}` - Get specific region
 - `GET /api/v1/services` - List services
-- `GET /api-docs/` - Swagger UI documentation
+- `GET /api/docs/` - Swagger UI documentation
 
 ## Troubleshooting
 
@@ -115,4 +115,4 @@ After configuring the build settings:
 2. Check build logs for any errors
 3. Verify `/api/v1/health` returns JSON (not HTML)
 4. Test other API endpoints
-5. Check `/api-docs/` for Swagger UI
+5. Check `/api/docs/` for Swagger UI

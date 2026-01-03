@@ -1,0 +1,984 @@
+# Veeam Data Cloud Service Availability API - Complete Documentation for AI Agents
+
+> Comprehensive guide for LLMs and AI agents to understand and effectively use the Veeam Data Cloud Service Availability API
+
+## Table of Contents
+
+1. [API Overview](#api-overview)
+2. [Complete Endpoint Reference](#complete-endpoint-reference)
+3. [Data Models & Schemas](#data-models--schemas)
+4. [Query Patterns & Workflows](#query-patterns--workflows)
+5. [Error Handling & Recovery](#error-handling--recovery)
+6. [Business Logic & Rules](#business-logic--rules)
+7. [Integration Examples](#integration-examples)
+
+---
+
+## API Overview
+
+### Purpose
+This API provides programmatic access to comprehensive data about Veeam Data Cloud (VDC) service availability across Amazon Web Services (AWS) and Microsoft Azure cloud regions worldwide. It enables automated discovery of where specific VDC services are available, filtering by cloud provider, geographic location, and service tier/edition requirements.
+
+### Base Information
+- **Base URL:** `/api/v1`
+- **Protocol:** HTTPS
+- **Response Format:** JSON only
+- **Authentication:** None (public API)
+- **API Version:** 1.0.0
+- **OpenAPI Version:** 3.1.0
+- **Total Regions:** 63 (27 AWS + 36 Azure as of 2026-01-03)
+
+### Key Characteristics
+- RESTful design with predictable resource-oriented URLs
+- Standard HTTP response codes
+- Consistent error response format
+- CORS enabled for all origins
+- Cache-Control headers for performance optimization
+- All timestamps in ISO 8601 format
+
+---
+
+## Complete Endpoint Reference
+
+### 1. GET /api/v1/regions
+
+**Purpose:** Retrieve a comprehensive list of all cloud regions with VDC service availability, with powerful filtering capabilities.
+
+**When to use:**
+- Planning a new VDC deployment and need to identify suitable regions
+- Checking which regions support specific service combinations
+- Finding regions that meet data residency requirements
+- Comparing service availability across cloud providers
+- Building a multi-region disaster recovery strategy
+
+**URL:** `GET /api/v1/regions`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Values | Description |
+|-----------|------|----------|--------|-------------|
+| provider | string | No | AWS, Azure | Filter by cloud provider. Omit to see both. |
+| country | string | No | Any string | Search by country or location name. Matches region names and aliases (e.g., "Japan" finds Tokyo). Case-insensitive partial matching. |
+| service | string | No | vdc_vault, vdc_m365, vdc_entra_id, vdc_salesforce, vdc_azure_backup | Show only regions where this service is available. |
+| tier | string | No | Core, Non-Core | Filter VDC Vault by pricing tier. Only applies to vdc_vault service. |
+| edition | string | No | Foundation, Advanced | Filter VDC Vault by edition. Only applies to vdc_vault service. |
+
+**Filtering Logic:**
+- All parameters are optional and can be combined
+- Multiple filters use AND logic (all must match)
+- Country search is case-insensitive and supports partial matching
+- Tier and edition filters only affect VDC Vault results
+- Empty/no filters return all 63 regions
+
+**Response Schema:**
+```json
+{
+  "data": [
+    {
+      "id": "aws-us-east-1",
+      "name": "US East 1 (N. Virginia)",
+      "provider": "AWS",
+      "coords": [38.9, -77.4],
+      "aliases": ["Virginia", "N. Virginia", "US East", "IAD"],
+      "services": {
+        "vdc_vault": [
+          {"edition": "Foundation", "tier": "Core"},
+          {"edition": "Advanced", "tier": "Core"}
+        ],
+        "vdc_m365": true,
+        "vdc_entra_id": true
+      }
+    }
+  ],
+  "count": 1,
+  "filters": {
+    "provider": null,
+    "country": null,
+    "service": null,
+    "tier": null,
+    "edition": null
+  }
+}
+```
+
+**Example Queries:**
+
+1. **All AWS regions:**
+   ```
+   GET /api/v1/regions?provider=AWS
+   ```
+
+2. **Regions with Microsoft 365 backup:**
+   ```
+   GET /api/v1/regions?service=vdc_m365
+   ```
+
+3. **AWS regions with VDC Vault Advanced/Core:**
+   ```
+   GET /api/v1/regions?provider=AWS&service=vdc_vault&edition=Advanced&tier=Core
+   ```
+
+4. **Regions in Japan:**
+   ```
+   GET /api/v1/regions?country=Japan
+   ```
+
+5. **Azure regions with Salesforce backup:**
+   ```
+   GET /api/v1/regions?provider=Azure&service=vdc_salesforce
+   ```
+
+**Response Codes:**
+- `200 OK` - Success, returns matching regions (may be empty array)
+- `400 Bad Request` - Invalid parameter value
+
+**Common Errors:**
+- Invalid provider (must be "AWS" or "Azure")
+- Invalid service ID
+- Invalid tier (must be "Core" or "Non-Core")
+- Invalid edition (must be "Foundation" or "Advanced")
+
+---
+
+### 2. GET /api/v1/regions/{id}
+
+**Purpose:** Retrieve complete details about a specific cloud region by its unique identifier.
+
+**When to use:**
+- You know the exact region ID and need detailed information
+- Verifying service availability in a specific region
+- Getting geographic coordinates for mapping
+- Looking up alternative names for a region
+
+**URL:** `GET /api/v1/regions/{id}`
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Format | Description |
+|-----------|------|----------|--------|-------------|
+| id | string | Yes | {provider}-{region-code} | Unique region identifier (e.g., "aws-us-east-1", "azure-us-east") |
+
+**Region ID Patterns:**
+- AWS: `aws-{region-code}` (e.g., "aws-us-east-1", "aws-eu-west-1", "aws-ap-southeast-1")
+- Azure: `azure-{location-name}` (e.g., "azure-us-east", "azure-europe-west", "azure-asia-southeast")
+
+**Response Schema:**
+```json
+{
+  "id": "aws-us-east-1",
+  "name": "US East 1 (N. Virginia)",
+  "provider": "AWS",
+  "coords": [38.9, -77.4],
+  "aliases": ["Virginia", "N. Virginia", "US East", "IAD"],
+  "services": {
+    "vdc_vault": [
+      {"edition": "Foundation", "tier": "Core"},
+      {"edition": "Advanced", "tier": "Core"}
+    ],
+    "vdc_m365": true,
+    "vdc_entra_id": true,
+    "vdc_salesforce": true
+  }
+}
+```
+
+**Example Queries:**
+
+1. **Get AWS US East region:**
+   ```
+   GET /api/v1/regions/aws-us-east-1
+   ```
+
+2. **Get Azure West Europe region:**
+   ```
+   GET /api/v1/regions/azure-europe-west
+   ```
+
+**Response Codes:**
+- `200 OK` - Region found and returned
+- `404 Not Found` - Region ID doesn't exist
+
+**Understanding Service Data:**
+- **Tiered service (vdc_vault):** Returns array of available edition/tier combinations
+- **Boolean services:** `true` = available, `false` or absent = not available
+- Services not offered in region are typically omitted from the object
+
+---
+
+### 3. GET /api/v1/services
+
+**Purpose:** Retrieve metadata about all Veeam Data Cloud services tracked by this API.
+
+**When to use:**
+- Discovering what VDC services exist
+- Understanding service types (tiered vs boolean)
+- Building UI dropdowns or service selection menus
+- Learning which services support editions and tiers
+
+**URL:** `GET /api/v1/services`
+
+**Parameters:** None
+
+**Response Schema:**
+```json
+{
+  "services": [
+    {
+      "id": "vdc_vault",
+      "name": "Veeam Data Cloud Vault",
+      "type": "tiered",
+      "editions": ["Foundation", "Advanced"],
+      "tiers": ["Core", "Non-Core"]
+    },
+    {
+      "id": "vdc_m365",
+      "name": "VDC for Microsoft 365",
+      "type": "boolean"
+    },
+    {
+      "id": "vdc_entra_id",
+      "name": "VDC for Entra ID",
+      "type": "boolean"
+    },
+    {
+      "id": "vdc_salesforce",
+      "name": "VDC for Salesforce",
+      "type": "boolean"
+    },
+    {
+      "id": "vdc_azure_backup",
+      "name": "VDC for Azure",
+      "type": "boolean"
+    }
+  ]
+}
+```
+
+**Service Details:**
+
+1. **VDC Vault** (vdc_vault)
+   - Type: Tiered
+   - Purpose: Object storage backup repository
+   - Editions: Foundation (entry-level), Advanced (full-featured)
+   - Tiers: Core (premium performance), Non-Core (cost-optimized)
+
+2. **VDC for Microsoft 365** (vdc_m365)
+   - Type: Boolean
+   - Purpose: Backup for Exchange Online, SharePoint Online, OneDrive, Teams
+
+3. **VDC for Entra ID** (vdc_entra_id)
+   - Type: Boolean
+   - Purpose: Azure Active Directory backup
+
+4. **VDC for Salesforce** (vdc_salesforce)
+   - Type: Boolean
+   - Purpose: Salesforce CRM data protection
+
+5. **VDC for Azure** (vdc_azure_backup)
+   - Type: Boolean
+   - Purpose: Azure VM and resource backup
+
+**Response Codes:**
+- `200 OK` - Always returns successfully with complete service list
+
+---
+
+### 4. GET /api/v1/health
+
+**Purpose:** Comprehensive health check that validates API functionality and data availability.
+
+**When to use:**
+- Health monitoring in production systems
+- Getting current region statistics
+- Troubleshooting data loading issues
+- Dashboard status displays
+
+**URL:** `GET /api/v1/health`
+
+**Parameters:** None
+
+**Response Schema:**
+```json
+{
+  "status": "healthy",
+  "version": "1.0.0",
+  "timestamp": "2026-01-03T10:30:00Z",
+  "stats": {
+    "totalRegions": 63,
+    "awsRegions": 27,
+    "azureRegions": 36
+  }
+}
+```
+
+**Status Values:**
+- `healthy` - API fully operational with all data loaded
+- `degraded` - API responding but with reduced functionality
+- `unhealthy` - Critical errors preventing normal operation
+
+**Response Codes:**
+- `200 OK` - Health check completed (check status field for details)
+- `500 Internal Server Error` - Critical failure
+
+---
+
+### 5. GET /api/v1/ping
+
+**Purpose:** Lightweight connectivity test with no data dependencies.
+
+**When to use:**
+- Quick connectivity tests
+- Monitoring system health checks
+- CI/CD pipeline validation
+- Network troubleshooting
+
+**URL:** `GET /api/v1/ping`
+
+**Parameters:** None
+
+**Response Schema:**
+```json
+{
+  "status": "ok",
+  "message": "Cloudflare Pages Functions are working!",
+  "timestamp": "2026-01-03T10:30:00Z",
+  "environment": "production"
+}
+```
+
+**Response Fields:**
+- `status`: Always "ok" if the endpoint is reachable
+- `message`: Confirmation message about API functionality
+- `timestamp`: Current server time in ISO 8601 format
+- `environment`: Deployment environment. Possible values:
+  - `"production"` - Production deployment
+  - `"preview"` - Preview/staging deployment (Cloudflare Pages preview branches)
+  - `"local"` - Local development environment
+
+**Response Codes:**
+- `200 OK` - API is reachable and responding
+
+**Note:** This endpoint will respond even if the region database is unavailable, making it ideal for basic connectivity checks.
+
+---
+
+## Data Models & Schemas
+
+### Region Object
+
+```typescript
+interface Region {
+  id: string;              // Unique identifier (e.g., "aws-us-east-1")
+  name: string;            // Human-readable name (e.g., "US East 1 (N. Virginia)")
+  provider: "AWS" | "Azure";  // Cloud provider
+  coords: [number, number];   // [latitude, longitude]
+  aliases?: string[];      // Alternative names for searching
+  services: Services;      // Available VDC services
+}
+```
+
+**Field Details:**
+
+- **id**: Format is `{provider}-{region-code}`. Stable identifier that never changes.
+- **name**: Official region name from cloud provider. Display this to users.
+- **provider**: Either "AWS" or "Azure". Use for grouping/filtering.
+- **coords**: Geographic coordinates as [lat, lng]. Approximate data center location.
+- **aliases**: Optional array of alternative names, country names, airport codes, etc.
+- **services**: Object with VDC service availability (see below).
+
+### Services Object
+
+```typescript
+interface Services {
+  vdc_vault?: VaultService[];     // Tiered service
+  vdc_m365?: boolean;             // Boolean service
+  vdc_entra_id?: boolean;         // Boolean service
+  vdc_salesforce?: boolean;       // Boolean service
+  vdc_azure_backup?: boolean;     // Boolean service
+}
+
+interface VaultService {
+  edition: "Foundation" | "Advanced";
+  tier: "Core" | "Non-Core";
+}
+```
+
+**Understanding Service Data:**
+
+1. **Tiered Service (VDC Vault)**:
+   - Represented as array of edition/tier combinations
+   - Region may offer multiple combinations
+   - Example: `[{edition: "Foundation", tier: "Core"}, {edition: "Advanced", tier: "Core"}]`
+   - Absent = service not available in region
+
+2. **Boolean Services**:
+   - `true` = service available
+   - `false` or property absent = service not available
+   - No variation in features or pricing
+
+### Service Object
+
+```typescript
+interface Service {
+  id: string;                    // Service identifier (e.g., "vdc_vault")
+  name: string;                  // Display name
+  type: "tiered" | "boolean";    // Availability type
+  editions?: string[];           // Only for tiered services
+  tiers?: string[];              // Only for tiered services
+}
+```
+
+### Error Object
+
+```typescript
+interface Error {
+  error: string;       // Short error title
+  code: string;        // Machine-readable error code
+  message: string;     // Detailed explanation
+  parameter?: string;  // Parameter that caused error
+  value?: string;      // Invalid value provided
+}
+```
+
+**Common Error Codes:**
+- `REGION_NOT_FOUND` - Region ID doesn't exist
+- `INVALID_PARAMETER` - General parameter validation failure
+- `INVALID_PROVIDER` - Provider must be "AWS" or "Azure"
+- `INVALID_SERVICE` - Service ID not recognized
+- `INVALID_TIER` - Tier must be "Core" or "Non-Core"
+- `INVALID_EDITION` - Edition must be "Foundation" or "Advanced"
+
+---
+
+## Query Patterns & Workflows
+
+### Common Workflow Patterns
+
+#### 1. Discover Available Services
+```
+Step 1: GET /api/v1/services
+Step 2: Review service types and options
+Step 3: Use service IDs in region queries
+```
+
+#### 2. Find Regions for Specific Service
+```
+Step 1: GET /api/v1/regions?service=vdc_m365
+Step 2: Filter results by provider if needed
+Step 3: Select region based on geography/latency
+```
+
+#### 3. Check Service Availability in Known Region
+```
+Step 1: GET /api/v1/regions/aws-us-east-1
+Step 2: Check services object for required service
+Step 3: Verify edition/tier if using VDC Vault
+```
+
+#### 4. Find Nearest Region with Required Service
+```
+Step 1: GET /api/v1/regions?service={required_service}
+Step 2: Calculate distance using coords field
+Step 3: Sort by distance to user location
+Step 4: Select nearest region
+```
+
+#### 5. Multi-Region Deployment Planning
+```
+Step 1: GET /api/v1/regions?service=vdc_vault&edition=Advanced&tier=Core
+Step 2: Group by provider for cost comparison
+Step 3: Select regions across different geographies
+Step 4: Verify each region: GET /api/v1/regions/{id}
+```
+
+### Advanced Query Patterns
+
+#### Find Regions by Data Residency Requirements
+```
+GET /api/v1/regions?country=Germany
+GET /api/v1/regions?country=Europe
+GET /api/v1/regions?country=Canada
+```
+
+#### Compare Cloud Provider Options
+```
+Step 1: GET /api/v1/regions?provider=AWS&service=vdc_vault&tier=Core
+Step 2: GET /api/v1/regions?provider=Azure&service=vdc_vault&tier=Core
+Step 3: Compare counts and geographic distribution
+```
+
+#### Find Cost-Optimized Regions
+```
+GET /api/v1/regions?service=vdc_vault&tier=Non-Core
+```
+
+#### Find Premium Performance Regions
+```
+GET /api/v1/regions?service=vdc_vault&tier=Core
+```
+
+---
+
+## Error Handling & Recovery
+
+### Error Response Format
+
+All errors return appropriate HTTP status codes with structured JSON:
+
+```json
+{
+  "error": "Invalid parameter",
+  "code": "INVALID_PROVIDER",
+  "message": "Provider must be either 'AWS' or 'Azure'. Received: 'GCP'",
+  "parameter": "provider",
+  "value": "GCP"
+}
+```
+
+### Automatic Recovery Strategies
+
+#### Strategy 1: Parameter Validation Errors (400)
+```
+1. Parse error.message field for guidance
+2. Check error.parameter and error.value
+3. Correct the parameter value
+4. Retry request with corrected value
+```
+
+Example:
+```
+Error: "Provider must be either 'AWS' or 'Azure'. Received: 'GCP'"
+Action: Replace 'GCP' with 'AWS' or 'Azure' and retry
+```
+
+#### Strategy 2: Region Not Found (404)
+```
+1. Check if region ID format is correct ({provider}-{code})
+2. Try searching instead: GET /api/v1/regions?country={search_term}
+3. Use returned region IDs for specific queries
+```
+
+#### Strategy 3: Service Not Found in Region
+```
+1. GET /api/v1/regions/{id} returns region but missing service
+2. Service not available - search for alternative regions
+3. GET /api/v1/regions?service={required_service}
+```
+
+### Validation Rules
+
+**Provider Parameter:**
+- Must be exactly "AWS" or "Azure"
+- Case-sensitive
+- No other values accepted
+
+**Service Parameter:**
+- Must be one of: vdc_vault, vdc_m365, vdc_entra_id, vdc_salesforce, vdc_azure_backup
+- Case-sensitive
+- Exact match required
+
+**Tier Parameter:**
+- Must be exactly "Core" or "Non-Core"
+- Only valid with vdc_vault service
+- Case-sensitive
+
+**Edition Parameter:**
+- Must be exactly "Foundation" or "Advanced"
+- Only valid with vdc_vault service
+- Case-sensitive
+
+**Country Parameter:**
+- Any string accepted
+- Case-insensitive matching
+- Supports partial matching
+- Searches both names and aliases
+
+**Region ID Path Parameter:**
+- Format: `{provider}-{region-code}`
+- Must match existing region exactly
+- Case-sensitive
+
+---
+
+## Business Logic & Rules
+
+### Service Availability Rules
+
+1. **VDC Vault (Tiered Service)**
+   - Can have multiple edition/tier combinations per region
+   - Not all combinations available in all regions
+   - Typical pattern: both editions in Core tier, fewer in Non-Core
+   - Filtering by edition/tier shows regions with ANY matching combination
+
+2. **Boolean Services**
+   - Simple presence/absence model
+   - No variations in features or pricing
+   - Either available (true) or not (absent/false)
+
+3. **Regional Patterns**
+   - Not all services available in all regions
+   - Major/popular regions tend to have more services
+   - New regions may have limited service availability
+   - Some services are cloud-provider specific
+
+### Filter Combination Logic
+
+When multiple filters are applied:
+```
+AND logic: ALL conditions must be met
+Example: provider=AWS&service=vdc_vault&tier=Core
+Returns: AWS regions that have VDC Vault with Core tier
+```
+
+Special cases:
+- `tier` without `service` - filters only VDC Vault
+- `edition` without `service` - filters only VDC Vault
+- Empty result set is valid (no matching regions)
+
+### Data Freshness
+
+- Data is compiled at build time from YAML source files
+- Updates require rebuilding and redeploying
+- Check `/api/v1/health` for current region counts
+- This is not real-time data - community-maintained
+
+### Geographic Search Behavior
+
+Country parameter uses fuzzy matching:
+```
+"Japan" matches:
+- "Asia Pacific (Tokyo)"
+- "Asia Pacific (Osaka)"
+
+"virgin" matches:
+- "US East 1 (N. Virginia)"
+
+"europe" matches:
+- "Europe (London)"
+- "Europe (Paris)"
+- "Europe West"
+- etc.
+```
+
+---
+
+## Integration Examples
+
+### Example 1: Find Nearest Region for Service
+
+```python
+import requests
+import math
+
+def haversine_distance(lat1, lon1, lat2, lon2):
+    """Calculate distance between two points in km"""
+    R = 6371  # Earth radius in km
+
+    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+    c = 2 * math.asin(math.sqrt(a))
+
+    return R * c
+
+def find_nearest_region(user_lat, user_lon, service):
+    """Find nearest region offering specified service"""
+
+    # Get all regions with the service
+    response = requests.get(f"/api/v1/regions?service={service}")
+    data = response.json()
+
+    nearest = None
+    min_distance = float('inf')
+
+    for region in data['data']:
+        lat, lon = region['coords']
+        distance = haversine_distance(user_lat, user_lon, lat, lon)
+
+        if distance < min_distance:
+            min_distance = distance
+            nearest = region
+
+    return nearest, min_distance
+
+# Usage
+region, distance = find_nearest_region(51.5074, -0.1278, 'vdc_m365')
+print(f"Nearest region: {region['name']} ({distance:.0f} km away)")
+```
+
+### Example 2: Multi-Cloud Comparison
+
+```javascript
+async function compareProviders(service) {
+  // Get AWS regions
+  const awsResponse = await fetch(`/api/v1/regions?provider=AWS&service=${service}`);
+  const awsData = await awsResponse.json();
+
+  // Get Azure regions
+  const azureResponse = await fetch(`/api/v1/regions?provider=Azure&service=${service}`);
+  const azureData = await azureResponse.json();
+
+  return {
+    aws: {
+      count: awsData.count,
+      regions: awsData.data.map(r => r.name)
+    },
+    azure: {
+      count: azureData.count,
+      regions: azureData.data.map(r => r.name)
+    }
+  };
+}
+
+// Usage
+const comparison = await compareProviders('vdc_vault');
+console.log(`AWS: ${comparison.aws.count} regions`);
+console.log(`Azure: ${comparison.azure.count} regions`);
+```
+
+### Example 3: Data Residency Compliance
+
+```javascript
+async function findCompliantRegions(country, requiredServices) {
+  // Find regions in the country
+  const response = await fetch(`/api/v1/regions?country=${country}`);
+  const data = await response.json();
+
+  // Filter regions that have ALL required services
+  const compliant = data.data.filter(region => {
+    return requiredServices.every(service => {
+      if (service === 'vdc_vault') {
+        // Tiered service - check if array exists and has items
+        return Array.isArray(region.services.vdc_vault) && region.services.vdc_vault.length > 0;
+      } else {
+        // Boolean service - check if true
+        return region.services[service] === true;
+      }
+    });
+  });
+
+  return compliant;
+}
+
+// Usage
+const regions = await findCompliantRegions('Germany', ['vdc_vault', 'vdc_m365']);
+console.log(`Found ${regions.length} compliant regions in Germany`);
+```
+
+### Example 4: Automatic Error Recovery
+
+```python
+import requests
+import time
+
+def query_with_retry(url, max_retries=3):
+    """Query API with automatic error recovery"""
+
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(url)
+
+            if response.status_code == 200:
+                return response.json()
+
+            elif response.status_code == 400:
+                error = response.json()
+
+                # Automatic correction for common mistakes
+                if error['code'] == 'INVALID_PROVIDER' and 'GCP' in error.get('value', ''):
+                    # User likely meant cloud provider - try AWS first
+                    corrected_url = url.replace('GCP', 'AWS')
+                    print(f"Auto-correcting: {error['message']}")
+                    response = requests.get(corrected_url)
+                    if response.status_code == 200:
+                        return response.json()
+
+                # If can't auto-correct, raise the error
+                raise ValueError(error['message'])
+
+            elif response.status_code == 404:
+                error = response.json()
+                raise ValueError(f"Not found: {error['message']}")
+
+            else:
+                # Unexpected error, retry
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)  # Exponential backoff
+                    continue
+                else:
+                    response.raise_for_status()
+
+        except requests.RequestException as e:
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+                continue
+            raise
+
+    raise Exception("Max retries exceeded")
+
+# Usage
+try:
+    data = query_with_retry('/api/v1/regions?provider=GCP')
+except ValueError as e:
+    print(f"Error: {e}")
+```
+
+### Example 5: Building Region Selector UI
+
+```javascript
+async function buildRegionSelector(container, serviceFilter = null) {
+  // Get services first
+  const servicesResp = await fetch('/api/v1/services');
+  const servicesData = await servicesResp.json();
+
+  // Build URL with optional service filter
+  let url = '/api/v1/regions';
+  if (serviceFilter) {
+    url += `?service=${serviceFilter}`;
+  }
+
+  // Get regions
+  const regionsResp = await fetch(url);
+  const regionsData = await regionsResp.json();
+
+  // Group by provider
+  const byProvider = regionsData.data.reduce((acc, region) => {
+    if (!acc[region.provider]) acc[region.provider] = [];
+    acc[region.provider].push(region);
+    return acc;
+  }, {});
+
+  // Build HTML
+  let html = '<select id="region-selector">';
+
+  for (const [provider, regions] of Object.entries(byProvider)) {
+    html += `<optgroup label="${provider}">`;
+
+    regions
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .forEach(region => {
+        html += `<option value="${region.id}">${region.name}</option>`;
+      });
+
+    html += '</optgroup>';
+  }
+
+  html += '</select>';
+
+  container.innerHTML = html;
+
+  return {
+    totalRegions: regionsData.count,
+    byProvider: Object.keys(byProvider).map(provider => ({
+      provider,
+      count: byProvider[provider].length
+    }))
+  };
+}
+
+// Usage
+const stats = await buildRegionSelector(
+  document.getElementById('region-container'),
+  'vdc_m365'
+);
+console.log(`Loaded ${stats.totalRegions} regions`);
+```
+
+---
+
+## Important Notes for AI Agents
+
+### Parsing Considerations
+
+1. **Service Objects Are Dynamic**
+   - Not all services present in all regions
+   - Check for property existence before accessing
+   - Absent property typically means service not available
+
+2. **VDC Vault is Special**
+   - Only service with tiered availability
+   - Returns array, not boolean
+   - Can have 0, 1, or multiple edition/tier combinations
+
+3. **Filter Behavior**
+   - Empty result set (count: 0) is valid response
+   - Don't treat as error - no regions match criteria
+
+4. **Geographic Coordinates**
+   - Approximate locations, not exact
+   - Good for mapping and distance calculations
+   - Not suitable for precision routing
+
+### Best Practices for LLMs
+
+1. **Always validate parameters** before making requests
+   - Check enum values match exactly (case-sensitive)
+   - Verify format of region IDs
+
+2. **Use error messages for auto-correction**
+   - Parse the `message` field for specific guidance
+   - Extract valid values from error descriptions
+   - Implement retry logic with corrections
+
+3. **Leverage the /services endpoint**
+   - Don't hardcode service IDs
+   - Query first to understand current services
+   - Use returned IDs in subsequent queries
+
+4. **Handle empty results gracefully**
+   - `count: 0` means no matches, not an error
+   - Suggest broadening search criteria
+   - Try removing filters one by one
+
+5. **Combine filters strategically**
+   - Start broad, add filters to narrow down
+   - Test each filter individually first
+   - Remember tier/edition only work with vdc_vault
+
+6. **Cache service metadata**
+   - Service list rarely changes
+   - Can cache /api/v1/services response
+   - Reduces API calls
+
+### Data Freshness Expectations
+
+- **Static data:** Region list is relatively static
+- **Community maintained:** Not official Veeam data
+- **Build-time compilation:** Updates require rebuild
+- **No real-time updates:** Don't expect live changes
+- **Verify critical data:** Cross-check with official Veeam docs for production use
+
+### Performance Tips
+
+1. Use `/api/v1/ping` for health checks (lightweight)
+2. Use `/api/v1/health` when you need statistics
+3. Filter at the API level rather than client-side
+4. Cache region data when possible (1 hour is reasonable)
+5. Batch lookups by using filter parameters
+
+---
+
+## Disclaimer
+
+This is an unofficial, community-maintained API and is not affiliated with, endorsed by, or supported by Veeam Software. Always refer to official Veeam documentation for authoritative information about product availability and features.
+
+## Version Information
+
+- **API Version:** 1.0.0
+- **OpenAPI Specification:** 3.1.0
+- **Last Updated:** 2026-01-03
+- **Total Regions:** 63 (27 AWS + 36 Azure as of 2026-01-03)
+
+## Additional Resources
+
+- **OpenAPI Specification:** `/api/openapi.yaml`
+- **Interactive Documentation:** `/api/docs/` (Swagger UI)
+- **Concise Documentation:** `/llms.txt`
+- **GitHub Repository:** https://github.com/comnam90/veeam-data-cloud-services-map
+- **Issue Tracker:** https://github.com/comnam90/veeam-data-cloud-services-map/issues
+
+---
+
+End of comprehensive documentation. This file is optimized for RAG (Retrieval-Augmented Generation) systems and provides complete context for AI agents to effectively use the Veeam Data Cloud Service Availability API.
