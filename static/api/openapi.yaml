@@ -232,6 +232,35 @@ paths:
                     name: "VDC for Azure"
                     type: "boolean"
 
+  /api/v1/ping:
+    get:
+      summary: Simple ping test
+      description: Test if the API is responding (no data dependencies)
+      operationId: ping
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Ping response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  message:
+                    type: string
+                    example: "Cloudflare Pages Functions are working!"
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-01-03T10:30:00Z"
+                  environment:
+                    type: string
+                    example: "preview"
+
   /api/v1/health:
     get:
       summary: Health check
