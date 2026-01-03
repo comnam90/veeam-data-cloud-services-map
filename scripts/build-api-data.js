@@ -10,7 +10,7 @@ const path = require('path');
 const yaml = require('js-yaml');
 
 const DATA_DIR = path.join(__dirname, '..', 'data', 'regions');
-const OUTPUT_DIR = path.join(__dirname, '..', 'functions', 'shared');
+const OUTPUT_DIR = path.join(__dirname, '..', 'functions');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'regions.json');
 
 /**

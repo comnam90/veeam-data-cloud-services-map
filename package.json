@@ -7,7 +7,7 @@
     "build:data": "node scripts/build-api-data.js",
     "build": "npm run build:data && hugo --gc --minify",
     "dev": "npm run build:data && wrangler pages dev public",
-    "clean": "rm -rf public functions/_shared/regions.json"
+    "clean": "rm -rf public functions/regions.json"
   },
   "keywords": [
     "veeam",
