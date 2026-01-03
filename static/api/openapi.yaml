@@ -45,6 +45,13 @@ paths:
             type: string
             enum: [AWS, Azure]
           example: AWS
+        - name: country
+          in: query
+          description: Filter by country name (searches region name and aliases)
+          required: false
+          schema:
+            type: string
+          example: Japan
         - name: service
           in: query
           description: Filter by VDC service availability
@@ -91,6 +98,9 @@ paths:
                       provider:
                         type: string
                         nullable: true
+                      country:
+                        type: string
+                        nullable: true
                       service:
                         type: string
                         nullable: true
@@ -119,6 +129,7 @@ paths:
                     count: 1
                     filters:
                       provider: null
+                      country: null
                       service: null
                       tier: null
                       edition: null
@@ -137,6 +148,7 @@ paths:
                     count: 1
                     filters:
                       provider: "AWS"
+                      country: null
                       service: null
                       tier: null
                       edition: null

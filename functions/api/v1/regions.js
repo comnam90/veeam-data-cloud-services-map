@@ -92,6 +92,7 @@ export async function onRequestGet(context) {
   const service = searchParams.get('service');
   const tier = searchParams.get('tier');
   const edition = searchParams.get('edition');
+  const country = searchParams.get('country');
 
   // Validate parameters
   const providerValidation = validateParam('provider', provider, ['AWS', 'Azure']);
@@ -118,6 +119,18 @@ export async function onRequestGet(context) {
   // Apply filters
   if (provider) {
     regions = regions.filter(r => r.provider === provider);
+  }
+
+  if (country) {
+    const countryLower = country.toLowerCase();
+    regions = regions.filter(r => {
+      // Check if country matches the name or any alias
+      if (r.name.toLowerCase().includes(countryLower)) return true;
+      if (r.aliases && Array.isArray(r.aliases)) {
+        return r.aliases.some(alias => alias.toLowerCase().includes(countryLower));
+      }
+      return false;
+    });
   }
 
   if (service) {
@@ -157,7 +170,8 @@ export async function onRequestGet(context) {
       provider: provider || null,
       service: service || null,
       tier: tier || null,
-      edition: edition || null
+      edition: edition || null,
+      country: country || null
     }
   });
 }
