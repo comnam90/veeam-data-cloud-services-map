@@ -19,8 +19,7 @@ info:
 servers:
   - url: https://veeam-data-cloud-services-map.pages.dev
     description: Production
-
- - url: http://localhost:8788
+  - url: http://localhost:8788
     description: Local development
 
 tags:
