@@ -1,0 +1,27 @@
+{
+  "name": "veeam-data-cloud-services-map",
+  "version": "1.0.0",
+  "description": "Interactive map and API for Veeam Data Cloud service availability across AWS and Azure regions",
+  "private": true,
+  "scripts": {
+    "build:data": "node scripts/build-api-data.js",
+    "build": "npm run build:data && hugo --gc --minify",
+    "dev": "npm run build:data && wrangler pages dev public",
+    "clean": "rm -rf public functions/_shared/regions.json"
+  },
+  "keywords": [
+    "veeam",
+    "cloud",
+    "regions",
+    "api",
+    "map"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

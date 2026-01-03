@@ -1,0 +1,403 @@
+openapi: 3.0.0
+info:
+  title: Veeam Data Cloud Service Availability API
+  version: 1.0.0
+  description: |
+    Query Veeam Data Cloud (VDC) service availability across AWS and Azure regions.
+
+    **Disclaimer:** This is an unofficial, community-maintained API and is not affiliated
+    with, endorsed by, or supported by Veeam Software. Always refer to official Veeam
+    documentation for authoritative information.
+
+  contact:
+    name: GitHub Repository
+    url: https://github.com/comnam90/veeam-data-cloud-services-map
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://veeam-data-cloud-services-map.pages.dev
+    description: Production
+
+ - url: http://localhost:8788
+    description: Local development
+
+tags:
+  - name: Regions
+    description: Query cloud regions and their VDC service availability
+  - name: Services
+    description: Information about available VDC services
+  - name: Health
+    description: API health and status
+
+paths:
+  /api/v1/regions:
+    get:
+      summary: List all regions
+      description: Get a list of all cloud regions, optionally filtered by provider, service, tier, or edition
+      operationId: listRegions
+      tags:
+        - Regions
+      parameters:
+        - name: provider
+          in: query
+          description: Filter by cloud provider
+          required: false
+          schema:
+            type: string
+            enum: [AWS, Azure]
+          example: AWS
+        - name: service
+          in: query
+          description: Filter by VDC service availability
+          required: false
+          schema:
+            type: string
+            enum: [vdc_vault, vdc_m365, vdc_entra_id, vdc_salesforce, vdc_azure_backup]
+          example: vdc_vault
+        - name: tier
+          in: query
+          description: Filter by pricing tier (only applicable to vdc_vault)
+          required: false
+          schema:
+            type: string
+            enum: [Core, Non-Core]
+          example: Core
+        - name: edition
+          in: query
+          description: Filter by service edition (only applicable to vdc_vault)
+          required: false
+          schema:
+            type: string
+            enum: [Foundation, Advanced]
+          example: Advanced
+      responses:
+        '200':
+          description: List of regions matching the filter criteria
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Region'
+                  count:
+                    type: integer
+                    description: Number of regions returned
+                    example: 25
+                  filters:
+                    type: object
+                    properties:
+                      provider:
+                        type: string
+                        nullable: true
+                      service:
+                        type: string
+                        nullable: true
+                      tier:
+                        type: string
+                        nullable: true
+                      edition:
+                        type: string
+                        nullable: true
+              examples:
+                all_regions:
+                  summary: All regions
+                  value:
+                    data:
+                      - id: "aws-us-east-1"
+                        name: "US East 1 (N. Virginia)"
+                        provider: "AWS"
+                        coords: [38.9, -77.4]
+                        aliases: ["Virginia", "N. Virginia", "US East"]
+                        services:
+                          vdc_vault:
+                            - edition: "Foundation"
+                              tier: "Core"
+                            - edition: "Advanced"
+                              tier: "Core"
+                    count: 1
+                    filters:
+                      provider: null
+                      service: null
+                      tier: null
+                      edition: null
+                aws_only:
+                  summary: AWS regions only
+                  value:
+                    data:
+                      - id: "aws-us-east-1"
+                        name: "US East 1 (N. Virginia)"
+                        provider: "AWS"
+                        coords: [38.9, -77.4]
+                        services:
+                          vdc_vault:
+                            - edition: "Foundation"
+                              tier: "Core"
+                    count: 1
+                    filters:
+                      provider: "AWS"
+                      service: null
+                      tier: null
+                      edition: null
+        '400':
+          description: Invalid query parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/regions/{id}:
+    get:
+      summary: Get a specific region
+      description: Get detailed information about a specific region by its ID
+      operationId: getRegion
+      tags:
+        - Regions
+      parameters:
+        - name: id
+          in: path
+          description: Region ID (e.g., aws-us-east-1, azure-us-east)
+          required: true
+          schema:
+            type: string
+          example: aws-us-east-1
+      responses:
+        '200':
+          description: Region details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Region'
+              example:
+                id: "aws-us-east-1"
+                name: "US East 1 (N. Virginia)"
+                provider: "AWS"
+                coords: [38.9, -77.4]
+                aliases: ["Virginia", "N. Virginia", "US East", "IAD"]
+                services:
+                  vdc_vault:
+                    - edition: "Foundation"
+                      tier: "Core"
+                    - edition: "Advanced"
+                      tier: "Core"
+        '404':
+          description: Region not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Region not found"
+                code: "REGION_NOT_FOUND"
+                message: "No region found with ID: invalid-region-id"
+
+  /api/v1/services:
+    get:
+      summary: List available services
+      description: Get metadata about all available Veeam Data Cloud services
+      operationId: listServices
+      tags:
+        - Services
+      responses:
+        '200':
+          description: List of available VDC services
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  services:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Service'
+              example:
+                services:
+                  - id: "vdc_vault"
+                    name: "Veeam Data Cloud Vault"
+                    type: "tiered"
+                    editions: ["Foundation", "Advanced"]
+                    tiers: ["Core", "Non-Core"]
+                  - id: "vdc_m365"
+                    name: "VDC for Microsoft 365"
+                    type: "boolean"
+                    editions: ["Flex", "Express", "Premium"]
+                  - id: "vdc_entra_id"
+                    name: "VDC for Entra ID"
+                    type: "boolean"
+                  - id: "vdc_salesforce"
+                    name: "VDC for Salesforce"
+                    type: "boolean"
+                  - id: "vdc_azure_backup"
+                    name: "VDC for Azure"
+                    type: "boolean"
+
+  /api/v1/health:
+    get:
+      summary: Health check
+      description: Get API health status and statistics
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: API health information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy, degraded, unhealthy]
+                    example: healthy
+                  version:
+                    type: string
+                    example: "1.0.0"
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-01-03T10:30:00Z"
+                  stats:
+                    type: object
+                    properties:
+                      totalRegions:
+                        type: integer
+                        example: 64
+                      awsRegions:
+                        type: integer
+                        example: 27
+                      azureRegions:
+                        type: integer
+                        example: 37
+
+components:
+  schemas:
+    Region:
+      type: object
+      required:
+        - id
+        - name
+        - provider
+        - coords
+        - services
+      properties:
+        id:
+          type: string
+          description: Unique region identifier
+          example: "aws-us-east-1"
+        name:
+          type: string
+          description: Human-readable region name
+          example: "US East 1 (N. Virginia)"
+        provider:
+          type: string
+          enum: [AWS, Azure]
+          description: Cloud provider
+          example: "AWS"
+        coords:
+          type: array
+          description: Geographic coordinates [latitude, longitude]
+          items:
+            type: number
+          minItems: 2
+          maxItems: 2
+          example: [38.9, -77.4]
+        aliases:
+          type: array
+          description: Alternative names for searching
+          items:
+            type: string
+          example: ["Virginia", "N. Virginia", "US East", "IAD"]
+        services:
+          type: object
+          description: Available VDC services in this region
+          properties:
+            vdc_vault:
+              type: array
+              description: VDC Vault availability with edition and tier
+              items:
+                type: object
+                properties:
+                  edition:
+                    type: string
+                    enum: [Foundation, Advanced]
+                  tier:
+                    type: string
+                    enum: [Core, Non-Core]
+            vdc_m365:
+              type: boolean
+              description: VDC for Microsoft 365 availability
+            vdc_entra_id:
+              type: boolean
+              description: VDC for Entra ID availability
+            vdc_salesforce:
+              type: boolean
+              description: VDC for Salesforce availability
+            vdc_azure_backup:
+              type: boolean
+              description: VDC for Azure availability
+
+    Service:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          type: string
+          description: Service identifier
+          example: "vdc_vault"
+        name:
+          type: string
+          description: Human-readable service name
+          example: "Veeam Data Cloud Vault"
+        type:
+          type: string
+          enum: [tiered, boolean]
+          description: Service availability type
+          example: "tiered"
+        editions:
+          type: array
+          description: Available editions (if applicable)
+          items:
+            type: string
+          example: ["Foundation", "Advanced"]
+        tiers:
+          type: array
+          description: Available pricing tiers (if applicable)
+          items:
+            type: string
+          example: ["Core", "Non-Core"]
+
+    Error:
+      type: object
+      required:
+        - error
+        - code
+        - message
+      properties:
+        error:
+          type: string
+          description: Short error description
+          example: "Region not found"
+        code:
+          type: string
+          description: Machine-readable error code
+          example: "REGION_NOT_FOUND"
+        message:
+          type: string
+          description: Detailed error message
+          example: "No region found with ID: invalid-region-id"
+        parameter:
+          type: string
+          description: Parameter that caused the error (if applicable)
+          example: "provider"
+        value:
+          type: string
+          description: Invalid value (if applicable)
+          example: "GCP"

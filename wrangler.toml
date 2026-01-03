@@ -1,0 +1,12 @@
+name = "veeam-data-cloud-services-map"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "public"
+
+[build]
+command = "npm run build:data && hugo --gc --minify"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+
+[env.preview.vars]
+ENVIRONMENT = "preview"
