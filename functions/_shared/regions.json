@@ -1,0 +1,1823 @@
+[
+  {
+    "id": "aws-af-south-1",
+    "name": "AF South 1 (Cape Town)",
+    "provider": "AWS",
+    "coords": [
+      -33.9249,
+      18
+    ],
+    "aliases": [
+      "Cape Town",
+      "South Africa",
+      "ZA",
+      "CPT",
+      "Western Cape",
+      "Africa"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ap-east-1",
+    "name": "AP East 1 (Hong Kong)",
+    "provider": "AWS",
+    "coords": [
+      22.3193,
+      113.9
+    ],
+    "aliases": [
+      "Hong Kong",
+      "HK",
+      "HKG"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ap-northeast-1",
+    "name": "AP Northeast 1 (Tokyo)",
+    "provider": "AWS",
+    "coords": [
+      35.6762,
+      139.2
+    ],
+    "aliases": [
+      "Tokyo",
+      "Japan",
+      "JP",
+      "NRT",
+      "HND",
+      "Kanto"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ap-northeast-2",
+    "name": "AP Northeast 2 (Seoul)",
+    "provider": "AWS",
+    "coords": [
+      37.5665,
+      126.5
+    ],
+    "aliases": [
+      "Seoul",
+      "South Korea",
+      "Korea",
+      "KR",
+      "ICN",
+      "Gyeonggi"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ap-northeast-3",
+    "name": "AP Northeast 3 (Osaka)",
+    "provider": "AWS",
+    "coords": [
+      34.6937,
+      135.1
+    ],
+    "aliases": [
+      "Osaka",
+      "Japan",
+      "JP",
+      "KIX",
+      "ITM",
+      "Kansai"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ap-south-1",
+    "name": "AP South 1 (Mumbai)",
+    "provider": "AWS",
+    "coords": [
+      19.076,
+      72.8777
+    ],
+    "aliases": [
+      "Mumbai",
+      "India",
+      "IN",
+      "BOM",
+      "Maharashtra",
+      "Bombay"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ap-south-2",
+    "name": "AP South 2 (Hyderabad)",
+    "provider": "AWS",
+    "coords": [
+      17.385,
+      78.4867
+    ],
+    "aliases": [
+      "Hyderabad",
+      "India",
+      "IN",
+      "HYD",
+      "Telangana"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ap-southeast-1",
+    "name": "AP Southeast 1 (Singapore)",
+    "provider": "AWS",
+    "coords": [
+      1.3521,
+      103.4
+    ],
+    "aliases": [
+      "Singapore",
+      "SG",
+      "SIN",
+      "Southeast Asia"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ap-southeast-2",
+    "name": "AP Southeast 2 (Sydney)",
+    "provider": "AWS",
+    "coords": [
+      -33.8688,
+      150.9
+    ],
+    "aliases": [
+      "Sydney",
+      "Australia",
+      "AU",
+      "NSW",
+      "New South Wales",
+      "SYD"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ap-southeast-3",
+    "name": "AP Southeast 3 (Jakarta)",
+    "provider": "AWS",
+    "coords": [
+      -6.2088,
+      106.4
+    ],
+    "aliases": [
+      "Jakarta",
+      "Indonesia",
+      "ID",
+      "CGK",
+      "Java"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ap-southeast-5",
+    "name": "AP Southeast 5 (Malaysia)",
+    "provider": "AWS",
+    "coords": [
+      3.139,
+      101.2
+    ],
+    "aliases": [
+      "Kuala Lumpur",
+      "Malaysia",
+      "MY",
+      "KUL",
+      "KL"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ap-southeast-7",
+    "name": "AP Southeast 7 (Thailand)",
+    "provider": "AWS",
+    "coords": [
+      13.7563,
+      100.5018
+    ],
+    "aliases": [
+      "Bangkok",
+      "Thailand",
+      "TH",
+      "BKK"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ca-central-1",
+    "name": "Canada Central 1 (Montreal)",
+    "provider": "AWS",
+    "coords": [
+      45.5,
+      -73.6
+    ],
+    "aliases": [
+      "Montreal",
+      "Canada",
+      "CA",
+      "YUL",
+      "Quebec",
+      "QC"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-eu-central-1",
+    "name": "EU Central 1 (Frankfurt)",
+    "provider": "AWS",
+    "coords": [
+      50.1109,
+      8.2
+    ],
+    "aliases": [
+      "Frankfurt",
+      "Germany",
+      "DE",
+      "FRA",
+      "Hesse"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-eu-central-2",
+    "name": "EU Central 2 (Zurich)",
+    "provider": "AWS",
+    "coords": [
+      47.3769,
+      8.1
+    ],
+    "aliases": [
+      "Zurich",
+      "Switzerland",
+      "CH",
+      "ZRH"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-eu-north-1",
+    "name": "EU North 1 (Stockholm)",
+    "provider": "AWS",
+    "coords": [
+      59.3293,
+      17.5
+    ],
+    "aliases": [
+      "Stockholm",
+      "Sweden",
+      "SE",
+      "ARN",
+      "Scandinavia",
+      "Nordic"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-eu-south-1",
+    "name": "EU South 1 (Milan)",
+    "provider": "AWS",
+    "coords": [
+      45.4642,
+      9.6
+    ],
+    "aliases": [
+      "Milan",
+      "Italy",
+      "IT",
+      "MXP",
+      "Lombardy"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-eu-south-2",
+    "name": "EU South 2 (Spain)",
+    "provider": "AWS",
+    "coords": [
+      40.4168,
+      -3.7038
+    ],
+    "aliases": [
+      "Madrid",
+      "Spain",
+      "ES",
+      "MAD"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-eu-west-2",
+    "name": "EU West 2 (London)",
+    "provider": "AWS",
+    "coords": [
+      51.5074,
+      -0.6
+    ],
+    "aliases": [
+      "London",
+      "United Kingdom",
+      "UK",
+      "GB",
+      "LHR",
+      "England"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-eu-west-3",
+    "name": "EU West 3 (Paris)",
+    "provider": "AWS",
+    "coords": [
+      48.8566,
+      2.3522
+    ],
+    "aliases": [
+      "Paris",
+      "France",
+      "FR",
+      "CDG",
+      "ORY"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-il-central-1",
+    "name": "Israel (Tel Aviv)",
+    "provider": "AWS",
+    "coords": [
+      32.0853,
+      34.3
+    ],
+    "aliases": [
+      "Tel Aviv",
+      "Israel",
+      "IL",
+      "TLV",
+      "Middle East"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-me-central-1",
+    "name": "Middle East (UAE)",
+    "provider": "AWS",
+    "coords": [
+      25.2048,
+      54.8
+    ],
+    "aliases": [
+      "Dubai",
+      "Abu Dhabi",
+      "UAE",
+      "United Arab Emirates",
+      "AE",
+      "DXB",
+      "AUH",
+      "Middle East"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-sa-east-1",
+    "name": "SA East 1 (São Paulo)",
+    "provider": "AWS",
+    "coords": [
+      -23.5505,
+      -46.2
+    ],
+    "aliases": [
+      "São Paulo",
+      "Sao Paulo",
+      "Brazil",
+      "BR",
+      "GRU",
+      "South America"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-ap-east-1-taipei",
+    "name": "Taipei",
+    "provider": "AWS",
+    "coords": [
+      25.033,
+      121.5654
+    ],
+    "aliases": [
+      "Taipei",
+      "Taiwan",
+      "TW",
+      "TPE"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-us-east-1",
+    "name": "US East 1 (N. Virginia)",
+    "provider": "AWS",
+    "coords": [
+      38.9,
+      -77.4
+    ],
+    "aliases": [
+      "Virginia",
+      "Northern Virginia",
+      "N. Virginia",
+      "United States",
+      "USA",
+      "US",
+      "IAD",
+      "VA",
+      "US East"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-us-east-2",
+    "name": "US East 2 (Ohio)",
+    "provider": "AWS",
+    "coords": [
+      40.4173,
+      -82.9071
+    ],
+    "aliases": [
+      "Ohio",
+      "Columbus",
+      "United States",
+      "USA",
+      "US",
+      "CMH",
+      "OH",
+      "US East"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "aws-us-west-2",
+    "name": "US West 2 (Oregon)",
+    "provider": "AWS",
+    "coords": [
+      45.8,
+      -119.5
+    ],
+    "aliases": [
+      "Oregon",
+      "Portland",
+      "United States",
+      "USA",
+      "US",
+      "PDX",
+      "OR",
+      "US West",
+      "Pacific Northwest"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "azure-au-east",
+    "name": "Australia East (Sydney)",
+    "provider": "Azure",
+    "coords": [
+      -33.8688,
+      151.5
+    ],
+    "aliases": [
+      "Sydney",
+      "Australia",
+      "AU",
+      "NSW",
+      "New South Wales",
+      "SYD"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-australia-southeast",
+    "name": "Australia Southeast (Victoria)",
+    "provider": "Azure",
+    "coords": [
+      -37.8136,
+      144.9631
+    ],
+    "aliases": [
+      "Melbourne",
+      "Victoria",
+      "Australia",
+      "AU",
+      "VIC",
+      "MEL"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ],
+      "vdc_azure_backup": true
+    }
+  },
+  {
+    "id": "azure-austria-east",
+    "name": "Austria East (Vienna)",
+    "provider": "Azure",
+    "coords": [
+      48.2082,
+      16.3738
+    ],
+    "aliases": [
+      "Vienna",
+      "Austria",
+      "AT",
+      "VIE"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "azure-brazil-south",
+    "name": "Brazil South (São Paulo)",
+    "provider": "Azure",
+    "coords": [
+      -23.5505,
+      -46.6333
+    ],
+    "aliases": [
+      "São Paulo",
+      "Sao Paulo",
+      "Brazil",
+      "BR",
+      "GRU",
+      "South America"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Non-Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-canada-central",
+    "name": "Canada Central (Toronto)",
+    "provider": "Azure",
+    "coords": [
+      43.6532,
+      -79.3832
+    ],
+    "aliases": [
+      "Toronto",
+      "Canada",
+      "CA",
+      "YYZ",
+      "Ontario",
+      "ON"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-canada-east",
+    "name": "Canada East (Quebec)",
+    "provider": "Azure",
+    "coords": [
+      46.8139,
+      -71.2082
+    ],
+    "aliases": [
+      "Quebec City",
+      "Quebec",
+      "Canada",
+      "CA",
+      "YQB",
+      "QC"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        }
+      ],
+      "vdc_azure_backup": true
+    }
+  },
+  {
+    "id": "azure-india-central",
+    "name": "Central India (Pune)",
+    "provider": "Azure",
+    "coords": [
+      18.5204,
+      73.8567
+    ],
+    "aliases": [
+      "Pune",
+      "India",
+      "IN",
+      "PNQ",
+      "Maharashtra"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-us-central",
+    "name": "Central US (Iowa)",
+    "provider": "Azure",
+    "coords": [
+      41.5908,
+      -93.6208
+    ],
+    "aliases": [
+      "Iowa",
+      "Des Moines",
+      "United States",
+      "USA",
+      "US",
+      "DSM",
+      "IA",
+      "US Central",
+      "Midwest"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-east-asia",
+    "name": "East Asia (Hong Kong)",
+    "provider": "Azure",
+    "coords": [
+      22.3193,
+      114.1694
+    ],
+    "aliases": [
+      "Hong Kong",
+      "HK",
+      "HKG"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-us-east",
+    "name": "East US (Virginia)",
+    "provider": "Azure",
+    "coords": [
+      37.3719,
+      -79.8164
+    ],
+    "aliases": [
+      "Virginia",
+      "United States",
+      "USA",
+      "US",
+      "RIC",
+      "VA",
+      "US East"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Non-Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-us-east2",
+    "name": "East US 2 (Virginia)",
+    "provider": "Azure",
+    "coords": [
+      36.6681,
+      -78.3876
+    ],
+    "aliases": [
+      "Virginia",
+      "United States",
+      "USA",
+      "US",
+      "VA",
+      "US East"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_azure_backup": true
+    }
+  },
+  {
+    "id": "azure-france-central",
+    "name": "France Central (Paris)",
+    "provider": "Azure",
+    "coords": [
+      46.3772,
+      2.373
+    ],
+    "aliases": [
+      "Paris",
+      "France",
+      "FR",
+      "CDG",
+      "ORY"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-germany-west-central",
+    "name": "Germany West Central (Frankfurt)",
+    "provider": "Azure",
+    "coords": [
+      50.1109,
+      8.6821
+    ],
+    "aliases": [
+      "Frankfurt",
+      "Germany",
+      "DE",
+      "FRA",
+      "Hesse"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-indonesia-central",
+    "name": "Indonesia Central (Jakarta)",
+    "provider": "Azure",
+    "coords": [
+      -6.2088,
+      106.8456
+    ],
+    "aliases": [
+      "Jakarta",
+      "Indonesia",
+      "ID",
+      "CGK",
+      "Java"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-israel-central",
+    "name": "Israel Central (Tel Aviv)",
+    "provider": "Azure",
+    "coords": [
+      32.0853,
+      34.7818
+    ],
+    "aliases": [
+      "Tel Aviv",
+      "Israel",
+      "IL",
+      "TLV",
+      "Middle East"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        }
+      ],
+      "vdc_azure_backup": true
+    }
+  },
+  {
+    "id": "azure-italy-north",
+    "name": "Italy North (Milan)",
+    "provider": "Azure",
+    "coords": [
+      45.4642,
+      9.19
+    ],
+    "aliases": [
+      "Milan",
+      "Italy",
+      "IT",
+      "MXP",
+      "Lombardy"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-japan-east",
+    "name": "Japan East (Tokyo)",
+    "provider": "Azure",
+    "coords": [
+      35.6762,
+      139.6503
+    ],
+    "aliases": [
+      "Tokyo",
+      "Japan",
+      "JP",
+      "NRT",
+      "HND",
+      "Kanto"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-japan-west",
+    "name": "Japan West (Osaka)",
+    "provider": "Azure",
+    "coords": [
+      34.6937,
+      135.5023
+    ],
+    "aliases": [
+      "Osaka",
+      "Japan",
+      "JP",
+      "KIX",
+      "ITM",
+      "Kansai"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_azure_backup": true
+    }
+  },
+  {
+    "id": "azure-korea-central",
+    "name": "Korea Central (Seoul)",
+    "provider": "Azure",
+    "coords": [
+      37.5665,
+      126.978
+    ],
+    "aliases": [
+      "Seoul",
+      "South Korea",
+      "Korea",
+      "KR",
+      "ICN",
+      "Gyeonggi"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "azure-malaysia-west",
+    "name": "Malaysia West (Kuala Lumpur)",
+    "provider": "Azure",
+    "coords": [
+      3.139,
+      101.6869
+    ],
+    "aliases": [
+      "Kuala Lumpur",
+      "Malaysia",
+      "MY",
+      "KUL",
+      "KL"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "azure-nz-north",
+    "name": "New Zealand North (Auckland)",
+    "provider": "Azure",
+    "coords": [
+      -36.8485,
+      174.7633
+    ],
+    "aliases": [
+      "Auckland",
+      "New Zealand",
+      "NZ",
+      "NZ North",
+      "Aotearoa",
+      "AKL"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "azure-us-north-central",
+    "name": "North Central US (Illinois)",
+    "provider": "Azure",
+    "coords": [
+      41.8819,
+      -87.6278
+    ],
+    "aliases": [
+      "Chicago",
+      "Illinois",
+      "United States",
+      "USA",
+      "US",
+      "ORD",
+      "IL",
+      "US Central",
+      "Midwest"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ],
+      "vdc_azure_backup": true
+    }
+  },
+  {
+    "id": "azure-north-europe",
+    "name": "North Europe (Ireland)",
+    "provider": "Azure",
+    "coords": [
+      53.3498,
+      -6.2603
+    ],
+    "aliases": [
+      "Dublin",
+      "Ireland",
+      "IE",
+      "DUB"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-south-africa-north",
+    "name": "South Africa North (Johannesburg)",
+    "provider": "Azure",
+    "coords": [
+      -25.7479,
+      28.2293
+    ],
+    "aliases": [
+      "Johannesburg",
+      "South Africa",
+      "ZA",
+      "JNB",
+      "Gauteng",
+      "Africa"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Non-Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_azure_backup": true
+    }
+  },
+  {
+    "id": "azure-south-africa-west",
+    "name": "South Africa West (Cape Town)",
+    "provider": "Azure",
+    "coords": [
+      -33.9249,
+      18.4241
+    ],
+    "aliases": [
+      "Cape Town",
+      "South Africa",
+      "ZA",
+      "CPT",
+      "Western Cape",
+      "Africa"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ]
+    }
+  },
+  {
+    "id": "azure-us-south-central",
+    "name": "South Central US (Texas)",
+    "provider": "Azure",
+    "coords": [
+      29.4167,
+      -98.5
+    ],
+    "aliases": [
+      "San Antonio",
+      "Texas",
+      "United States",
+      "USA",
+      "US",
+      "SAT",
+      "TX",
+      "US South"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true
+    }
+  },
+  {
+    "id": "azure-south-india",
+    "name": "South India (Chennai)",
+    "provider": "Azure",
+    "coords": [
+      13.0827,
+      80.2707
+    ],
+    "aliases": [
+      "Chennai",
+      "India",
+      "IN",
+      "MAA",
+      "Tamil Nadu",
+      "TN"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_azure_backup": true
+    }
+  },
+  {
+    "id": "azure-southeast-asia",
+    "name": "Southeast Asia (Singapore)",
+    "provider": "Azure",
+    "coords": [
+      1.3521,
+      103.8198
+    ],
+    "aliases": [
+      "Singapore",
+      "SG",
+      "SIN",
+      "Southeast Asia"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-sweden-central",
+    "name": "Sweden Central (Gävle)",
+    "provider": "Azure",
+    "coords": [
+      59.3293,
+      18.0686
+    ],
+    "aliases": [
+      "Gävle",
+      "Gavle",
+      "Stockholm",
+      "Sweden",
+      "SE",
+      "ARN",
+      "Scandinavia",
+      "Nordic"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-switzerland-north",
+    "name": "Switzerland North (Zurich)",
+    "provider": "Azure",
+    "coords": [
+      47.4515,
+      8.5644
+    ],
+    "aliases": [
+      "Zurich",
+      "Switzerland",
+      "CH",
+      "ZRH"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_azure_backup": true
+    }
+  },
+  {
+    "id": "azure-uae-north",
+    "name": "UAE North (Dubai)",
+    "provider": "Azure",
+    "coords": [
+      25.2048,
+      55.2708
+    ],
+    "aliases": [
+      "Dubai",
+      "UAE",
+      "United Arab Emirates",
+      "AE",
+      "DXB",
+      "Middle East"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-uk-south",
+    "name": "UK South (London)",
+    "provider": "Azure",
+    "coords": [
+      51.5074,
+      -0.1278
+    ],
+    "aliases": [
+      "London",
+      "United Kingdom",
+      "UK",
+      "GB",
+      "LHR",
+      "England"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-west-europe",
+    "name": "West Europe (Netherlands)",
+    "provider": "Azure",
+    "coords": [
+      52.3676,
+      4.9041
+    ],
+    "aliases": [
+      "Amsterdam",
+      "Netherlands",
+      "NL",
+      "AMS",
+      "Holland"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-us-west",
+    "name": "West US (California)",
+    "provider": "Azure",
+    "coords": [
+      37.783,
+      -122.417
+    ],
+    "aliases": [
+      "San Francisco",
+      "California",
+      "United States",
+      "USA",
+      "US",
+      "SFO",
+      "CA",
+      "US West",
+      "Bay Area"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Non-Core"
+        }
+      ],
+      "vdc_m365": true,
+      "vdc_salesforce": true,
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-us-west2",
+    "name": "West US 2 (Washington)",
+    "provider": "Azure",
+    "coords": [
+      47.233,
+      -119.852
+    ],
+    "aliases": [
+      "Washington",
+      "Seattle",
+      "United States",
+      "USA",
+      "US",
+      "SEA",
+      "WA",
+      "US West",
+      "Pacific Northwest"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        }
+      ],
+      "vdc_azure_backup": true
+    }
+  },
+  {
+    "id": "azure-us-west3",
+    "name": "West US 3 (Phoenix)",
+    "provider": "Azure",
+    "coords": [
+      33.448,
+      -112.074
+    ],
+    "aliases": [
+      "Phoenix",
+      "Arizona",
+      "United States",
+      "USA",
+      "US",
+      "PHX",
+      "AZ",
+      "US West"
+    ],
+    "services": {
+      "vdc_m365": true,
+      "vdc_azure_backup": true
+    }
+  }
+]
