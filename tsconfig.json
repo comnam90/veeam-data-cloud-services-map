@@ -14,6 +14,6 @@
     "isolatedModules": true,
     "jsx": "preserve"
   },
-  "include": ["functions/**/*"],
-  "exclude": ["node_modules", "dist", "public", ".cloudflare"]
+  "include": ["src/functions/**/*"],
+  "exclude": ["node_modules", "dist", "public", ".cloudflare", "functions"]
 }

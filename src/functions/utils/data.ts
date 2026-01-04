@@ -1,6 +1,6 @@
 import type { Region, Service } from '../types/data'
 // @ts-ignore - JSON import
-import regionsData from '../regions.json'
+import regionsData from '../../../functions/regions.json'
 
 /**
  * Get all regions with type safety

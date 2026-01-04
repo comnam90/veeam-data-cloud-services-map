@@ -9,7 +9,7 @@ const path = require('path');
 async function build() {
   try {
     await esbuild.build({
-      entryPoints: [path.join(__dirname, '../functions/_worker.ts')],
+      entryPoints: [path.join(__dirname, '../src/functions/_worker.ts')],
       bundle: true,
       format: 'esm',
       target: 'es2021',
