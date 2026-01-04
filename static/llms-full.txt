@@ -973,8 +973,8 @@ This is an unofficial, community-maintained API and is not affiliated with, endo
 
 ## Additional Resources
 
-- **OpenAPI Specification:** `/api/openapi.yaml`
-- **Interactive Documentation:** `/api/docs/` (Swagger UI)
+- **OpenAPI Specification:** `/api/openapi.json`
+- **Interactive Documentation:** `/api/docs` (Scalar API Reference)
 - **Concise Documentation:** `/llms.txt`
 - **GitHub Repository:** https://github.com/comnam90/veeam-data-cloud-services-map
 - **Issue Tracker:** https://github.com/comnam90/veeam-data-cloud-services-map/issues
