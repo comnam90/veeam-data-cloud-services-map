@@ -1,128 +1,165 @@
 # Copilot Instructions for Veeam Cloud Service Map
 
 ## Project Overview
-A Hugo static site displaying an interactive Leaflet.js map of Veeam Data Cloud (VDC) service availability across AWS and Azure regions. Data-driven architecture—**no HTML changes needed to add regions**.
+Interactive map + REST API for Veeam Data Cloud (VDC) service availability across AWS/Azure regions. Both hosted on **Cloudflare Pages** at `vdcmap.bcthomas.com`.
 
-## Architecture
-- **Hugo** generates static HTML by injecting YAML data into `layouts/index.html`
-- **Data flow**: `data/regions/*.yaml` → Hugo template → JavaScript object `regions[]` → Leaflet markers
-- Single-page app with all logic in `layouts/index.html` (no separate JS files)
+## Architecture (Single Deployment, Two Build Outputs)
 
-## Adding New Regions (Most Common Task)
-Create a new file in `data/regions/` with this structure:
-
-```yaml
-id: "provider-region-code"           # Unique identifier
-name: "Human Readable Name"          # Display name for popup
-provider: "AWS"                      # MUST be exactly "AWS" or "Azure" (case-sensitive)
-coords: [-33.8688, 151.2093]         # [latitude, longitude] as array
-aliases:                             # Optional: searchable alternative names
-  - "Sydney"
-  - "NSW"
-  - "New South Wales"
-services:
-  vdc_vault:                         # Tiered service (see below)
-    - edition: "Advanced"
-      tier: "Core"                   # "Core" or "Non-Core"
-  vdc_m365: true                     # Boolean service (available or not listed)
+```
+data/regions/*.yaml  ─┬─▶  Hugo template   ─▶  public/index.html  ─┬─▶  Cloudflare Pages
+                      │                                            │    (vdcmap.bcthomas.com)
+                      └─▶  build:data      ─▶  functions/regions.json
+                           build:worker    ─▶  functions/_worker.js ─┘
 ```
 
-### Aliases (Optional)
-The `aliases` field enables users to find regions via the search bar using alternative names:
-- City names (e.g., "Auckland", "Sydney", "London")
-- Country/state names (e.g., "New Zealand", "NSW")
-- Common abbreviations (e.g., "NZ North", "US East")
-- Local names (e.g., "Aotearoa" for New Zealand)
-
-Aliases are case-insensitive during search. Add aliases that users might naturally type when looking for a region.
-
-### Service Types
-**Tiered services** (edition + tier matter per region):
-- `vdc_vault` - Veeam Data Cloud Vault
-
-**Boolean services** (available globally with same editions, just mark presence):
-- `vdc_m365` - Veeam Data Cloud for Microsoft 365 (Flex/Express/Premium available everywhere)
-- `vdc_entra_id` - Veeam Data Cloud for Entra ID
-- `vdc_salesforce` - Veeam Data Cloud for Salesforce
-- `vdc_azure_backup` - Veeam Data Cloud for Azure
-
-### Valid Service Keys
-- `vdc_vault` - Veeam Data Cloud Vault (tiered: edition + Core/Non-Core)
-- `vdc_m365` - Veeam Data Cloud for Microsoft 365 (boolean: `true` if available)
-- `vdc_entra_id` - Veeam Data Cloud for Entra ID (boolean: `true` if available)
-- `vdc_salesforce` - Veeam Data Cloud for Salesforce (boolean: `true` if available)
-- `vdc_azure_backup` - Veeam Data Cloud for Azure (boolean: `true` if available)
-
-### Critical Conventions
-- **Provider values are case-sensitive**: Use exactly `"AWS"` or `"Azure"`
-- **Coords must be an array**, not a string: `coords: [-33, 151]` ✓ vs `coords: "[-33, 151]"` ✗
-- **Tiered services use arrays**: `vdc_vault` contains an array of `{edition, tier}` objects
-- **Boolean services use `true`**: `vdc_m365`, `vdc_entra_id`, `vdc_salesforce`, `vdc_azure_backup` are just `true` if available
-
-### Tier Pricing Context (VDC Vault)
-- **Core**: Standard pricing ($14/TB Foundation, $24/TB Advanced)
-- **Non-Core**: Price uplift applies—used for less common regions
+- **Hugo frontend**: `layouts/index.html` is a single-file SPA (HTML + Tailwind + Leaflet.js). Hugo injects YAML data as a JavaScript `regions[]` array at build time.
+- **Hono API**: TypeScript in `src/functions/` → compiled to `functions/_worker.js` → runs on Cloudflare Workers. Auto-generates OpenAPI spec at `/api/openapi.json`.
 
 ## Development Commands
+
 ```bash
-hugo server          # Dev server at http://localhost:1313 with hot reload
-hugo                 # Build to public/ directory
+# Frontend only (Hugo dev server)
+hugo server                    # http://localhost:1313 with hot reload
+
+# Full stack (API + frontend)
+npm run dev                    # Runs wrangler pages dev (includes API)
+
+# Build everything
+npm run build                  # build:data → build:worker → typecheck → hugo
+
+# Individual build steps
+npm run build:data             # YAML → functions/regions.json
+npm run build:worker           # TypeScript → functions/_worker.js
+npm run typecheck              # tsc --noEmit (validates types)
+npm run test                   # Runs API integration tests
 ```
 
-## Deployment
-- **Target**: GitHub Pages via GitHub Actions
-- **Workflow**: `.github/workflows/hugo.yml` builds and deploys on push to `main`
-- Region data is manually maintained—no external sync or validation required
+## Adding New Regions (Most Common Task)
 
-## Contributing (Issue & PR Templates)
-GitHub issue templates exist for community contributions:
-- **Missing Service**: Report a service missing from an existing region
-- **Missing Region**: Report an entirely missing region
-- **Incorrect Information**: Report wrong data (coordinates, tier, etc.)
+Create file: `data/regions/{aws|azure}/{provider}_{region_code}.yaml`
 
-PR template ensures contributors:
-- Provide source/evidence for data changes
-- Follow YAML conventions (case-sensitive provider, correct coords format)
-- Link related issues
+```yaml
+id: "aws-us-east-1"              # Unique, lowercase, hyphenated
+name: "US East 1 (N. Virginia)"  # Display name
+provider: "AWS"                  # Case-sensitive: "AWS" or "Azure" ONLY
+coords: [38.9, -77.4]            # [lat, lng] as array, NOT string
+aliases:                         # Optional: searchable alternative names
+  - "Virginia"
+  - "US East"
+services:
+  vdc_vault:                     # Tiered service: array of {edition, tier}
+    - edition: "Foundation"      # "Foundation" or "Advanced"
+      tier: "Core"               # "Core" or "Non-Core"
+    - edition: "Advanced"
+      tier: "Core"
+  vdc_m365: true                 # Boolean services: just true if available
+```
+
+### Service Keys Reference
+| Key | Type | Notes |
+|-----|------|-------|
+| `vdc_vault` | Array of `{edition, tier}` | Tiered pricing per region |
+| `vdc_m365` | Boolean | Microsoft 365 backup |
+| `vdc_entra_id` | Boolean | Entra ID protection |
+| `vdc_salesforce` | Boolean | Salesforce backup |
+| `vdc_azure_backup` | Boolean | Azure backup |
+
+### Critical Data Conventions
+- Provider is **case-sensitive**: `"AWS"` or `"Azure"` exactly
+- Coords must be array `[lat, lng]`, not string `"[lat, lng]"`
+- Boolean services: use `true`, not `"true"`
+
+## API Development
+
+### Route Pattern (Hono + Zod OpenAPI)
+Routes in `src/functions/routes/v1/*.ts` follow this structure:
+
+```typescript
+// 1. Define Zod schema with OpenAPI metadata
+const MyResponseSchema = z.object({
+  data: z.string().openapi({ description: '...', example: '...' })
+}).openapi('MyResponse')
+
+// 2. Create route with full OpenAPI spec
+const myRoute = createRoute({
+  method: 'get',
+  path: '/api/v1/my-endpoint',
+  summary: 'Short description',
+  tags: ['TagName'],
+  responses: { 200: { content: { 'application/json': { schema: MyResponseSchema } } } }
+})
+
+// 3. Register with handler
+export function registerMyRoute(app: OpenAPIHono<{ Bindings: Env }>) {
+  app.openapi(myRoute, (c) => c.json({ data: 'value' }))
+}
+```
+
+Then register in `src/functions/_worker.ts`:
+```typescript
+import { registerMyRoute } from './routes/v1/my-endpoint'
+registerMyRoute(app)
+```
+
+### Key API Files
+- `src/functions/_worker.ts` - Main Hono app, middleware, route registration
+- `src/functions/schemas/common.ts` - Shared Zod schemas with OpenAPI docs
+- `src/functions/utils/data.ts` - Data access helpers (loads `regions.json`)
+- `src/functions/types/` - TypeScript interfaces (`Env`, `Region`, etc.)
 
 ## Modifying the Map UI
-All UI code lives in `layouts/index.html`:
-- **Service icons**: `getServiceIcon()` function (~line 130) - inline SVGs keyed by service name
-- **Provider colors**: `getProviderBadgeColor()` function (~line 145) - returns Tailwind v4 classes
-- **Filters**: Dropdowns in navbar section (~lines 55-70) - add `<option>` for new services
-- **Map styling**: CartoDB Dark Matter tiles; change `L.tileLayer` URL for different theme
 
-## Adding a New Service Type
-1. Add YAML entries under the new service key in region files
+All UI code in `layouts/index.html` (1500+ lines):
+- **Service icons**: `getServiceIcon()` (~line 884) - inline SVGs keyed by service name
+- **Provider colors**: `getProviderBadgeColor()` (~line 895) - returns Tailwind classes
+- **Service display names**: `serviceDisplayNames` object (~line 901)
+- **Map tiles**: CartoDB Dark Matter; change `L.tileLayer` URL for different theme
+
+### Adding a New Service Type
+1. Add YAML entries under new key in region files
 2. Add icon SVG to `getServiceIcon()` in `layouts/index.html`
-3. Add `<option value="service_key">Display Name</option>` to `#serviceFilter` dropdown
+3. Add entry to `serviceDisplayNames` object
+4. Add to filter dropdown (`#serviceFilter`)
+5. Update Zod schemas in `src/functions/schemas/common.ts`
+6. Update route query param enums in `src/functions/routes/v1/regions.ts`
 
-**Note**: Keep filter dropdown in sync with valid service keys—missing options is a known issue to watch for.
+## Testing
 
-## File Structure Reference
+```bash
+npm run test                   # Preferred way to run API integration tests
 ```
-data/regions/
-  aws/                 # AWS region YAML files
-  azure/               # Azure region YAML files
-layouts/index.html     # Single template with all HTML, CSS, JS
-static/icons/          # Static assets (currently unused)
-config.yaml            # Hugo config (minimal settings)
-.github/
-  workflows/hugo.yml   # GitHub Actions deployment
-  ISSUE_TEMPLATE/      # Issue templates for data corrections
-  PULL_REQUEST_TEMPLATE.md
+
+Tests live in `scripts/test-api.js`. When adding new endpoints or modifying API behavior, extend this file to maintain test coverage.
+
+## Deployment
+
+Both map and API deploy to **Cloudflare Pages** at `vdcmap.bcthomas.com`:
+- **Preview**: Automatic on pull requests
+- **Production**: Automatic on commits to `main`
+- **Config**: `wrangler.toml` + Cloudflare Pages dashboard
+
+GitHub Pages workflow (`.github/workflows/hugo.yml`) exists for legacy URL support only.
+
+## File Structure
+
 ```
+data/regions/{aws,azure}/*.yaml  # Source of truth for all region data
+src/functions/                   # TypeScript API source
+  _worker.ts                     # Hono app entry point
+  routes/v1/*.ts                 # API endpoints
+  schemas/common.ts              # Zod schemas with OpenAPI metadata
+  types/, utils/                 # Supporting code
+functions/                       # Build output (git-ignored except regions.json)
+layouts/index.html               # Single-file Hugo template (map UI)
+scripts/                         # Build scripts and tests
+static/                          # Static files copied to public/
+  llms.txt                       # Concise API summary for LLM consumption
+  llms-full.txt                  # Full API documentation for LLMs
+  api/openapi.yaml               # Static OpenAPI spec (backup)
+```
+
+### LLM Documentation Files
+`static/llms.txt` and `static/llms-full.txt` provide API documentation optimized for LLM agents. **Keep these updated** when adding endpoints or changing API behavior—they're consumed by AI tools discovering the API.
 
 ## Keeping Instructions Current
-**When making changes, flag if this file needs updating:**
-- Adding a new service key? Update "Valid Service Keys" section
-- Adding new filter types or UI components? Document in "Modifying the Map UI"
-- Changing data structure in YAML? Update the example in "Adding New Regions"
-- Setting up GitHub Actions deployment? Remove the TODO and document the workflow
-
-**Also check if `README.md` needs updating:**
-- New service keys should be added to "Available Keys" section
-- Changes to dev workflow or prerequisites
-- New customization options or file structure changes
-
-If you notice these instructions or the README are outdated or missing context that would have helped, suggest specific updates.
+When adding new service keys, update: this file, `README.md`, `schemas/common.ts`, route enums, and `static/llms*.txt` files.
