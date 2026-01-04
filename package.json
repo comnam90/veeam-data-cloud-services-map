@@ -5,11 +5,13 @@
   "private": true,
   "scripts": {
     "build:data": "node scripts/build-api-data.js",
+    "build:worker": "node scripts/build-worker.js",
     "typecheck": "tsc --noEmit",
     "build": "npm run build:data && npm run typecheck && hugo --gc --minify",
-    "dev": "npm run build:data && wrangler pages dev public",
+    "dev": "npm run build:data && npm run build:worker && wrangler pages dev public",
+    "pretest": "npm run build:data && npm run build:worker",
     "test": "node scripts/test-api.js",
-    "clean": "rm -rf public functions/regions.json"
+    "clean": "rm -rf public functions/regions.json functions/_worker.js"
   },
   "keywords": [
     "veeam",
@@ -29,6 +31,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260103.0",
     "@types/node": "^25.0.3",
+    "esbuild": "^0.24.2",
     "typescript": "^5.9.3",
     "wrangler": "^4.54.0"
   }
