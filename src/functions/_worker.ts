@@ -114,7 +114,7 @@ documentation for authoritative information.
 // Serve interactive API documentation UI at /api/docs
 app.get('/api/docs', apiReference({
   url: '/api/openapi.json',
-  pageTitle: 'Veeam Data Cloud API Documentation',
+  pageTitle: 'Veeam Data Cloud Service Availability API',
 }))
 
 // Register routes
