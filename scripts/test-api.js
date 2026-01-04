@@ -101,6 +101,125 @@ async function runTests() {
     assert(Array.isArray(vault.tiers), 'vdc_vault should have tiers array');
   });
 
+  await test('GET /api/v1/services includes regionCount for all services', async () => {
+    const res = await makeRequest('/api/v1/services');
+    assert(res.data.services.every(s => typeof s.regionCount === 'number'), 'All services should have regionCount');
+    assert(res.data.services.every(s => s.regionCount >= 0), 'All regionCounts should be non-negative');
+  });
+
+  await test('GET /api/v1/services includes providerBreakdown for all services', async () => {
+    const res = await makeRequest('/api/v1/services');
+    assert(res.data.services.every(s => s.providerBreakdown), 'All services should have providerBreakdown');
+    assert(res.data.services.every(s => typeof s.providerBreakdown.AWS === 'number'), 'All should have AWS count');
+    assert(res.data.services.every(s => typeof s.providerBreakdown.Azure === 'number'), 'All should have Azure count');
+  });
+
+  await test('GET /api/v1/services provider breakdown sums match regionCount', async () => {
+    const res = await makeRequest('/api/v1/services');
+    res.data.services.forEach(service => {
+      const sum = service.providerBreakdown.AWS + service.providerBreakdown.Azure;
+      assert(sum === service.regionCount,
+        `${service.id}: provider breakdown sum (${sum}) should equal regionCount (${service.regionCount})`);
+    });
+  });
+
+  await test('GET /api/v1/services vdc_vault includes configurationBreakdown', async () => {
+    const res = await makeRequest('/api/v1/services');
+    const vault = res.data.services.find(s => s.id === 'vdc_vault');
+    assert(vault.configurationBreakdown, 'vdc_vault should have configurationBreakdown');
+    assert(typeof vault.configurationBreakdown === 'object', 'configurationBreakdown should be an object');
+    // Check for expected edition-tier combinations
+    const keys = Object.keys(vault.configurationBreakdown);
+    assert(keys.length > 0, 'configurationBreakdown should have entries');
+    assert(keys.every(k => k.includes('-')), 'All keys should follow "Edition-Tier" format');
+  });
+
+  await test('GET /api/v1/services boolean services do not have configurationBreakdown', async () => {
+    const res = await makeRequest('/api/v1/services');
+    const booleanServices = res.data.services.filter(s => s.type === 'boolean');
+    assert(booleanServices.length > 0, 'Should have boolean services');
+    assert(booleanServices.every(s => !s.configurationBreakdown),
+      'Boolean services should not have configurationBreakdown');
+  });
+
+  // Service detail endpoint tests
+  await test('GET /api/v1/services/vdc_m365 returns service details', async () => {
+    const res = await makeRequest('/api/v1/services/vdc_m365');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.service.id === 'vdc_m365', 'Service ID should match');
+    assert(res.data.service.type === 'boolean', 'vdc_m365 should be boolean');
+    assert(Array.isArray(res.data.regions), 'Should have regions array');
+    assert(res.data.providerBreakdown, 'Should have providerBreakdown');
+  });
+
+  await test('GET /api/v1/services/vdc_vault returns service details with configurations', async () => {
+    const res = await makeRequest('/api/v1/services/vdc_vault');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.service.id === 'vdc_vault', 'Service ID should match');
+    assert(res.data.service.type === 'tiered', 'vdc_vault should be tiered');
+    assert(Array.isArray(res.data.service.editions), 'Should have editions');
+    assert(Array.isArray(res.data.service.tiers), 'Should have tiers');
+    assert(res.data.configurationBreakdown, 'Should have configurationBreakdown');
+  });
+
+  await test('GET /api/v1/services/{id} provider breakdown has region lists', async () => {
+    const res = await makeRequest('/api/v1/services/vdc_m365');
+    assert(res.data.providerBreakdown.AWS, 'Should have AWS breakdown');
+    assert(res.data.providerBreakdown.Azure, 'Should have Azure breakdown');
+    assert(typeof res.data.providerBreakdown.AWS.count === 'number', 'AWS should have count');
+    assert(Array.isArray(res.data.providerBreakdown.AWS.regions), 'AWS should have regions array');
+    assert(typeof res.data.providerBreakdown.Azure.count === 'number', 'Azure should have count');
+    assert(Array.isArray(res.data.providerBreakdown.Azure.regions), 'Azure should have regions array');
+  });
+
+  await test('GET /api/v1/services/{id} data consistency checks', async () => {
+    const res = await makeRequest('/api/v1/services/vdc_m365');
+    // Region count should match array length
+    assert(res.data.regions.length === res.data.service.regionCount,
+      `regions array length (${res.data.regions.length}) should match regionCount (${res.data.service.regionCount})`);
+    // Provider breakdown counts should sum to total
+    const awsCount = res.data.providerBreakdown.AWS.count;
+    const azureCount = res.data.providerBreakdown.Azure.count;
+    assert(awsCount + azureCount === res.data.service.regionCount,
+      'Provider breakdown counts should sum to total regionCount');
+    // Provider breakdown region lists should match counts
+    assert(res.data.providerBreakdown.AWS.regions.length === awsCount,
+      'AWS regions array should match AWS count');
+    assert(res.data.providerBreakdown.Azure.regions.length === azureCount,
+      'Azure regions array should match Azure count');
+  });
+
+  await test('GET /api/v1/services/vdc_vault configuration breakdown has region lists', async () => {
+    const res = await makeRequest('/api/v1/services/vdc_vault');
+    const configBreakdown = res.data.configurationBreakdown;
+    assert(configBreakdown, 'Should have configurationBreakdown');
+    const configs = Object.values(configBreakdown);
+    assert(configs.length > 0, 'Should have at least one configuration');
+    configs.forEach(config => {
+      assert(typeof config.count === 'number', 'Each config should have count');
+      assert(Array.isArray(config.regions), 'Each config should have regions array');
+      assert(config.regions.length === config.count, 'Regions array length should match count');
+    });
+  });
+
+  await test('GET /api/v1/services/invalid_service returns 404', async () => {
+    const res = await makeRequest('/api/v1/services/invalid_service');
+    assert(res.status === 404, `Expected 404, got ${res.status}`);
+    assert(res.data.code === 'SERVICE_NOT_FOUND', 'Expected SERVICE_NOT_FOUND error code');
+    assert(res.data.error, 'Should have error message');
+    assert(res.data.parameter === 'serviceId', 'Should indicate serviceId parameter');
+    assert(Array.isArray(res.data.allowedValues), 'Should provide allowed values');
+  });
+
+  await test('GET /api/v1/services/{id} for all valid service IDs', async () => {
+    const serviceIds = ['vdc_vault', 'vdc_m365', 'vdc_entra_id', 'vdc_salesforce', 'vdc_azure_backup'];
+    for (const serviceId of serviceIds) {
+      const res = await makeRequest(`/api/v1/services/${serviceId}`);
+      assert(res.status === 200, `${serviceId} should return 200, got ${res.status}`);
+      assert(res.data.service.id === serviceId, `Service ID should be ${serviceId}`);
+    }
+  });
+
   // Regions endpoint tests
   await test('GET /api/v1/regions returns all regions', async () => {
     const res = await makeRequest('/api/v1/regions');
