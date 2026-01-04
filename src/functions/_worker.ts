@@ -1,6 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { cors } from 'hono/cors'
 import { secureHeaders } from 'hono/secure-headers'
+import { apiReference } from '@scalar/hono-api-reference'
 import type { Env } from './types/env'
 
 // Create Hono app with OpenAPI support and custom validation error handling
@@ -109,6 +110,14 @@ documentation for authoritative information.
     },
   ],
 })
+
+// Serve interactive API documentation UI at /api/docs
+app.get('/api/docs', apiReference({
+  pageTitle: 'Veeam Data Cloud API Documentation',
+  spec: {
+    url: '/api/openapi.json',
+  },
+} as any))
 
 // Register routes
 import { registerPingRoute } from './routes/v1/ping'
