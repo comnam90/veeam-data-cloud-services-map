@@ -207,11 +207,14 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 ### 3. GET /api/v1/services
 
-**Purpose:** Retrieve metadata about all Veeam Data Cloud services tracked by this API.
+**Purpose:** Retrieve metadata about all Veeam Data Cloud services with comprehensive regional availability statistics.
 
 **When to use:**
 - Discovering what VDC services exist
 - Understanding service types (tiered vs boolean)
+- Comparing service coverage across VDC offerings
+- Finding which services have the widest availability
+- Understanding distribution across cloud providers
 - Building UI dropdowns or service selection menus
 - Learning which services support editions and tiers
 
@@ -227,32 +230,76 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
       "id": "vdc_vault",
       "name": "Veeam Data Cloud Vault",
       "type": "tiered",
+      "description": "Immutable backup storage with configurable pricing tiers",
       "editions": ["Foundation", "Advanced"],
-      "tiers": ["Core", "Non-Core"]
+      "tiers": ["Core", "Non-Core"],
+      "regionCount": 80,
+      "providerBreakdown": {
+        "AWS": 45,
+        "Azure": 35
+      },
+      "configurationBreakdown": {
+        "Foundation-Core": 12,
+        "Advanced-Core": 45,
+        "Foundation-Non-Core": 8,
+        "Advanced-Non-Core": 15
+      }
     },
     {
       "id": "vdc_m365",
       "name": "VDC for Microsoft 365",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Backup and recovery for Microsoft 365 data",
+      "regionCount": 23,
+      "providerBreakdown": {
+        "AWS": 0,
+        "Azure": 23
+      }
     },
     {
       "id": "vdc_entra_id",
       "name": "VDC for Entra ID",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Backup and recovery for Microsoft Entra ID (Azure AD)",
+      "regionCount": 23,
+      "providerBreakdown": {
+        "AWS": 0,
+        "Azure": 23
+      }
     },
     {
       "id": "vdc_salesforce",
       "name": "VDC for Salesforce",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Backup and recovery for Salesforce data",
+      "regionCount": 12,
+      "providerBreakdown": {
+        "AWS": 5,
+        "Azure": 7
+      }
     },
     {
       "id": "vdc_azure_backup",
       "name": "VDC for Azure",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Native Azure backup capabilities",
+      "regionCount": 36,
+      "providerBreakdown": {
+        "AWS": 0,
+        "Azure": 36
+      }
     }
-  ]
+  ],
+  "count": 5
 }
 ```
+
+**Response Fields Explained:**
+
+- **regionCount**: Total number of regions where this service is available. Use to quickly compare service coverage.
+- **providerBreakdown**: Count of AWS vs Azure regions offering the service. Helps understand cloud provider distribution.
+- **configurationBreakdown**: (Tiered services only) Count of regions per edition-tier combination. Keys follow "Edition-Tier" format (e.g., "Foundation-Core", "Advanced-Non-Core"). Use to find how many regions support specific configurations.
+- **count**: Total number of services returned (always 5 currently)
 
 **Service Details:**
 
@@ -281,9 +328,186 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 **Response Codes:**
 - `200 OK` - Always returns successfully with complete service list
 
+**Use Cases:**
+
+1. **Compare service availability**: Quickly see that VDC Vault has 80 regions while VDC for Salesforce has only 12
+2. **Understand provider distribution**: See that M365/Entra ID are Azure-only while VDC Vault spans both providers
+3. **Configuration planning**: Check configurationBreakdown to see how many regions support Advanced-Core tier
+
 ---
 
-### 4. GET /api/v1/health
+### 4. GET /api/v1/services/{serviceId}
+
+**Purpose:** Retrieve comprehensive details about a specific VDC service, including complete lists of all regions where the service is available and detailed breakdowns by cloud provider and configuration.
+
+**When to use:**
+- Get all regions supporting a specific service
+- Find which regions support specific edition-tier combinations
+- Understand geographic distribution of a service
+- Build deployment plans for specific services
+- Verify service availability details
+
+**URL:** `GET /api/v1/services/{serviceId}`
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Values | Description |
+|-----------|------|----------|--------|-------------|
+| serviceId | string | Yes | vdc_vault, vdc_m365, vdc_entra_id, vdc_salesforce, vdc_azure_backup | Unique identifier for the VDC service |
+
+**Response Schema (Boolean Service - e.g., vdc_m365):**
+```json
+{
+  "service": {
+    "id": "vdc_m365",
+    "name": "VDC for Microsoft 365",
+    "type": "boolean",
+    "description": "Backup and recovery for Microsoft 365 data",
+    "regionCount": 23
+  },
+  "regions": [
+    "azure-au-east",
+    "azure-brazil-south",
+    "azure-canada-central"
+  ],
+  "providerBreakdown": {
+    "AWS": {
+      "count": 0,
+      "regions": []
+    },
+    "Azure": {
+      "count": 23,
+      "regions": [
+        "azure-au-east",
+        "azure-brazil-south",
+        "azure-canada-central"
+      ]
+    }
+  }
+}
+```
+
+**Response Schema (Tiered Service - vdc_vault):**
+```json
+{
+  "service": {
+    "id": "vdc_vault",
+    "name": "Veeam Data Cloud Vault",
+    "type": "tiered",
+    "description": "Immutable backup storage with configurable pricing tiers",
+    "editions": ["Foundation", "Advanced"],
+    "tiers": ["Core", "Non-Core"],
+    "regionCount": 80
+  },
+  "regions": [
+    "aws-af-south-1",
+    "aws-ap-east-1",
+    "aws-eu-north-1"
+  ],
+  "providerBreakdown": {
+    "AWS": {
+      "count": 45,
+      "regions": [
+        "aws-af-south-1",
+        "aws-ap-east-1",
+        "aws-eu-north-1"
+      ]
+    },
+    "Azure": {
+      "count": 35,
+      "regions": [
+        "azure-au-east",
+        "azure-brazil-south"
+      ]
+    }
+  },
+  "configurationBreakdown": {
+    "Foundation-Core": {
+      "count": 12,
+      "regions": [
+        "aws-eu-north-1",
+        "aws-eu-south-2"
+      ]
+    },
+    "Advanced-Core": {
+      "count": 45,
+      "regions": [
+        "aws-af-south-1",
+        "aws-ap-east-1"
+      ]
+    },
+    "Foundation-Non-Core": {
+      "count": 8,
+      "regions": [
+        "aws-us-west-1"
+      ]
+    },
+    "Advanced-Non-Core": {
+      "count": 15,
+      "regions": [
+        "aws-us-east-1"
+      ]
+    }
+  }
+}
+```
+
+**Response Fields Explained:**
+
+- **service**: Complete service metadata including type, description, and total region count
+- **regions**: Array of all region IDs where this service is available. Use these IDs with `/api/v1/regions/{id}` for full region details.
+- **providerBreakdown**: Detailed breakdown by cloud provider including both counts and complete region ID lists
+- **configurationBreakdown**: (Tiered services only) Breakdown by edition-tier combination with counts and complete region ID lists. Keys follow "Edition-Tier" format.
+
+**Example Queries:**
+
+1. **Get all M365 regions:**
+   ```
+   GET /api/v1/services/vdc_m365
+   ```
+
+2. **Get VDC Vault distribution:**
+   ```
+   GET /api/v1/services/vdc_vault
+   ```
+
+3. **Check Salesforce availability:**
+   ```
+   GET /api/v1/services/vdc_salesforce
+   ```
+
+**Response Codes:**
+- `200 OK` - Service found and details returned
+- `404 Not Found` - Invalid service ID
+
+**Error Response (404):**
+```json
+{
+  "error": "Service not found",
+  "code": "SERVICE_NOT_FOUND",
+  "message": "Service with ID 'invalid_service' does not exist",
+  "parameter": "serviceId",
+  "value": "invalid_service",
+  "allowedValues": [
+    "vdc_vault",
+    "vdc_m365",
+    "vdc_entra_id",
+    "vdc_salesforce",
+    "vdc_azure_backup"
+  ]
+}
+```
+
+**Use Cases:**
+
+1. **List all regions for a service**: Use the `regions` array to get all region IDs
+2. **Find provider-specific regions**: Check `providerBreakdown.AWS.regions` or `providerBreakdown.Azure.regions`
+3. **Configuration-specific planning**: For VDC Vault, use `configurationBreakdown["Advanced-Core"].regions` to find regions supporting specific configurations
+4. **Build deployment matrices**: Combine with `/api/v1/regions/{id}` to get full geographic details for each region
+
+---
+
+### 5. GET /api/v1/health
 
 **Purpose:** Comprehensive health check that validates API functionality and data availability.
 
@@ -322,7 +546,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 ---
 
-### 5. GET /api/v1/ping
+### 6. GET /api/v1/ping
 
 **Purpose:** Lightweight connectivity test with no data dependencies.
 
@@ -442,6 +666,7 @@ interface Error {
 
 **Common Error Codes:**
 - `REGION_NOT_FOUND` - Region ID doesn't exist
+- `SERVICE_NOT_FOUND` - Service ID doesn't exist
 - `INVALID_PARAMETER` - General parameter validation failure
 - `INVALID_PROVIDER` - Provider must be "AWS" or "Azure"
 - `INVALID_SERVICE` - Service ID not recognized
@@ -457,12 +682,20 @@ interface Error {
 #### 1. Discover Available Services
 ```
 Step 1: GET /api/v1/services
-Step 2: Review service types and options
-Step 3: Use service IDs in region queries
+Step 2: Review service types, options, and regional statistics
+Step 3: Compare regionCount and providerBreakdown across services
+Step 4: Use service IDs in detailed queries or region filters
 ```
 
 #### 2. Find Regions for Specific Service
 ```
+Method A - Using service detail endpoint:
+Step 1: GET /api/v1/services/vdc_m365
+Step 2: Review regions array for complete list of region IDs
+Step 3: Check providerBreakdown to see AWS vs Azure distribution
+Step 4: Optionally fetch full region details: GET /api/v1/regions/{id}
+
+Method B - Using regions endpoint with filter:
 Step 1: GET /api/v1/regions?service=vdc_m365
 Step 2: Filter results by provider if needed
 Step 3: Select region based on geography/latency
@@ -485,6 +718,14 @@ Step 4: Select nearest region
 
 #### 5. Multi-Region Deployment Planning
 ```
+Method A - Using service detail endpoint:
+Step 1: GET /api/v1/services/vdc_vault
+Step 2: Review configurationBreakdown["Advanced-Core"].regions for all matching regions
+Step 3: Group by provider using providerBreakdown
+Step 4: Select regions across different geographies
+Step 5: Fetch full details: GET /api/v1/regions/{id} for each selected region
+
+Method B - Using regions filter:
 Step 1: GET /api/v1/regions?service=vdc_vault&edition=Advanced&tier=Core
 Step 2: Group by provider for cost comparison
 Step 3: Select regions across different geographies
@@ -558,11 +799,19 @@ Action: Replace 'GCP' with 'AWS' or 'Azure' and retry
 3. Use returned region IDs for specific queries
 ```
 
-#### Strategy 3: Service Not Found in Region
+#### Strategy 3: Service Not Found (404)
+```
+1. Check if service ID format is correct
+2. Try getting all services: GET /api/v1/services
+3. Use returned service IDs for specific queries
+```
+
+#### Strategy 4: Service Not Available in Region
 ```
 1. GET /api/v1/regions/{id} returns region but missing service
 2. Service not available - search for alternative regions
-3. GET /api/v1/regions?service={required_service}
+3. GET /api/v1/services/{service_id} to see all regions with service
+4. Or GET /api/v1/regions?service={required_service}
 ```
 
 ### Validation Rules
@@ -825,7 +1074,67 @@ except ValueError as e:
     print(f"Error: {e}")
 ```
 
-### Example 5: Building Region Selector UI
+### Example 5: Service Coverage Analysis
+
+```javascript
+async function analyzeServiceCoverage() {
+  // Get all services with statistics
+  const servicesResp = await fetch('/api/v1/services');
+  const servicesData = await servicesResp.json();
+
+  // Analyze and compare
+  const analysis = servicesData.services.map(service => ({
+    name: service.name,
+    totalRegions: service.regionCount,
+    awsRegions: service.providerBreakdown.AWS,
+    azureRegions: service.providerBreakdown.Azure,
+    coverage: (service.regionCount / 63 * 100).toFixed(1) + '%', // 63 total regions
+    configurations: service.configurationBreakdown
+      ? Object.keys(service.configurationBreakdown).length
+      : null
+  }));
+
+  // Sort by coverage
+  analysis.sort((a, b) => b.totalRegions - a.totalRegions);
+
+  return analysis;
+}
+
+// Get detailed regions for a specific service
+async function getServiceRegionDetails(serviceId) {
+  // Get service detail with region lists
+  const serviceResp = await fetch(`/api/v1/services/${serviceId}`);
+  const serviceData = await serviceResp.json();
+
+  // For VDC Vault, find regions supporting Advanced-Core
+  if (serviceId === 'vdc_vault' && serviceData.configurationBreakdown) {
+    const advancedCoreRegions = serviceData.configurationBreakdown['Advanced-Core'].regions;
+
+    console.log(`Found ${advancedCoreRegions.length} regions with Advanced-Core`);
+
+    // Optionally fetch full details for each region
+    const regionDetails = await Promise.all(
+      advancedCoreRegions.slice(0, 5).map(async (regionId) => {
+        const regionResp = await fetch(`/api/v1/regions/${regionId}`);
+        return regionResp.json();
+      })
+    );
+
+    return regionDetails;
+  }
+
+  return serviceData.regions;
+}
+
+// Usage
+const coverage = await analyzeServiceCoverage();
+console.log('Service coverage analysis:', coverage);
+
+const vaultRegions = await getServiceRegionDetails('vdc_vault');
+console.log('VDC Vault Advanced-Core regions:', vaultRegions);
+```
+
+### Example 6: Building Region Selector UI
 
 ```javascript
 async function buildRegionSelector(container, serviceFilter = null) {

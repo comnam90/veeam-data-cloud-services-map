@@ -27,12 +27,13 @@ functions/
 │   └── v1/
 │       ├── ping.ts        # GET /api/v1/ping
 │       ├── health.ts      # GET /api/v1/health
-│       ├── services.ts    # GET /api/v1/services
+│       ├── services.ts    # GET /api/v1/services (with statistics)
+│       ├── services-by-id.ts  # GET /api/v1/services/{serviceId}
 │       ├── regions.ts     # GET /api/v1/regions
 │       └── regions-by-id.ts  # GET /api/v1/regions/{id}
 ├── middleware/            # Custom middleware (future)
 ├── utils/
-│   ├── data.ts           # Data access helpers
+│   ├── data.ts           # Data access & statistics helpers
 │   ├── response.ts       # Response formatting helpers
 │   └── validation.ts     # Validation utilities
 └── regions.json          # Generated region data (build artifact)
@@ -141,6 +142,67 @@ The API automatically generates OpenAPI 3.1 specification at `/api/openapi.json`
 GET /api/openapi.json
 ```
 
+## API Endpoints
+
+### Services Endpoints
+
+#### `GET /api/v1/services`
+Returns all VDC services with regional availability statistics.
+
+**Response includes:**
+- Service metadata (id, name, type, description)
+- `regionCount`: Total regions supporting the service
+- `providerBreakdown`: Count of AWS vs Azure regions
+- `configurationBreakdown`: For tiered services, count per edition-tier combination
+
+**Use cases:**
+- Compare service coverage across VDC offerings
+- Understand which services have the widest availability
+- See distribution of services across cloud providers
+
+#### `GET /api/v1/services/{serviceId}`
+Returns detailed information about a specific service.
+
+**Path parameters:**
+- `serviceId`: Service identifier (vdc_vault, vdc_m365, vdc_entra_id, vdc_salesforce, vdc_azure_backup)
+
+**Response includes:**
+- Complete service metadata
+- List of all region IDs supporting the service
+- Provider breakdown with region lists
+- Configuration breakdown with region lists (for tiered services)
+
+**Use cases:**
+- Get all regions supporting a specific service
+- Find which regions support specific edition-tier combinations
+- Understand geographic distribution of a service
+
+### Regions Endpoints
+
+#### `GET /api/v1/regions`
+Returns all regions with optional filtering.
+
+**Query parameters:**
+- `provider`: Filter by AWS or Azure
+- `service`: Filter by service ID
+- `tier`: Filter by tier (vdc_vault only)
+- `edition`: Filter by edition (vdc_vault only)
+- `country`: Search by country/location name
+
+#### `GET /api/v1/regions/{id}`
+Returns detailed information about a specific region.
+
+**Path parameters:**
+- `id`: Region identifier (e.g., aws-us-east-1)
+
+### Health Endpoints
+
+#### `GET /api/v1/ping`
+Simple health check endpoint.
+
+#### `GET /api/v1/health`
+Detailed health status with environment information.
+
 ## Error Handling
 
 All errors follow a consistent format:
@@ -158,6 +220,7 @@ All errors follow a consistent format:
 
 Error codes:
 - `REGION_NOT_FOUND` - Region ID doesn't exist
+- `SERVICE_NOT_FOUND` - Service ID doesn't exist
 - `INVALID_PARAMETER` - Query parameter invalid
 - `INTERNAL_ERROR` - Server error
 
