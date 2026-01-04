@@ -10,14 +10,14 @@ import {
 } from '../../utils/data'
 import { ErrorResponseSchema } from '../../schemas/common'
 
-// Path parameter schema
+// Path parameter schema - accepts any string, validation happens in handler
 const ServiceIdParamSchema = z.object({
-  serviceId: z.enum(['vdc_vault', 'vdc_m365', 'vdc_entra_id', 'vdc_salesforce', 'vdc_azure_backup']).openapi({
+  serviceId: z.string().openapi({
     param: {
       name: 'serviceId',
       in: 'path',
     },
-    description: 'Unique identifier for the VDC service',
+    description: 'Unique identifier for the VDC service. Valid values: vdc_vault, vdc_m365, vdc_entra_id, vdc_salesforce, vdc_azure_backup',
     example: 'vdc_m365',
   }),
 })
@@ -143,7 +143,7 @@ export function registerServiceByIdRoute(app: OpenAPIHono<{ Bindings: Env }>) {
     // Get service metadata
     const service = getServiceById(serviceId)
 
-    // This should never happen due to Zod validation, but TypeScript needs the check
+    // Return 404 if service doesn't exist
     if (!service) {
       return c.json(
         {
