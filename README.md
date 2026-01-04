@@ -113,8 +113,8 @@ https://vdcmap.bcthomas.com
 
 ### Interactive Documentation
 
-- **Swagger UI:** [/api/docs/](https://vdcmap.bcthomas.com/api/docs/)
-- **OpenAPI Spec:** [/api/openapi.yaml](https://vdcmap.bcthomas.com/api/openapi.yaml)
+- **Scalar API Reference:** [/api/docs](https://vdcmap.bcthomas.com/api/docs)
+- **OpenAPI Spec:** [/api/openapi.json](https://vdcmap.bcthomas.com/api/openapi.json)
 
 ### Endpoints
 

@@ -4,3 +4,6 @@ resources
 .hugo_build.lock
 .playwright-mcp
 node_modules
+functions/_worker.js
+.cloudflare/
+.wrangler/

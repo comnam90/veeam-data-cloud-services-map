@@ -50,18 +50,18 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
 **Estimated Time: 1-2 hours**
 
 #### 1.1 Create Cloudflare Account & Install Wrangler
-- [ ] Sign up at https://dash.cloudflare.com
-- [ ] Install Wrangler CLI globally: `npm install -g wrangler`
-- [ ] Authenticate: `wrangler login`
-- [ ] Verify: `wrangler whoami`
+- [x] Sign up at https://dash.cloudflare.com
+- [x] Install Wrangler CLI globally: `npm install -g wrangler`
+- [x] Authenticate: `wrangler login`
+- [x] Verify: `wrangler whoami`
 
 #### 1.2 Prepare Data Build Script
-- [ ] Create `scripts/build-api-data.js`
+- [x] Create `scripts/build-api-data.js`
   - Reads all YAML files from `data/regions/`
   - Converts to single JSON array
   - Validates data structure
   - Outputs to `functions/data/regions.json`
-- [ ] Add to `package.json` scripts:
+- [x] Add to `package.json` scripts:
   ```json
   {
     "scripts": {
@@ -72,14 +72,11 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
   ```
 
 #### 1.3 Create Wrangler Configuration (Optional but Recommended)
-- [ ] Create `wrangler.toml` in project root:
+- [x] Create `wrangler.toml` in project root:
   ```toml
   name = "veeam-data-cloud-services-map"
   compatibility_date = "2025-01-01"
   pages_build_output_dir = "public"
-
-  [build]
-  command = "npm run build:data && hugo --gc --minify"
 
   [env.production.vars]
   ENVIRONMENT = "production"
@@ -94,7 +91,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
   - Environment variables for production and preview environments
 
 #### 1.4 Create OpenAPI Specification
-- [ ] Create `static/api/openapi.yaml`
+- [x] Create `static/api/openapi.yaml`
   - Define all endpoints (`/regions`, `/regions/{id}`, `/services`)
   - Include query parameters (provider, service, tier, edition)
   - Document request/response schemas
@@ -102,7 +99,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
   - Version as `1.0.0`
 
 #### 1.5 Set Up Swagger UI
-- [ ] Create `static/api/docs/index.html`
+- [x] Create `static/api/docs/index.html`
   - Use Swagger UI standalone bundle from CDN
   - Point to `/api/openapi.yaml`
   - Customize branding (Veeam colors)
@@ -113,7 +110,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
 **Estimated Time: 2-3 hours**
 
 #### 2.1 Create Shared Data Module
-- [ ] Create `functions/_shared/data.js`:
+- [x] Create `functions/_shared/data.js`:
   ```javascript
   import regionsData from './regions.json';
 
@@ -127,13 +124,13 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
   ```
 
 #### 2.2 Create Shared Response Utilities
-- [ ] Create `functions/_shared/response.js`:
+- [x] Create `functions/_shared/response.js`:
   - **jsonResponse(data, status = 200)** - Format JSON with CORS headers
   - **errorResponse(message, code, status = 400)** - Standard error format
   - **corsHeaders()** - Return CORS headers object
 
 #### 2.3 Implement `/api/v1/regions` Endpoint
-- [ ] Create `functions/api/v1/regions.js`:
+- [x] Create `functions/api/v1/regions.js`:
   ```javascript
   import { getRegions } from '../../../_shared/data.js';
   import { jsonResponse, errorResponse } from '../../../_shared/response.js';
@@ -180,7 +177,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
   ```
 
 #### 2.4 Implement `/api/v1/regions/[id]` Endpoint
-- [ ] Create `functions/api/v1/regions/[id].js`:
+- [x] Create `functions/api/v1/regions/[id].js`:
   ```javascript
   import { getRegionById } from '../../../../_shared/data.js';
   import { jsonResponse, errorResponse } from '../../../../_shared/response.js';
@@ -198,7 +195,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
   ```
 
 #### 2.5 Implement `/api/v1/services` Endpoint
-- [ ] Create `functions/api/v1/services.js`:
+- [x] Create `functions/api/v1/services.js`:
   ```javascript
   import { jsonResponse } from '../../../_shared/response.js';
 
@@ -239,7 +236,7 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
   ```
 
 #### 2.6 Implement `/api/v1/health` Endpoint
-- [ ] Create `functions/api/v1/health.js`:
+- [x] Create `functions/api/v1/health.js`:
   ```javascript
   import { getRegions } from '../../../_shared/data.js';
   import { jsonResponse } from '../../../_shared/response.js';
@@ -264,15 +261,15 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
 **Estimated Time: 1 hour**
 
 #### 3.1 Build and Run Local Development Server
-- [ ] Build the site: `npm run build` (runs data conversion + Hugo)
-- [ ] Run Pages dev server: `wrangler pages dev public`
+- [x] Build the site: `npm run build` (runs data conversion + Hugo)
+- [x] Run Pages dev server: `wrangler pages dev public`
   - Serves static files from `public/`
   - Runs Functions from `functions/`
   - Local server at http://localhost:8788
   - Hot reload for Functions (rebuild needed for Hugo changes)
 
 #### 3.2 Test Each Endpoint
-- [ ] Test static site:
+- [x] Test static site:
   - `GET /` (map loads)
   - `GET /api/docs/` (Swagger UI loads)
 - [ ] Test API endpoints:
@@ -283,100 +280,100 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
   - `GET /api/v1/regions/invalid-id` (should return 404)
   - `GET /api/v1/services` (service metadata)
   - `GET /api/v1/health` (health check)
-- [ ] Test Swagger UI functionality:
+- [x] Test Swagger UI functionality:
   - Verify all endpoints appear
   - Test "Try it out" functionality
   - Check response schemas match actual responses
 
 #### 3.3 Test CORS
-- [ ] Create test HTML file
-- [ ] Make fetch requests from different origin
-- [ ] Verify CORS headers present
+- [x] Create test HTML file
+- [x] Make fetch requests from different origin
+- [x] Verify CORS headers present
 
 ### Phase 4: Cloudflare Pages Deployment
 
 **Estimated Time: 30 minutes**
 
 #### 4.1 Connect GitHub Repository
-- [ ] Go to Cloudflare dashboard → Pages
-- [ ] Click "Create a project"
-- [ ] Click "Connect to Git"
-- [ ] Select your GitHub repository
-- [ ] Authorize Cloudflare to access the repo
+- [x] Go to Cloudflare dashboard → Pages
+- [x] Click "Create a project"
+- [x] Click "Connect to Git"
+- [x] Select your GitHub repository
+- [x] Authorize Cloudflare to access the repo
 
 #### 4.2 Configure Build Settings
-- [ ] **Project name:** veeam-data-cloud-services-map
-- [ ] **Production branch:** main (or your default branch)
-- [ ] **Framework preset:** Hugo
-- [ ] **Build command:** `npm run build:data && hugo --gc --minify`
-- [ ] **Build output directory:** `public`
-- [ ] **Root directory:** `/` (leave blank)
-- [ ] **Environment variables:**
+- [x] **Project name:** veeam-data-cloud-services-map
+- [x] **Production branch:** main (or your default branch)
+- [x] **Framework preset:** Hugo
+- [x] **Build command:** `npm run build:data && hugo --gc --minify`
+- [x] **Build output directory:** `public`
+- [x] **Root directory:** `/` (leave blank)
+- [x] **Environment variables:**
   - `HUGO_VERSION` = `0.139.3` (check your version with `hugo version`)
   - `NODE_VERSION` = `18` (or your preferred version)
 
 #### 4.3 Deploy
-- [ ] Click "Save and Deploy"
-- [ ] Wait for build to complete (~2-3 minutes)
-- [ ] Pages will provide a URL: `https://veeam-data-cloud-services-map.pages.dev`
+- [x] Click "Save and Deploy"
+- [x] Wait for build to complete (~2-3 minutes)
+- [x] Pages will provide a URL: `https://veeam-data-cloud-services-map.pages.dev`
 
 #### 4.4 Verify Deployment
-- [ ] Check map loads at root URL
-- [ ] Check API endpoints respond:
+- [x] Check map loads at root URL
+- [x] Check API endpoints respond:
   - `curl https://veeam-data-cloud-services-map.pages.dev/api/v1/regions`
   - `curl https://veeam-data-cloud-services-map.pages.dev/api/v1/health`
-- [ ] Check Swagger UI loads at `/api/docs/`
-- [ ] Test API queries from Swagger UI
-- [ ] Verify data accuracy (spot check against GitHub Pages version)
+- [x] Check Swagger UI loads at `/api/docs/`
+- [x] Test API queries from Swagger UI
+- [x] Verify data accuracy (spot check against GitHub Pages version)
 
 #### 4.5 Monitor Deployment
-- [ ] Check Functions logs in Cloudflare dashboard
-- [ ] Verify no errors in build or runtime logs
-- [ ] Note the deployment URL for documentation
+- [x] Check Functions logs in Cloudflare dashboard
+- [x] Verify no errors in build or runtime logs
+- [x] Note the deployment URL for documentation
 
 ### Phase 5: Custom Domain Setup (Optional)
 
 **Estimated Time: 15 minutes + DNS propagation**
 
 #### 5.1 Add Custom Domain in Pages
-- [ ] In Cloudflare Pages project, go to "Custom domains"
-- [ ] Click "Set up a custom domain"
-- [ ] Enter your domain (e.g., `veeam-cloud-map.dev`)
-- [ ] Follow DNS instructions provided
+- [x] In Cloudflare Pages project, go to "Custom domains"
+- [x] Click "Set up a custom domain"
+- [x] Enter your domain (e.g., `vdcmap.bcthomas.com`)
+- [x] Follow DNS instructions provided
 
 #### 5.2 Configure DNS
-- [ ] Add CNAME record pointing to `<project>.pages.dev`
-- [ ] Or add A/AAAA records if provided
-- [ ] Wait for DNS propagation (~5-15 minutes)
-- [ ] SSL certificate provisioned automatically
+- [x] Add CNAME record pointing to `<project>.pages.dev`
+- [x] Or add A/AAAA records if provided
+- [x] Wait for DNS propagation (~5-15 minutes)
+- [x] SSL certificate provisioned automatically
 
 #### 5.3 Verify and Update
-- [ ] Test custom domain loads correctly
-- [ ] Verify HTTPS works (automatic SSL)
-- [ ] Update README with production URL
-- [ ] Update GitHub repo description
+- [x] Test custom domain loads correctly
+- [x] Verify HTTPS works (automatic SSL)
+- [x] Update README with production URL
+- [x] Update GitHub repo description
 
 ### Phase 6: Documentation & Finalization
 
 **Estimated Time: 1 hour**
 
 #### 6.1 Update README
-- [ ] Add "API Documentation" section
-- [ ] Link to Swagger UI
-- [ ] Add example API calls:
+- [x] Add "API Documentation" section
+- [x] Link to Swagger UI
+- [x] Add example API calls:
   ```bash
   # Get all AWS regions
-  curl "https://veeam-map.pages.dev/api/v1/regions?provider=AWS"
+  curl "https://vdcmap.bcthomas.com/api/v1/regions?provider=AWS"
 
   # Get regions with VDC Vault Core tier
-  curl "https://veeam-map.pages.dev/api/v1/regions?service=vdc_vault&tier=Core"
+  curl "https://vdcmap.bcthomas.com/api/v1/regions?service=vdc_vault&tier=Core"
 
   # Get specific region
-  curl "https://veeam-map.pages.dev/api/v1/regions/aws-us-east-1"
+  curl "https://vdcmap.bcthomas.com/api/v1/regions/aws-us-east-1"
   ```
-- [ ] Document response format
-- [ ] Add rate limits (if implementing)
-- [ ] Note API is free and public
+- [x] Document response format
+- [x] Add rate limits (if implementing)
+- [x] Note API is free and public
 
 #### 6.2 Create API Usage Examples
 - [ ] Create `examples/` directory
@@ -392,34 +389,34 @@ Migrate from GitHub Pages to Cloudflare Pages and implement a REST API with Swag
 - [ ] Define versioning strategy
 
 #### 6.4 Verify Automated Deployment
-- [ ] Cloudflare Pages automatically deploys on git push to main
-- [ ] Test by making a small change and pushing
-- [ ] Verify build triggers in Pages dashboard
-- [ ] Check deployment completes successfully
+- [x] Cloudflare Pages automatically deploys on git push to main
+- [x] Test by making a small change and pushing
+- [x] Verify build triggers in Pages dashboard
+- [x] Check deployment completes successfully
 - [ ] Remove `.github/workflows/hugo.yml` (old GitHub Pages workflow)
-- [ ] Keep `pr-validation.yml` if it exists
-- [ ] Note: Pages also creates preview deployments for PRs automatically
+- [x] Keep `pr-validation.yml` if it exists
+- [x] Note: Pages also creates preview deployments for PRs automatically
 
 ### Phase 7: Monitoring & Polish
 
 **Estimated Time: 30 minutes**
 
 #### 7.1 Set Up Monitoring
-- [ ] Review Pages Analytics in Cloudflare dashboard
+- [x] Review Pages Analytics in Cloudflare dashboard
 - [ ] Monitor Functions logs: Pages → your-project → Functions
 - [ ] Use `wrangler pages deployment tail` for real-time logs (optional)
 - [ ] Enable Web Analytics for visitor tracking (optional)
 - [ ] Set up Cloudflare Notifications for build failures (optional)
 
 #### 7.2 Add API Response Headers
-- [ ] `X-API-Version: 1.0.0`
-- [ ] `Cache-Control: public, max-age=3600` (cache for 1 hour)
+- [x] `X-API-Version: 1.0.0`
+- [x] `Cache-Control: public, max-age=3600` (cache for 1 hour)
 - [ ] `X-Data-Last-Updated: <timestamp>` (from Git info)
 
 #### 7.3 Add Security Headers
-- [ ] `X-Content-Type-Options: nosniff`
-- [ ] `X-Frame-Options: DENY`
-- [ ] `Referrer-Policy: strict-origin-when-cross-origin`
+- [x] `X-Content-Type-Options: nosniff`
+- [x] `X-Frame-Options: DENY`
+- [x] `Referrer-Policy: strict-origin-when-cross-origin`
 
 #### 7.4 Create Issue Templates
 - [ ] Add "API Issue" template to `.github/ISSUE_TEMPLATE/`
@@ -616,14 +613,14 @@ If issues arise during migration:
 
 ## Success Criteria
 
-- [ ] Map loads and functions identically to GitHub Pages version
-- [ ] All API endpoints return correct data
-- [ ] Swagger UI loads and allows testing
-- [ ] CORS headers allow cross-origin requests
-- [ ] API response time < 200ms (global average)
+- [x] Map loads and functions identically to GitHub Pages version
+- [x] All API endpoints return correct data
+- [x] Swagger UI loads and allows testing
+- [x] CORS headers allow cross-origin requests
+- [x] API response time < 200ms (global average)
 - [ ] Zero errors in Functions logs
-- [ ] Pages Analytics shows successful requests
-- [ ] README documents API usage
+- [x] Pages Analytics shows successful requests
+- [x] README documents API usage
 - [ ] At least 3 example use cases provided
 
 ## Cost Analysis

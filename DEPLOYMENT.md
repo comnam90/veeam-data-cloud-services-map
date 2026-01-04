@@ -22,32 +22,35 @@ Add under Settings > Environment variables > Production:
 
 ## How the Build Works
 
-1. `npm install` - Installs dependencies (js-yaml, wrangler)
+1. `npm install` - Installs dependencies (Hono, Zod, TypeScript, etc.)
 2. `npm run build` executes:
    - `npm run build:data` → Runs `scripts/build-api-data.js` → Generates `functions/regions.json`
+   - `npm run build:worker` → Compiles TypeScript to `functions/_worker.js` (Hono app)
    - `hugo --gc --minify` → Generates static site in `public/`
 3. Cloudflare Pages deploys:
    - Static files from `public/` (the Hugo site)
-   - Functions from `functions/` (the API endpoints)
+   - Functions from `functions/` (the Hono API worker)
 
 ## Expected File Structure After Build
 
 ```
 public/               # Hugo static site
 ├── index.html
-├── api/
-│   └── openapi.yaml
+├── llms.txt
+├── llms-full.txt
 └── ...
 
-functions/            # Pages Functions (API)
-├── regions.json      # Generated region data
-└── api/
-    └── v1/
-        ├── health.js
-        ├── regions.js
-        ├── services.js
-        └── regions/
-            └── [id].js
+functions/            # Cloudflare Pages Functions
+├── regions.json      # Generated region data (loaded by worker)
+├── _worker.js        # Compiled Hono application (all API routes)
+└── [[path]].js       # Catch-all route handler
+
+src/functions/        # TypeScript source (not deployed)
+├── _worker.ts        # Main Hono app
+├── routes/           # API route handlers
+├── schemas/          # Zod schemas with OpenAPI metadata
+├── types/            # TypeScript type definitions
+└── utils/            # Helper functions
 ```
 
 ## API Endpoints
@@ -55,10 +58,12 @@ functions/            # Pages Functions (API)
 Once deployed, these endpoints should work:
 
 - `GET /api/v1/health` - Health check
+- `GET /api/v1/ping` - Connectivity test
 - `GET /api/v1/regions` - List all regions
 - `GET /api/v1/regions/{id}` - Get specific region
 - `GET /api/v1/services` - List services
-- `GET /api/docs/` - Swagger UI documentation
+- `GET /api/docs` - Scalar API Reference (interactive docs)
+- `GET /api/openapi.json` - OpenAPI specification
 
 ## Troubleshooting
 
@@ -115,4 +120,5 @@ After configuring the build settings:
 2. Check build logs for any errors
 3. Verify `/api/v1/health` returns JSON (not HTML)
 4. Test other API endpoints
-5. Check `/api/docs/` for Swagger UI
+5. Check `/api/docs` for Scalar API Reference UI
+6. Verify `/api/openapi.json` generates valid OpenAPI spec
