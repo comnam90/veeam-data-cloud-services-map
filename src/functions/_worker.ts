@@ -3,8 +3,35 @@ import { cors } from 'hono/cors'
 import { secureHeaders } from 'hono/secure-headers'
 import type { Env } from './types/env'
 
-// Create Hono app with OpenAPI support
-const app = new OpenAPIHono<{ Bindings: Env }>()
+// Create Hono app with OpenAPI support and custom validation error handling
+const app = new OpenAPIHono<{ Bindings: Env }>({
+  defaultHook: (result, c) => {
+    if (!result.success) {
+      // Extract error details from Zod validation error
+      const firstError = result.error.errors?.[0]
+      if (firstError) {
+        const param = String(firstError.path?.[0] || 'unknown')
+        const value = c.req.query(param)
+        const allowedValues = (firstError as any).values || []
+
+        // Return custom error format that matches test expectations
+        return c.json(
+          {
+            error: 'Invalid parameter',
+            code: 'INVALID_PARAMETER',
+            message: firstError.message || 'Invalid parameter value',
+            parameter: param,
+            value: value,
+            allowedValues: allowedValues,
+          },
+          400
+        )
+      }
+    }
+    // If validation succeeds, continue to the route handler
+    return undefined
+  }
+})
 
 // Global middleware
 app.use('*', secureHeaders())

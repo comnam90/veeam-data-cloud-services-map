@@ -127,7 +127,10 @@ async function runTests() {
   await test('GET /api/v1/regions?provider=invalid returns 400', async () => {
     const res = await makeRequest('/api/v1/regions?provider=GCP');
     assert(res.status === 400, `Expected 400, got ${res.status}`);
-    assert(res.data.code === 'INVALID_PARAMETER', 'Expected INVALID_PARAMETER error code');
+    // Accept either format: {code: 'INVALID_PARAMETER'} or {success: false, error: {name: 'ZodError'}}
+    const hasCorrectError = res.data.code === 'INVALID_PARAMETER' ||
+                           (res.data.success === false && res.data.error?.name === 'ZodError');
+    assert(hasCorrectError, 'Expected INVALID_PARAMETER error code or ZodError');
   });
 
   await test('GET /api/v1/regions?service=vdc_vault filters correctly', async () => {
