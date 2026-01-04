@@ -8,7 +8,7 @@ const app = new OpenAPIHono<{ Bindings: Env }>({
   defaultHook: (result, c) => {
     if (!result.success) {
       // Extract error details from Zod validation error
-      const firstError = result.error.errors?.[0]
+      const firstError = result.error.issues?.[0]
       if (firstError) {
         const param = String(firstError.path?.[0] || 'unknown')
         const value = c.req.query(param)
