@@ -88,12 +88,10 @@ function hasService(region: Region, serviceId: string): boolean {
   const service = services[serviceId]
   if (!service) return false
 
-  // For boolean services, check if true
   if (typeof service === 'boolean') {
     return service === true
   }
 
-  // For tiered services (vdc_vault), check if array has entries
   return Array.isArray(service) && service.length > 0
 }
 
@@ -131,7 +129,6 @@ export function getServiceProviderBreakdown(serviceId: string): {
  * Get configuration breakdown for tiered services (vdc_vault)
  */
 export function getServiceConfigurationBreakdown(serviceId: string): Record<string, { count: number; regions: string[] }> | null {
-  // Only applicable for vdc_vault
   if (serviceId !== 'vdc_vault') return null
 
   const regions = getRegions()
@@ -177,7 +174,6 @@ export function getServicesWithStats(): Array<Service & {
       },
     }
 
-    // Add configuration breakdown for tiered services
     if (service.type === 'tiered') {
       const configBreakdown = getServiceConfigurationBreakdown(service.id)
       if (configBreakdown) {

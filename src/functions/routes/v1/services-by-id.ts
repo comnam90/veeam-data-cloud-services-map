@@ -8,9 +8,12 @@ import {
   getServiceProviderBreakdown,
   getServiceConfigurationBreakdown,
 } from '../../utils/data'
-import { ErrorResponseSchema } from '../../schemas/common'
+import {
+  ErrorResponseSchema,
+  ProviderBreakdownDetailSchema,
+  ConfigurationBreakdownDetailSchema,
+} from '../../schemas/common'
 
-// Path parameter schema - accepts any string, validation happens in handler
 const ServiceIdParamSchema = z.object({
   serviceId: z.string().openapi({
     param: {
@@ -22,31 +25,6 @@ const ServiceIdParamSchema = z.object({
   }),
 })
 
-// Provider breakdown detail schema
-const ProviderBreakdownDetailSchema = z.object({
-  count: z.number().openapi({
-    description: 'Number of regions from this provider that support the service',
-    example: 23,
-  }),
-  regions: z.array(z.string()).openapi({
-    description: 'List of region IDs from this provider that support the service',
-    example: ['azure-au-east', 'azure-brazil-south', 'azure-canada-central'],
-  }),
-})
-
-// Configuration breakdown detail schema
-const ConfigurationBreakdownDetailSchema = z.object({
-  count: z.number().openapi({
-    description: 'Number of regions that support this edition-tier combination',
-    example: 12,
-  }),
-  regions: z.array(z.string()).openapi({
-    description: 'List of region IDs that support this edition-tier combination',
-    example: ['aws-eu-north-1', 'aws-eu-south-2', 'aws-us-east-1'],
-  }),
-})
-
-// Base service info schema
 const ServiceInfoSchema = z.object({
   id: z.string().openapi({
     description: 'Unique identifier for this VDC service',
@@ -78,7 +56,6 @@ const ServiceInfoSchema = z.object({
   }),
 })
 
-// Response schema for service detail (handles both boolean and tiered services)
 const ServiceDetailResponseSchema = z.object({
   service: ServiceInfoSchema,
   regions: z.array(z.string()).openapi({
@@ -106,7 +83,6 @@ const ServiceDetailResponseSchema = z.object({
   }),
 }).openapi('ServiceDetail')
 
-// Route definition
 const serviceByIdRoute = createRoute({
   method: 'get',
   path: '/api/v1/services/{serviceId}',
@@ -139,11 +115,8 @@ const serviceByIdRoute = createRoute({
 export function registerServiceByIdRoute(app: OpenAPIHono<{ Bindings: Env }>) {
   app.openapi(serviceByIdRoute, (c) => {
     const { serviceId } = c.req.valid('param')
-
-    // Get service metadata
     const service = getServiceById(serviceId)
 
-    // Return 404 if service doesn't exist
     if (!service) {
       return c.json(
         {
@@ -158,11 +131,9 @@ export function registerServiceByIdRoute(app: OpenAPIHono<{ Bindings: Env }>) {
       )
     }
 
-    // Get regions and breakdowns
     const regions = getServiceRegions(serviceId)
     const providerBreakdown = getServiceProviderBreakdown(serviceId)
 
-    // Build response
     const response: any = {
       service: {
         ...service,
@@ -172,7 +143,6 @@ export function registerServiceByIdRoute(app: OpenAPIHono<{ Bindings: Env }>) {
       providerBreakdown,
     }
 
-    // Add configuration breakdown for tiered services
     if (service.type === 'tiered') {
       const configBreakdown = getServiceConfigurationBreakdown(serviceId)
       if (configBreakdown) {
