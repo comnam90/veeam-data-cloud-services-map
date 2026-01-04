@@ -115,6 +115,7 @@ documentation for authoritative information.
 app.get('/api/docs', Scalar({
   url: '/api/openapi.json',
   pageTitle: 'Veeam Data Cloud Service Availability API',
+  theme: 'solarized',
 }))
 
 // Register routes
