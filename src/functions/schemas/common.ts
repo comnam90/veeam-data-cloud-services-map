@@ -188,3 +188,128 @@ exactly what they sent that was incorrect.
     example: ['AWS', 'Azure'],
   }),
 }).openapi('Error')
+
+/**
+ * Provider breakdown with region lists
+ */
+export const ProviderBreakdownDetailSchema = z.object({
+  count: z.number().openapi({
+    description: 'Number of regions from this provider that support the service',
+    example: 23,
+  }),
+  regions: z.array(z.string()).openapi({
+    description: 'List of region IDs from this provider that support the service',
+    example: ['azure-au-east', 'azure-brazil-south', 'azure-canada-central'],
+  }),
+})
+
+/**
+ * Configuration breakdown for tiered services
+ */
+export const ConfigurationBreakdownDetailSchema = z.object({
+  count: z.number().openapi({
+    description: 'Number of regions that support this edition-tier combination',
+    example: 12,
+  }),
+  regions: z.array(z.string()).openapi({
+    description: 'List of region IDs that support this edition-tier combination',
+    example: ['aws-eu-north-1', 'aws-eu-south-2', 'aws-us-east-1'],
+  }),
+})
+
+/**
+ * Service detail response for boolean services
+ */
+export const ServiceDetailBooleanSchema = z.object({
+  service: z.object({
+    id: z.string().openapi({
+      description: 'Unique identifier for this VDC service',
+      example: 'vdc_m365',
+    }),
+    name: z.string().openapi({
+      description: 'Human-readable display name for the service',
+      example: 'VDC for Microsoft 365',
+    }),
+    type: z.literal('boolean').openapi({
+      description: 'Service type indicating simple availability (no configurations)',
+      example: 'boolean',
+    }),
+    description: z.string().openapi({
+      description: 'Brief description of what this service does',
+      example: 'Backup and recovery for Microsoft 365 data',
+    }),
+    regionCount: z.number().openapi({
+      description: 'Total number of regions where this service is available',
+      example: 23,
+    }),
+  }),
+  regions: z.array(z.string()).openapi({
+    description: 'List of all region IDs where this service is available',
+    example: ['azure-au-east', 'azure-brazil-south', 'azure-canada-central'],
+  }),
+  providerBreakdown: z.object({
+    AWS: ProviderBreakdownDetailSchema,
+    Azure: ProviderBreakdownDetailSchema,
+  }).openapi({
+    description: 'Breakdown of region availability by cloud provider',
+  }),
+})
+
+/**
+ * Service detail response for tiered services
+ */
+export const ServiceDetailTieredSchema = z.object({
+  service: z.object({
+    id: z.string().openapi({
+      description: 'Unique identifier for this VDC service',
+      example: 'vdc_vault',
+    }),
+    name: z.string().openapi({
+      description: 'Human-readable display name for the service',
+      example: 'Veeam Data Cloud Vault',
+    }),
+    type: z.literal('tiered').openapi({
+      description: 'Service type indicating multiple configuration options',
+      example: 'tiered',
+    }),
+    description: z.string().openapi({
+      description: 'Brief description of what this service does',
+      example: 'Immutable backup storage with configurable pricing tiers',
+    }),
+    editions: z.array(z.string()).openapi({
+      description: 'Available service editions',
+      example: ['Foundation', 'Advanced'],
+    }),
+    tiers: z.array(z.string()).openapi({
+      description: 'Available pricing tiers',
+      example: ['Core', 'Non-Core'],
+    }),
+    regionCount: z.number().openapi({
+      description: 'Total number of regions where this service is available (any configuration)',
+      example: 80,
+    }),
+  }),
+  regions: z.array(z.string()).openapi({
+    description: 'List of all region IDs where this service is available in any configuration',
+    example: ['aws-af-south-1', 'aws-ap-east-1', 'azure-au-east'],
+  }),
+  providerBreakdown: z.object({
+    AWS: ProviderBreakdownDetailSchema,
+    Azure: ProviderBreakdownDetailSchema,
+  }).openapi({
+    description: 'Breakdown of region availability by cloud provider',
+  }),
+  configurationBreakdown: z.record(z.string(), ConfigurationBreakdownDetailSchema).openapi({
+    description: `Breakdown of region availability by edition-tier combination. Keys are in format "Edition-Tier" (e.g., "Foundation-Core", "Advanced-Non-Core"). Use this to find regions that support specific service configurations.`,
+    example: {
+      'Foundation-Core': {
+        count: 12,
+        regions: ['aws-eu-north-1', 'aws-eu-south-2'],
+      },
+      'Advanced-Core': {
+        count: 45,
+        regions: ['aws-af-south-1', 'aws-ap-east-1'],
+      },
+    },
+  }),
+})
