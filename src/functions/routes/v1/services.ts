@@ -4,21 +4,33 @@ import type { OpenAPIHono } from '@hono/zod-openapi'
 import type { Env } from '../../types/env'
 import { getServices } from '../../utils/data'
 
-// Service schema
+// Service schema with detailed descriptions
 const ServiceSchema = z.object({
-  id: z.string().openapi({ example: 'vdc_vault' }),
-  name: z.string().openapi({ example: 'Veeam Data Cloud Vault' }),
-  type: z.enum(['tiered', 'boolean']).openapi({ example: 'tiered' }),
+  id: z.string().openapi({
+    description: `Unique identifier for this VDC service. Use this ID when filtering regions by service via the service parameter in /api/v1/regions. Common IDs include vdc_vault, vdc_m365, vdc_entra_id, vdc_salesforce, and vdc_azure_backup.`,
+    example: 'vdc_vault'
+  }),
+  name: z.string().openapi({
+    description: 'Human-readable display name for the service, suitable for showing in user interfaces',
+    example: 'Veeam Data Cloud Vault'
+  }),
+  type: z.enum(['tiered', 'boolean']).openapi({
+    description: `Service pricing/availability model. "tiered" services like VDC Vault have multiple edition and tier combinations. "boolean" services are either available or not, with no configuration options.`,
+    example: 'tiered'
+  }),
   description: z.string().openapi({
+    description: 'Brief description of what this service does and its main capabilities',
     example: 'Immutable backup storage with configurable pricing tiers',
   }),
   editions: z.array(z.string()).optional().openapi({
+    description: `Available service editions (only for tiered services). Foundation is entry-level, Advanced includes full feature set. Use these values when filtering regions by edition.`,
     example: ['Foundation', 'Advanced'],
   }),
   tiers: z.array(z.string()).optional().openapi({
+    description: `Available pricing tiers (only for tiered services). Core offers premium performance at higher cost, Non-Core is optimized for cost-effective long-term retention. Use these values when filtering regions by tier.`,
     example: ['Core', 'Non-Core'],
   }),
-})
+}).openapi('Service')
 
 // Response schema
 const ServicesResponseSchema = z.object({

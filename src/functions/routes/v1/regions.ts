@@ -4,55 +4,39 @@ import type { OpenAPIHono } from '@hono/zod-openapi'
 import type { Env } from '../../types/env'
 import { getRegions } from '../../utils/data'
 import type { Region } from '../../types/data'
-
-// VDC Vault configuration schema
-const VdcVaultSchema = z.object({
-  edition: z.enum(['Foundation', 'Advanced']).openapi({ example: 'Advanced' }),
-  tier: z.enum(['Core', 'Non-Core']).openapi({ example: 'Core' }),
-})
-
-// Services schema
-const ServicesSchema = z.object({
-  vdc_vault: z.array(VdcVaultSchema).optional(),
-  vdc_m365: z.boolean().optional(),
-  vdc_entra_id: z.boolean().optional(),
-  vdc_salesforce: z.boolean().optional(),
-  vdc_azure_backup: z.boolean().optional(),
-})
-
-// Region schema (for array items)
-const RegionSchema = z.object({
-  id: z.string().openapi({ example: 'aws-us-east-1' }),
-  name: z.string().openapi({ example: 'US East 1 (N. Virginia)' }),
-  provider: z.enum(['AWS', 'Azure']).openapi({ example: 'AWS' }),
-  coords: z.tuple([z.number(), z.number()]).openapi({ example: [38.9, -77.4] }),
-  aliases: z.array(z.string()).optional().openapi({
-    example: ['Virginia', 'N. Virginia', 'US East', 'IAD']
-  }),
-  services: ServicesSchema,
-})
+import { RegionSchema, VdcVaultConfigSchema, RegionServicesSchema, ErrorResponseSchema } from '../../schemas/common'
 
 // Response schema
 const RegionsResponseSchema = z.object({
   data: z.array(RegionSchema),
-  count: z.number().openapi({ example: 25 }),
-  filters: z.object({
-    provider: z.string().nullable().openapi({ example: 'AWS' }),
-    service: z.string().nullable().openapi({ example: null }),
-    tier: z.string().nullable().openapi({ example: null }),
-    edition: z.string().nullable().openapi({ example: null }),
-    country: z.string().nullable().openapi({ example: null }),
+  count: z.number().openapi({
+    description: 'Total number of regions returned after applying filters',
+    example: 25
   }),
-})
-
-// Error response schema
-const ErrorResponseSchema = z.object({
-  error: z.string().openapi({ example: 'Invalid parameter' }),
-  code: z.string().openapi({ example: 'INVALID_PARAMETER' }),
-  message: z.string().openapi({ example: 'Invalid parameter' }),
-  parameter: z.string().optional().openapi({ example: 'provider' }),
-  value: z.string().optional().openapi({ example: 'GCP' }),
-  allowedValues: z.array(z.string()).optional().openapi({ example: ['AWS', 'Azure'] }),
+  filters: z.object({
+    provider: z.string().nullable().openapi({
+      description: 'Applied cloud provider filter (AWS, Azure, or null if not filtered)',
+      example: 'AWS'
+    }),
+    service: z.string().nullable().openapi({
+      description: 'Applied service filter (vdc_vault, vdc_m365, etc., or null)',
+      example: null
+    }),
+    tier: z.string().nullable().openapi({
+      description: 'Applied pricing tier filter for VDC Vault (Core, Non-Core, or null)',
+      example: null
+    }),
+    edition: z.string().nullable().openapi({
+      description: 'Applied edition filter for VDC Vault (Foundation, Advanced, or null)',
+      example: null
+    }),
+    country: z.string().nullable().openapi({
+      description: 'Applied country name filter (searches region name and aliases)',
+      example: null
+    }),
+  }),
+}).openapi({
+  description: 'Response containing filtered list of cloud regions with their VDC service availability'
 })
 
 // Route definition

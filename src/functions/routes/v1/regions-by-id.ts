@@ -3,41 +3,7 @@ import { z } from '@hono/zod-openapi'
 import type { OpenAPIHono } from '@hono/zod-openapi'
 import type { Env } from '../../types/env'
 import { getRegionById } from '../../utils/data'
-
-// VDC Vault configuration schema
-const VdcVaultSchema = z.object({
-  edition: z.enum(['Foundation', 'Advanced']).openapi({ example: 'Advanced' }),
-  tier: z.enum(['Core', 'Non-Core']).openapi({ example: 'Core' }),
-})
-
-// Services schema
-const ServicesSchema = z.object({
-  vdc_vault: z.array(VdcVaultSchema).optional(),
-  vdc_m365: z.boolean().optional(),
-  vdc_entra_id: z.boolean().optional(),
-  vdc_salesforce: z.boolean().optional(),
-  vdc_azure_backup: z.boolean().optional(),
-})
-
-// Region schema
-const RegionSchema = z.object({
-  id: z.string().openapi({ example: 'aws-us-east-1' }),
-  name: z.string().openapi({ example: 'US East 1 (N. Virginia)' }),
-  provider: z.enum(['AWS', 'Azure']).openapi({ example: 'AWS' }),
-  coords: z.tuple([z.number(), z.number()]).openapi({ example: [38.9, -77.4] }),
-  aliases: z.array(z.string()).optional().openapi({
-    example: ['Virginia', 'N. Virginia', 'US East', 'IAD']
-  }),
-  services: ServicesSchema,
-})
-
-// Error response schema
-const ErrorResponseSchema = z.object({
-  error: z.string().openapi({ example: 'Region not found' }),
-  code: z.string().openapi({ example: 'REGION_NOT_FOUND' }),
-  message: z.string().openapi({ example: 'No region found with ID: invalid-id' }),
-  requestedId: z.string().optional().openapi({ example: 'invalid-id' }),
-})
+import { RegionSchema, ErrorResponseSchema } from '../../schemas/common'
 
 // Route definition
 const regionByIdRoute = createRoute({
