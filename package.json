@@ -7,7 +7,7 @@
     "build:data": "node scripts/build-api-data.js",
     "build:worker": "node scripts/build-worker.js",
     "typecheck": "tsc --noEmit",
-    "build": "npm run build:data && npm run typecheck && hugo --gc --minify",
+    "build": "npm run build:data && npm run build:worker && npm run typecheck && hugo --gc --minify",
     "dev": "npm run build:data && npm run build:worker && wrangler pages dev public",
     "pretest": "npm run build:data && npm run build:worker",
     "test": "node scripts/test-api.js",
