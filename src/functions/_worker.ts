@@ -1,7 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { cors } from 'hono/cors'
 import { secureHeaders } from 'hono/secure-headers'
-import { apiReference } from '@scalar/hono-api-reference'
+import { Scalar } from '@scalar/hono-api-reference'
 import type { Env } from './types/env'
 
 // Create Hono app with OpenAPI support and custom validation error handling
@@ -112,7 +112,7 @@ documentation for authoritative information.
 })
 
 // Serve interactive API documentation UI at /api/docs
-app.get('/api/docs', apiReference({
+app.get('/api/docs', Scalar({
   url: '/api/openapi.json',
   pageTitle: 'Veeam Data Cloud Service Availability API',
 }))
