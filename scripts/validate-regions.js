@@ -14,6 +14,7 @@ const ID_PATTERN = /^(aws|azure)-[a-z0-9-]+$/;
 const VALID_EDITIONS = ['Foundation', 'Advanced'];
 const VALID_TIERS = ['Core', 'Non-Core'];
 const TIERED_SERVICES = ['vdc_vault'];
+const BOOLEAN_SERVICES = ['vdc_m365', 'vdc_entra_id', 'vdc_salesforce', 'vdc_azure_backup'];
 
 function validateRegionFile(filePath) {
   const errors = [];
@@ -53,16 +54,21 @@ function validateRegionFile(filePath) {
   }
   
   if (data.coords !== undefined) {
+    const [lat, lng] = Array.isArray(data.coords) ? data.coords : [];
     const isValidCoords = Array.isArray(data.coords) &&
       data.coords.length === 2 &&
-      typeof data.coords[0] === 'number' &&
-      typeof data.coords[1] === 'number';
+      typeof lat === 'number' &&
+      typeof lng === 'number' &&
+      Number.isFinite(lat) &&
+      Number.isFinite(lng) &&
+      lat >= -90 && lat <= 90 &&
+      lng >= -180 && lng <= 180;
     
     if (!isValidCoords) {
       errors.push({
         type: 'invalid_coords',
         value: data.coords,
-        message: 'Coordinates must be an array of two numbers [lat, lng]',
+        message: 'Coordinates must be [lat, lng] with lat in [-90, 90] and lng in [-180, 180]',
         file: filePath
       });
     }
@@ -80,9 +86,27 @@ function validateRegionFile(filePath) {
   if (data.services) {
     for (const [serviceName, serviceConfig] of Object.entries(data.services)) {
       if (TIERED_SERVICES.includes(serviceName)) {
-        if (Array.isArray(serviceConfig)) {
+        if (!Array.isArray(serviceConfig)) {
+          errors.push({
+            type: 'invalid_service_config',
+            service: serviceName,
+            field: null,
+            value: serviceConfig,
+            message: `Tiered service "${serviceName}" must be an array of edition/tier objects`,
+            file: filePath
+          });
+        } else {
           for (const entry of serviceConfig) {
-            if (entry.edition && !VALID_EDITIONS.includes(entry.edition)) {
+            if (!entry.edition) {
+              errors.push({
+                type: 'invalid_service_config',
+                service: serviceName,
+                field: 'edition',
+                value: entry.edition,
+                message: `Missing required field "edition" in ${serviceName} entry`,
+                file: filePath
+              });
+            } else if (!VALID_EDITIONS.includes(entry.edition)) {
               errors.push({
                 type: 'invalid_service_config',
                 service: serviceName,
@@ -92,7 +116,16 @@ function validateRegionFile(filePath) {
                 file: filePath
               });
             }
-            if (entry.tier && !VALID_TIERS.includes(entry.tier)) {
+            if (!entry.tier) {
+              errors.push({
+                type: 'invalid_service_config',
+                service: serviceName,
+                field: 'tier',
+                value: entry.tier,
+                message: `Missing required field "tier" in ${serviceName} entry`,
+                file: filePath
+              });
+            } else if (!VALID_TIERS.includes(entry.tier)) {
               errors.push({
                 type: 'invalid_service_config',
                 service: serviceName,
@@ -103,6 +136,17 @@ function validateRegionFile(filePath) {
               });
             }
           }
+        }
+      } else if (BOOLEAN_SERVICES.includes(serviceName)) {
+        if (serviceConfig !== true) {
+          errors.push({
+            type: 'invalid_service_config',
+            service: serviceName,
+            field: null,
+            value: serviceConfig,
+            message: `Boolean service "${serviceName}" must be true, got ${typeof serviceConfig}`,
+            file: filePath
+          });
         }
       }
     }

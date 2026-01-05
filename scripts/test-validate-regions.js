@@ -9,8 +9,7 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
-// Import the validator module (does not exist yet - tests will fail)
-const { validateRegionFile, validateAllRegions } = require('./validate-regions.js');
+const { validateRegionFile, validateAllRegions, validateAllRegionsRecursive } = require('./validate-regions.js');
 
 const TESTS_PASSED = [];
 const TESTS_FAILED = [];
@@ -56,11 +55,23 @@ function createTempDir(files) {
   return { dirPath: tmpDir, cleanup: () => fs.rmSync(tmpDir, { recursive: true }) };
 }
 
+function createTempDirWithSubdirs(structure) {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'validate-test-'));
+  for (const [subdir, files] of Object.entries(structure)) {
+    const subdirPath = path.join(tmpDir, subdir);
+    fs.mkdirSync(subdirPath, { recursive: true });
+    for (const [name, content] of Object.entries(files)) {
+      fs.writeFileSync(path.join(subdirPath, name), content, 'utf8');
+    }
+  }
+  return { dirPath: tmpDir, cleanup: () => fs.rmSync(tmpDir, { recursive: true }) };
+}
+
 async function runTests() {
   console.log(`\n${colors.cyan}🧪 Running Region Validation Tests (Issue #12)${colors.reset}\n`);
 
   // Test 1: YAML Syntax Validation
-  await test('Should_FailValidation_When_YAMLSyntaxIsInvalid_Issue12', async () => {
+  await test('Invalid YAML syntax fails validation', async () => {
     const invalidYaml = `
 id: "aws-test"
 name: "Test Region
@@ -81,7 +92,7 @@ name: "Test Region
   });
 
   // Test 2: Required Fields Validation
-  await test('Should_FailValidation_When_RequiredFieldsAreMissing_Issue12', async () => {
+  await test('Missing required fields fails validation', async () => {
     const missingFieldsYaml = `
 name: "Test Region"
 provider: "AWS"
@@ -105,7 +116,7 @@ provider: "AWS"
   });
 
   // Test 3: Provider Enum Validation (case-sensitive)
-  await test('Should_FailValidation_When_ProviderIsNotExactlyAWSOrAzure_Issue12', async () => {
+  await test('Lowercase provider value fails validation', async () => {
     const lowercaseProviderYaml = `
 id: "aws-test-region"
 name: "Test Region"
@@ -127,7 +138,7 @@ coords: [38.9, -77.4]
   });
 
   // Test 4: Coordinates Format Validation
-  await test('Should_FailValidation_When_CoordsIsNotNumberArray_Issue12', async () => {
+  await test('String coordinates fail validation', async () => {
     const stringCoordsYaml = `
 id: "aws-test-region"
 name: "Test Region"
@@ -148,7 +159,7 @@ coords: "38.9, -77.4"
     }
   });
 
-  await test('Should_FailValidation_When_CoordsHasWrongArrayLength_Issue12', async () => {
+  await test('Coordinates with wrong array length fails validation', async () => {
     const wrongLengthCoordsYaml = `
 id: "aws-test-region"
 name: "Test Region"
@@ -170,7 +181,7 @@ coords: [38.9]
   });
 
   // Test 6: ID Format Validation
-  await test('Should_FailValidation_When_IDDoesNotMatchPattern_Issue12', async () => {
+  await test('Invalid ID format fails validation', async () => {
     const invalidIdYaml = `
 id: "US-East-1"
 name: "Test Region"
@@ -192,7 +203,7 @@ coords: [38.9, -77.4]
   });
 
   // Test 7: ID Uniqueness Across Files
-  await test('Should_FailValidation_When_DuplicateIDsExistAcrossFiles_Issue12', async () => {
+  await test('Duplicate IDs across files fails validation', async () => {
     const region1 = `
 id: "aws-us-east-1"
 name: "US East 1"
@@ -223,7 +234,7 @@ coords: [39.0, -78.0]
   });
 
   // Test 8: Tiered Service Schema Validation (vdc_vault)
-  await test('Should_FailValidation_When_TieredServiceHasInvalidEdition_Issue12', async () => {
+  await test('Invalid edition value fails validation', async () => {
     const invalidEditionYaml = `
 id: "aws-test-region"
 name: "Test Region"
@@ -248,7 +259,7 @@ services:
     }
   });
 
-  await test('Should_FailValidation_When_TieredServiceHasInvalidTier_Issue12', async () => {
+  await test('Invalid tier value fails validation', async () => {
     const invalidTierYaml = `
 id: "aws-test-region"
 name: "Test Region"
@@ -274,7 +285,7 @@ services:
   });
 
   // Test 10: Valid region file should pass
-  await test('Should_PassValidation_When_AllFieldsAreValid_Issue12', async () => {
+  await test('Valid region file passes validation', async () => {
     const validYaml = `
 id: "aws-us-east-1"
 name: "US East 1"
@@ -293,6 +304,127 @@ services:
       const result = validateRegionFile(filePath);
       assert(result.valid === true, 'Expected validation to pass for valid region');
       assert(result.errors.length === 0, 'Expected no errors');
+    } finally {
+      cleanup();
+    }
+  });
+
+  // Test 11: Boolean service validation
+  await test('Boolean service with string value fails validation', async () => {
+    const invalidBooleanYaml = `
+id: "aws-test-region"
+name: "Test Region"
+provider: "AWS"
+coords: [38.9, -77.4]
+services:
+  vdc_m365: "true"
+`;
+    const { filePath, cleanup } = createTempFile(invalidBooleanYaml);
+    try {
+      const result = validateRegionFile(filePath);
+      assert(result.valid === false, 'Expected validation to fail for string boolean service');
+      assert(
+        result.errors.some(e => e.type === 'invalid_service_config' && e.service === 'vdc_m365'),
+        'Expected error for invalid boolean service'
+      );
+    } finally {
+      cleanup();
+    }
+  });
+
+  // Test 12: Tiered service must be array
+  await test('Tiered service defined as boolean fails validation', async () => {
+    const invalidTieredYaml = `
+id: "aws-test-region"
+name: "Test Region"
+provider: "AWS"
+coords: [38.9, -77.4]
+services:
+  vdc_vault: true
+`;
+    const { filePath, cleanup } = createTempFile(invalidTieredYaml);
+    try {
+      const result = validateRegionFile(filePath);
+      assert(result.valid === false, 'Expected validation to fail for non-array tiered service');
+      assert(
+        result.errors.some(e => e.type === 'invalid_service_config' && e.service === 'vdc_vault'),
+        'Expected error for tiered service not being array'
+      );
+    } finally {
+      cleanup();
+    }
+  });
+
+  // Test 13: Tiered service missing required fields
+  await test('Tiered service entry missing edition fails validation', async () => {
+    const missingEditionYaml = `
+id: "aws-test-region"
+name: "Test Region"
+provider: "AWS"
+coords: [38.9, -77.4]
+services:
+  vdc_vault:
+    - tier: "Core"
+`;
+    const { filePath, cleanup } = createTempFile(missingEditionYaml);
+    try {
+      const result = validateRegionFile(filePath);
+      assert(result.valid === false, 'Expected validation to fail for missing edition');
+      assert(
+        result.errors.some(e => e.type === 'invalid_service_config' && e.field === 'edition'),
+        'Expected error for missing edition field'
+      );
+    } finally {
+      cleanup();
+    }
+  });
+
+  // Test 14: Duplicate IDs across subdirectories (recursive)
+  await test('Duplicate IDs across subdirectories detected by recursive validation', async () => {
+    const region1 = `
+id: "aws-us-east-1"
+name: "US East 1"
+provider: "AWS"
+coords: [38.9, -77.4]
+`;
+    const region2 = `
+id: "aws-us-east-1"
+name: "Duplicate in Azure folder"
+provider: "Azure"
+coords: [39.0, -78.0]
+`;
+    const { dirPath, cleanup } = createTempDirWithSubdirs({
+      'aws': { 'region1.yaml': region1 },
+      'azure': { 'region2.yaml': region2 }
+    });
+    try {
+      const result = validateAllRegionsRecursive(dirPath);
+      assert(result.valid === false, 'Expected validation to fail for duplicate IDs across subdirs');
+      assert(
+        result.errors.some(e => e.type === 'duplicate_id'),
+        'Expected duplicate_id error'
+      );
+    } finally {
+      cleanup();
+    }
+  });
+
+  // Test 15: Invalid coordinate values (out of range)
+  await test('Coordinates outside valid range fail validation', async () => {
+    const invalidCoordsYaml = `
+id: "aws-test-region"
+name: "Test Region"
+provider: "AWS"
+coords: [100, -77.4]
+`;
+    const { filePath, cleanup } = createTempFile(invalidCoordsYaml);
+    try {
+      const result = validateRegionFile(filePath);
+      assert(result.valid === false, 'Expected validation to fail for latitude > 90');
+      assert(
+        result.errors.some(e => e.type === 'invalid_coords'),
+        'Expected invalid_coords error'
+      );
     } finally {
       cleanup();
     }
