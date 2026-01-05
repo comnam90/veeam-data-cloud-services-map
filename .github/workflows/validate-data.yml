@@ -4,9 +4,11 @@ on:
   push:
     paths:
       - "data/regions/**/*.yaml"
+      - "scripts/validate-regions.js"
   pull_request:
     paths:
       - "data/regions/**/*.yaml"
+      - "scripts/validate-regions.js"
 
 permissions:
   contents: read
