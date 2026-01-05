@@ -280,6 +280,30 @@ async function runTests() {
     assert(res.data.message.includes('vdc_vault'), 'Error message should mention vdc_vault');
   });
 
+  await test('GET /api/v1/regions?edition=Advanced without service=vdc_vault returns 400', async () => {
+    const res = await makeRequest('/api/v1/regions?edition=Advanced');
+    assert(res.status === 400, `Expected 400, got ${res.status}`);
+    assert(res.data.code === 'INVALID_PARAMETER', 'Expected INVALID_PARAMETER error code');
+    assert(res.data.message.includes('vdc_vault'), 'Error message should mention vdc_vault');
+    assert(res.data.parameter === 'edition', 'Should identify edition as the problematic parameter');
+  });
+
+  await test('GET /api/v1/regions?service=vdc_m365&tier=Core returns 400', async () => {
+    const res = await makeRequest('/api/v1/regions?service=vdc_m365&tier=Core');
+    assert(res.status === 400, `Expected 400, got ${res.status}`);
+    assert(res.data.code === 'INVALID_PARAMETER', 'Expected INVALID_PARAMETER error code');
+    assert(res.data.message.includes('vdc_vault'), 'Error message should mention vdc_vault requirement');
+  });
+
+  await test('GET /api/v1/regions?service=vdc_vault&edition=Foundation returns 200', async () => {
+    const res = await makeRequest('/api/v1/regions?service=vdc_vault&edition=Foundation');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.filters.edition === 'Foundation', 'Filter should show Foundation edition');
+    assert(res.data.data.every(r =>
+      r.services.vdc_vault.some(v => v.edition === 'Foundation')
+    ), 'All regions should have Foundation edition');
+  });
+
   // Region by ID endpoint tests
   await test('GET /api/v1/regions/{id} returns specific region', async () => {
     const allRegions = await makeRequest('/api/v1/regions');
