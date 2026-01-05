@@ -116,6 +116,17 @@ function validateRegionFile(filePath) {
           });
         } else {
           for (const entry of serviceConfig) {
+            if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+              errors.push({
+                type: 'invalid_service_config',
+                service: serviceName,
+                field: null,
+                value: entry,
+                message: `Invalid entry in ${serviceName} array: expected object with edition/tier, got ${entry === null ? 'null' : typeof entry}`,
+                file: filePath
+              });
+              continue;
+            }
             if (!entry.edition) {
               errors.push({
                 type: 'invalid_service_config',

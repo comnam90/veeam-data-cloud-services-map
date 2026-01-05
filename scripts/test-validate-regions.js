@@ -505,6 +505,33 @@ coords: [40.0, -79.0]
     }
   });
 
+  // Test 19: Tiered service with non-object array entry fails validation
+  await test('Tiered service with non-object array entry fails validation', async () => {
+    const nonObjectEntryYaml = `
+id: "aws-test-region"
+name: "Test Region"
+provider: "AWS"
+coords: [38.9, -77.4]
+services:
+  vdc_vault:
+    - edition: "Foundation"
+      tier: "Core"
+    - null
+    - "invalid string entry"
+`;
+    const { filePath, cleanup } = createTempFile(nonObjectEntryYaml);
+    try {
+      const result = validateRegionFile(filePath);
+      assert(result.valid === false, 'Expected validation to fail for non-object entry');
+      assert(
+        result.errors.some(e => e.type === 'invalid_service_config' && e.message.includes('expected object')),
+        'Expected error for non-object array entry'
+      );
+    } finally {
+      cleanup();
+    }
+  });
+
   // Summary
   console.log(`\n${colors.cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
   console.log(`${colors.green}Passed: ${TESTS_PASSED.length}${colors.reset}`);
