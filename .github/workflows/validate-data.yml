@@ -1,0 +1,37 @@
+name: Validate Region Data
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "data/regions/**/*.yaml"
+      - "scripts/validate-regions.js"
+      - "scripts/test-validate-regions.js"
+  pull_request:
+    paths:
+      - "data/regions/**/*.yaml"
+      - "scripts/validate-regions.js"
+      - "scripts/test-validate-regions.js"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run validation tests
+        run: npm run test:validate
+      
+      - name: Validate region data
+        run: npm run validate
