@@ -80,17 +80,17 @@ export function filterRegions(regions: Region[], filters: RegionFilters): Region
     })
   }
 
-  // Filter by tier (only applicable to vdc_vault)
-  if (tier && service === 'vdc_vault') {
+  // Filter by tier and/or edition (only applicable to vdc_vault)
+  if (service === 'vdc_vault' && (tier || edition)) {
     filtered = filtered.filter(r => {
-      return r.services.vdc_vault?.some(v => v.tier === tier)
-    })
-  }
+      const vaultData = r.services.vdc_vault
+      if (!Array.isArray(vaultData)) return false
 
-  // Filter by edition (only applicable to vdc_vault)
-  if (edition && service === 'vdc_vault') {
-    filtered = filtered.filter(r => {
-      return r.services.vdc_vault?.some(v => v.edition === edition)
+      return vaultData.some(config => {
+        const tierMatch = !tier || config.tier === tier
+        const editionMatch = !edition || config.edition === edition
+        return tierMatch && editionMatch
+      })
     })
   }
 
