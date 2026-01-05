@@ -136,13 +136,15 @@ import { registerHealthRoute } from './routes/v1/health'
 import { registerNearestRegionsRoute } from './routes/v1/regions-nearest'
 import { registerRegionByIdRoute } from './routes/v1/regions-by-id'
 import { registerRegionsRoute } from './routes/v1/regions'
+import { registerRegionsCompareRoute } from './routes/v1/regions-compare'
 
 registerPingRoute(app)
 registerServicesRoute(app)
 registerServiceByIdRoute(app)
 registerHealthRoute(app)
 registerNearestRegionsRoute(app)
-registerRegionByIdRoute(app)
 registerRegionsRoute(app)
+registerRegionsCompareRoute(app)
+registerRegionByIdRoute(app)
 
 export default app

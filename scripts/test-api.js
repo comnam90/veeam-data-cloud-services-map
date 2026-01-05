@@ -525,6 +525,177 @@ async function runTests() {
     }
   });
 
+  // ===================================================================
+  // Regions Compare Endpoint Tests
+  // ===================================================================
+
+  await test('GET /api/v1/regions/compare with 2 valid regions returns 200', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,azure-us-east');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(Array.isArray(res.data.regions), 'Expected regions array');
+    assert(res.data.regions.length === 2, 'Expected 2 regions');
+    assert(res.data.comparison, 'Expected comparison object');
+    assert(res.data.summary, 'Expected summary object');
+  });
+
+  await test('Regions compare response includes all service comparisons', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,azure-us-east');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    const serviceIds = ['vdc_vault', 'vdc_m365', 'vdc_entra_id', 'vdc_salesforce', 'vdc_azure_backup'];
+    serviceIds.forEach(serviceId => {
+      assert(res.data.comparison[serviceId], `Expected comparison for ${serviceId}`);
+      assert(Array.isArray(res.data.comparison[serviceId].availableIn), `Expected availableIn array for ${serviceId}`);
+      assert(Array.isArray(res.data.comparison[serviceId].missingFrom), `Expected missingFrom array for ${serviceId}`);
+      assert(typeof res.data.comparison[serviceId].isCommon === 'boolean', `Expected isCommon boolean for ${serviceId}`);
+      assert(typeof res.data.comparison[serviceId].details === 'object', `Expected details object for ${serviceId}`);
+    });
+  });
+
+  await test('Regions compare isCommon is true only when service in all regions', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,aws-eu-west-2');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    Object.entries(res.data.comparison).forEach(([serviceId, data]) => {
+      const expectedIsCommon = data.availableIn.length === 2;
+      assert(data.isCommon === expectedIsCommon, 
+        `${serviceId}: isCommon should be ${expectedIsCommon}, got ${data.isCommon}`);
+    });
+  });
+
+  await test('Regions compare missingFrom correctly lists regions', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,azure-us-east');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    Object.entries(res.data.comparison).forEach(([serviceId, data]) => {
+      const allRegionIds = res.data.regions.map(r => r.id);
+      const combined = [...data.availableIn, ...data.missingFrom].sort();
+      assert(JSON.stringify(combined) === JSON.stringify(allRegionIds.sort()), 
+        `${serviceId}: availableIn + missingFrom should equal all region IDs`);
+    });
+  });
+
+  await test('Regions compare details includes service configuration', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,azure-us-east');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    Object.entries(res.data.comparison).forEach(([serviceId, data]) => {
+      data.availableIn.forEach(regionId => {
+        assert(data.details[regionId] !== undefined, 
+          `${serviceId}: details should include ${regionId}`);
+      });
+    });
+  });
+
+  await test('Regions compare summary counts are accurate', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,azure-us-east');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    const { summary, comparison } = res.data;
+    
+    let calculatedCommon = 0;
+    let calculatedPartial = 0;
+    let calculatedUnavailable = 0;
+    
+    Object.values(comparison).forEach(data => {
+      if (data.isCommon) calculatedCommon++;
+      else if (data.availableIn.length === 0) calculatedUnavailable++;
+      else calculatedPartial++;
+    });
+    
+    assert(summary.commonServices === calculatedCommon, 
+      `commonServices count mismatch: ${summary.commonServices} vs ${calculatedCommon}`);
+    assert(summary.partialServices === calculatedPartial, 
+      `partialServices count mismatch: ${summary.partialServices} vs ${calculatedPartial}`);
+    assert(summary.unavailableServices === calculatedUnavailable, 
+      `unavailableServices count mismatch: ${summary.unavailableServices} vs ${calculatedUnavailable}`);
+    assert(summary.totalServices === 5, 'Expected 5 total services');
+  });
+
+  await test('Regions compare summary service IDs match counts', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,azure-us-east');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    const { summary } = res.data;
+    
+    assert(summary.commonServiceIds.length === summary.commonServices, 
+      'commonServiceIds array length should match commonServices count');
+    assert(summary.partialServiceIds.length === summary.partialServices, 
+      'partialServiceIds array length should match partialServices count');
+    assert(summary.unavailableServiceIds.length === summary.unavailableServices, 
+      'unavailableServiceIds array length should match unavailableServices count');
+  });
+
+  await test('Regions compare with 3 regions works correctly', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,azure-us-east,aws-eu-west-2');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.regions.length === 3, 'Expected 3 regions');
+  });
+
+  await test('Regions compare with 5 regions (maximum) returns 200', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,azure-us-east,aws-eu-west-2,aws-ap-northeast-1,azure-west-europe');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.regions.length === 5, 'Expected 5 regions');
+  });
+
+  await test('Regions compare with duplicate IDs deduplicates silently', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,aws-us-east-1,azure-us-east');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.regions.length === 2, 'Expected 2 unique regions after deduplication');
+  });
+
+  await test('Regions compare returns 400 for less than 2 region IDs', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1');
+    assert(res.status === 400, `Expected 400, got ${res.status}`);
+    assert(res.data.code === 'INVALID_PARAMETER', 'Expected INVALID_PARAMETER error code');
+    assert(res.data.message.includes('At least 2 region IDs'), 'Expected message about minimum regions');
+  });
+
+  await test('Regions compare returns 400 for more than 5 region IDs', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,azure-us-east,aws-eu-west-2,aws-ap-northeast-1,azure-west-europe,aws-ca-central-1');
+    assert(res.status === 400, `Expected 400, got ${res.status}`);
+    assert(res.data.code === 'INVALID_PARAMETER', 'Expected INVALID_PARAMETER error code');
+    assert(res.data.message.includes('Maximum 5 region IDs'), 'Expected message about maximum regions');
+  });
+
+  await test('Regions compare returns 404 for invalid region ID', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,invalid-region-id');
+    assert(res.status === 404, `Expected 404, got ${res.status}`);
+    assert(res.data.code === 'REGION_NOT_FOUND', 'Expected REGION_NOT_FOUND error code');
+    assert(res.data.message.includes('invalid-region-id'), 'Expected message to mention invalid ID');
+  });
+
+  await test('Regions compare returns 404 listing all invalid IDs', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=invalid-1,invalid-2,aws-us-east-1');
+    assert(res.status === 404, `Expected 404, got ${res.status}`);
+    assert(res.data.code === 'REGION_NOT_FOUND', 'Expected REGION_NOT_FOUND error code');
+    assert(res.data.message.includes('invalid-1'), 'Expected message to mention invalid-1');
+    assert(res.data.message.includes('invalid-2'), 'Expected message to mention invalid-2');
+  });
+
+  await test('Regions compare handles vdc_vault tiered service correctly', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,azure-us-east');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    const vaultComparison = res.data.comparison.vdc_vault;
+    
+    vaultComparison.availableIn.forEach(regionId => {
+      const details = vaultComparison.details[regionId];
+      assert(Array.isArray(details), `vdc_vault details for ${regionId} should be an array`);
+      if (details.length > 0) {
+        assert(details[0].edition, 'vdc_vault config should have edition');
+        assert(details[0].tier, 'vdc_vault config should have tier');
+      }
+    });
+  });
+
+  await test('Regions compare handles boolean services correctly', async () => {
+    const res = await makeRequest('/api/v1/regions/compare?ids=aws-us-east-1,azure-us-east');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    const booleanServices = ['vdc_m365', 'vdc_entra_id', 'vdc_salesforce', 'vdc_azure_backup'];
+    
+    booleanServices.forEach(serviceId => {
+      const serviceComparison = res.data.comparison[serviceId];
+      serviceComparison.availableIn.forEach(regionId => {
+        const details = serviceComparison.details[regionId];
+        assert(details === true, `${serviceId} details for ${regionId} should be true`);
+      });
+    });
+  });
+
   // Print summary
   console.log(`\n${colors.cyan}Test Summary${colors.reset}`);
   console.log(`${colors.green}Passed: ${TESTS_PASSED.length}${colors.reset}`);
@@ -533,10 +704,10 @@ async function runTests() {
   if (TESTS_FAILED.length > 0) {
     console.log(`\n${colors.red}Failed Tests:${colors.reset}`);
     TESTS_FAILED.forEach(({ name }) => console.log(`  - ${name}`));
-    process.exit(1);
+    return false;
   } else {
     console.log(`\n${colors.green}All tests passed! ✨${colors.reset}\n`);
-    process.exit(0);
+    return true;
   }
 }
 
@@ -545,10 +716,33 @@ console.log(`${colors.blue}Starting development server...${colors.reset}`);
 
 const server = spawn('npm', ['run', 'dev'], {
   stdio: 'pipe',
-  shell: true
+  shell: true,
+  detached: true
 });
 
 let serverReady = false;
+
+function cleanup() {
+  if (server.pid) {
+    try {
+      // Kill the process group to ensure all child processes (wrangler, etc) are killed
+      process.kill(-server.pid);
+    } catch (e) {
+      // Ignore if already dead
+    }
+  }
+}
+
+// Handle cleanup on exit
+process.on('SIGINT', () => {
+  cleanup();
+  process.exit();
+});
+
+process.on('SIGTERM', () => {
+  cleanup();
+  process.exit();
+});
 
 server.stdout.on('data', (data) => {
   const output = data.toString();
@@ -558,10 +752,16 @@ server.stdout.on('data', (data) => {
       serverReady = true;
       console.log(`${colors.green}Server ready!${colors.reset}`);
       // Wait a bit more to ensure server is fully ready
-      setTimeout(() => {
-        runTests().finally(() => {
-          server.kill();
-        });
+      setTimeout(async () => {
+        try {
+          const success = await runTests();
+          cleanup();
+          process.exit(success ? 0 : 1);
+        } catch (error) {
+          console.error(error);
+          cleanup();
+          process.exit(1);
+        }
       }, 1000);
     }
   }
@@ -578,6 +778,7 @@ server.stderr.on('data', (data) => {
 // Handle server errors
 server.on('error', (error) => {
   console.error(`${colors.red}Failed to start server:${colors.reset}`, error);
+  cleanup();
   process.exit(1);
 });
 
@@ -585,7 +786,7 @@ server.on('error', (error) => {
 setTimeout(() => {
   if (!serverReady) {
     console.error(`${colors.red}Server failed to start within 30 seconds${colors.reset}`);
-    server.kill();
+    cleanup();
     process.exit(1);
   }
 }, 30000);
