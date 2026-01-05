@@ -7,3 +7,5 @@ node_modules
 functions/_worker.js
 .cloudflare/
 .wrangler/
+test-results/
+playwright-report/

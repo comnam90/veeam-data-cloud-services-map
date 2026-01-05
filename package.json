@@ -10,11 +10,15 @@
     "build": "npm run build:data && npm run build:worker && npm run typecheck && hugo --gc --minify",
     "dev": "npm run build:data && npm run build:worker && wrangler pages dev public",
     "pretest": "npm run build:data && npm run build:worker",
-    "test": "npm run test:validate && npm run test:api",
+    "test": "npm run test:validate && npm run test:api && npm run test:ui",
     "test:api": "node scripts/test-api.js",
     "test:validate": "node scripts/test-validate-regions.js",
     "validate": "node scripts/validate-regions.js",
-    "clean": "rm -rf public functions/regions.json functions/_worker.js"
+    "clean": "rm -rf public functions/regions.json functions/_worker.js",
+    "test:ui": "playwright test",
+    "test:ui:headed": "playwright test --headed",
+    "test:ui:debug": "playwright test --debug",
+    "test:ui:report": "playwright show-report"
   },
   "keywords": [
     "veeam",
@@ -34,6 +38,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260103.0",
+    "@playwright/test": "^1.57.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.0.3",
     "esbuild": "^0.27.2",
