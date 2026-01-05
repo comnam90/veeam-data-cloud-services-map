@@ -205,7 +205,139 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 ---
 
-### 3. GET /api/v1/services
+### 3. GET /api/v1/regions/nearest - Find Nearest Regions
+
+**Purpose:** Find the N closest Veeam Data Cloud regions to any geographic location
+
+**When to use:**
+- Infrastructure planning: Find closest regions for disaster recovery
+- Latency optimization: Identify nearest backup endpoints
+- Multi-region strategy: Discover geographically distributed options
+- Service discovery: Find closest regions with specific services
+
+**URL:** `GET /api/v1/regions/nearest`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Values | Description |
+|-----------|------|----------|--------|-------------|
+| `lat` | float | Yes | -90 to 90 | Latitude of source location in decimal degrees |
+| `lng` | float | Yes | -180 to 180 | Longitude of source location in decimal degrees |
+| `limit` | integer | No | 0-20 | Max results to return. Default: 5, Max: 20, 0=unlimited |
+| `provider` | string | No | `AWS`, `Azure` | Filter to specific cloud provider |
+| `service` | string | No | `vdc_vault`, `vdc_m365`, `vdc_entra_id`, `vdc_salesforce`, `vdc_azure_backup` | Filter to regions offering this service |
+| `tier` | string | No | `Core`, `Non-Core` | Filter vdc_vault by tier (requires `service=vdc_vault`) |
+| `edition` | string | No | `Foundation`, `Advanced` | Filter vdc_vault by edition (requires `service=vdc_vault`) |
+
+**Important Validation Rules:**
+- `tier` and `edition` are ONLY valid when `service=vdc_vault`
+- Passing `tier` or `edition` without `service=vdc_vault` returns 400 error
+- Provider is case-sensitive: must be exactly `AWS` or `Azure`
+
+**Response Schema:**
+
+```json
+{
+  "query": {
+    "lat": 35.6762,
+    "lng": 139.6503,
+    "limit": 5,
+    "service": "vdc_vault",
+    "provider": "AWS",
+    "tier": "Core",
+    "edition": null
+  },
+  "results": [
+    {
+      "region": {
+        "id": "aws-ap-northeast-1",
+        "name": "Asia Pacific (Tokyo)",
+        "provider": "AWS",
+        "coords": [35.6762, 139.2],
+        "aliases": ["Tokyo", "Japan"],
+        "services": {
+          "vdc_vault": [
+            { "edition": "Foundation", "tier": "Core" },
+            { "edition": "Advanced", "tier": "Core" }
+          ],
+          "vdc_m365": true
+        }
+      },
+      "distance": {
+        "km": 42.15,
+        "miles": 26.19
+      }
+    }
+  ],
+  "count": 1
+}
+```
+
+**Distance Calculation:**
+- Uses Haversine formula for great-circle distance
+- Accurate for Earth's spherical approximation
+- Returns distances rounded to 2 decimal places
+
+**Sorting & Tie-Breaking:**
+- Results sorted by distance ascending (closest first)
+- Equal distances tie-break by region.id alphabetically
+- Guarantees deterministic ordering
+
+**Example Queries:**
+
+1. Find 3 closest regions to Tokyo:
+   ```
+   GET /api/v1/regions/nearest?lat=35.6762&lng=139.6503&limit=3
+   ```
+
+2. Find closest AWS regions with vdc_vault:
+   ```
+   GET /api/v1/regions/nearest?lat=40.7128&lng=-74.0060&provider=AWS&service=vdc_vault
+   ```
+
+3. Find all Azure regions sorted by distance (unlimited):
+   ```
+   GET /api/v1/regions/nearest?lat=51.5074&lng=-0.1278&provider=Azure&limit=0
+   ```
+
+4. Find closest Core tier vdc_vault regions:
+   ```
+   GET /api/v1/regions/nearest?lat=37.7749&lng=-122.4194&service=vdc_vault&tier=Core&limit=10
+   ```
+
+5. Find closest Advanced edition Core tier regions:
+   ```
+   GET /api/v1/regions/nearest?lat=0&lng=0&service=vdc_vault&tier=Core&edition=Advanced
+   ```
+
+**Response Codes:**
+
+- `200 OK` - Successfully found nearest regions (may return 0 results if filters exclude all)
+- `400 Bad Request` - Invalid coordinates, limit out of range, or invalid filter combination
+
+**Common Error Scenarios:**
+
+```json
+{
+  "error": "Invalid parameter combination",
+  "code": "INVALID_PARAMETER",
+  "message": "tier and edition parameters are only valid with service=vdc_vault",
+  "parameter": "tier",
+  "value": "Core"
+}
+```
+
+**Use Cases:**
+
+1. **Disaster Recovery Planning:** Find 3-5 geographically distributed regions
+2. **Latency Optimization:** Identify single closest region for primary backup
+3. **Multi-Cloud Strategy:** Compare AWS vs Azure closest regions
+4. **Service Availability:** Check which nearby regions offer specific services
+5. **Cost Optimization:** Filter by Core tier to find most cost-effective nearby regions
+
+---
+
+### 4. GET /api/v1/services
 
 **Purpose:** Retrieve metadata about all Veeam Data Cloud services with comprehensive regional availability statistics.
 
@@ -336,7 +468,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 ---
 
-### 4. GET /api/v1/services/{serviceId}
+### 5. GET /api/v1/services/{serviceId}
 
 **Purpose:** Retrieve comprehensive details about a specific VDC service, including complete lists of all regions where the service is available and detailed breakdowns by cloud provider and configuration.
 
@@ -507,7 +639,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 ---
 
-### 5. GET /api/v1/health
+### 6. GET /api/v1/health
 
 **Purpose:** Comprehensive health check that validates API functionality and data availability.
 
@@ -546,7 +678,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 ---
 
-### 6. GET /api/v1/ping
+### 7. GET /api/v1/ping
 
 **Purpose:** Lightweight connectivity test with no data dependencies.
 
