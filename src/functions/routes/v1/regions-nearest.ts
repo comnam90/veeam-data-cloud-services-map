@@ -144,7 +144,11 @@ export function registerNearestRegionsRoute(app: OpenAPIHono<{ Bindings: Env }>)
       filteredRegions = filteredRegions.filter(r => {
         const serviceData = r.services[service]
         if (serviceData === undefined) return false
-        if (typeof serviceData === 'boolean') return serviceData
+        if (typeof serviceData === 'boolean') {
+          // If strict filtering is active, boolean "true" (unknown configuration) is insufficient
+          if (service === 'vdc_vault' && (tier || edition)) return false
+          return serviceData
+        }
 
         if (service === 'vdc_vault' && Array.isArray(serviceData)) {
           if (!tier && !edition) return true
