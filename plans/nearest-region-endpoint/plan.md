@@ -70,17 +70,17 @@ Enable users and LLM agents to programmatically discover the closest Veeam Data 
 
 From Issue #13:
 
-- [ ] `GET /api/v1/regions/nearest?lat=35.6762&lng=139.6503` returns Tokyo first
-- [ ] `limit` defaults to 5, caps at 20; `limit=0` returns all
-- [ ] `provider` filter works correctly
-- [ ] `service` filter works correctly
-- [ ] Combined filters work (`provider` + `service`, `tier` + `edition`)
-- [ ] Deterministic ordering for equal distances (tie-break by `region.id`)
-- [ ] Invalid `lat`/`lng` returns `400`
-- [ ] Invalid filter combo (`tier`/`edition` without `service=vdc_vault`) returns `400`
-- [ ] OpenAPI spec updated
-- [ ] API integration tests added
-- [ ] LLM docs updated (`llms.txt`, `llms-full.txt`)
+- [x] `GET /api/v1/regions/nearest?lat=35.6762&lng=139.6503` returns Tokyo first
+- [x] `limit` defaults to 5, caps at 20; `limit=0` returns all
+- [x] `provider` filter works correctly
+- [x] `service` filter works correctly
+- [x] Combined filters work (`provider` + `service`, `tier` + `edition`)
+- [x] Deterministic ordering for equal distances (tie-break by `region.id`)
+- [x] Invalid `lat`/`lng` returns `400`
+- [x] Invalid filter combo (`tier`/`edition` without `service=vdc_vault`) returns `400`
+- [x] OpenAPI spec updated
+- [x] API integration tests added
+- [x] LLM docs updated (`llms.txt`, `llms-full.txt`)
 
 ## Technical Notes
 

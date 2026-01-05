@@ -6,9 +6,9 @@ Add `GET /api/v1/regions/nearest` endpoint that returns the N closest cloud regi
 ## Prerequisites
 Ensure you are on the `feature/nearest-region-endpoint` branch before beginning implementation.
 
-- [ ] Check current branch: `git branch --show-current`
-- [ ] If not on the correct branch, switch to it: `git checkout feature/nearest-region-endpoint`
-- [ ] If the branch doesn't exist, create it from main: `git checkout -b feature/nearest-region-endpoint main`
+- [x] Check current branch: `git branch --show-current`
+- [x] If not on the correct branch, switch to it: `git checkout feature/nearest-region-endpoint`
+- [x] If the branch doesn't exist, create it from main: `git checkout -b feature/nearest-region-endpoint main`
 
 ---
 
@@ -20,8 +20,8 @@ This utility calculates the great-circle distance between two geographic coordin
 
 #### Step 1.1: Create geo.ts utility file
 
-- [ ] Create the file `src/functions/utils/geo.ts`
-- [ ] Copy and paste the complete code below:
+- [x] Create the file `src/functions/utils/geo.ts`
+- [x] Copy and paste the complete code below:
 
 ```typescript
 /**
@@ -94,9 +94,9 @@ function toRadians(degrees: number): number {
 
 #### Step 1 Verification Checklist
 
-- [ ] Run type checking: `npm run typecheck`
-- [ ] Verify no TypeScript errors in terminal output
-- [ ] File should be created at `src/functions/utils/geo.ts`
+- [x] Run type checking: `npm run typecheck`
+- [x] Verify no TypeScript errors in terminal output
+- [x] File should be created at `src/functions/utils/geo.ts`
 
 #### Step 1 STOP & COMMIT
 **STOP & COMMIT:** Pause here. Test the changes, stage files, and commit:
@@ -113,8 +113,8 @@ This creates the complete API endpoint with validation, filtering, distance calc
 
 #### Step 2.1: Create regions-nearest.ts route file
 
-- [ ] Create the file `src/functions/routes/v1/regions-nearest.ts`
-- [ ] Copy and paste the complete code below:
+- [x] Create the file `src/functions/routes/v1/regions-nearest.ts`
+- [x] Copy and paste the complete code below:
 
 ```typescript
 import { createRoute, z } from '@hono/zod-openapi'
@@ -315,15 +315,15 @@ export function registerNearestRegionsRoute(app: OpenAPIHono<{ Bindings: Env }>)
 
 #### Step 2.2: Register route in _worker.ts
 
-- [ ] Open the file `src/functions/_worker.ts`
-- [ ] Add the import at the top with other route imports (around line 10-20):
+- [x] Open the file `src/functions/_worker.ts`
+- [x] Add the import at the top with other route imports (around line 10-20):
 
 ```typescript
 import { registerNearestRegionsRoute } from './routes/v1/regions-nearest'
 ```
 
-- [ ] Find the section where routes are registered (around line 70-80)
-- [ ] Add the registration BEFORE `registerRegionByIdRoute(app)`:
+- [x] Find the section where routes are registered (around line 70-80)
+- [x] Add the registration BEFORE `registerRegionByIdRoute(app)`:
 
 ```typescript
 registerNearestRegionsRoute(app)  // MUST be before regions-by-id
@@ -344,19 +344,19 @@ registerRegionsRoute(app)
 
 #### Step 2 Verification Checklist
 
-- [ ] Run type checking: `npm run typecheck`
-- [ ] Verify no TypeScript errors
-- [ ] Build the worker: `npm run build:worker`
-- [ ] Verify build succeeds with no errors
-- [ ] Start the dev server: `npm run dev`
-- [ ] Wait for "Ready on http://localhost:8788" message
-- [ ] Test the endpoint manually:
+- [x] Run type checking: `npm run typecheck`
+- [x] Verify no TypeScript errors
+- [x] Build the worker: `npm run build:worker`
+- [x] Verify build succeeds with no errors
+- [x] Start the dev server: `npm run dev`
+- [x] Wait for "Ready on http://localhost:8788" message
+- [x] Test the endpoint manually:
   ```bash
   curl "http://localhost:8788/api/v1/regions/nearest?lat=35.6762&lng=139.6503&limit=3"
   ```
-- [ ] Verify response includes `query`, `results`, and `count` fields
-- [ ] Verify first result is `aws-ap-northeast-1` (Tokyo region)
-- [ ] Stop the dev server (Ctrl+C)
+- [x] Verify response includes `query`, `results`, and `count` fields
+- [x] Verify first result is `aws-ap-northeast-1` (Tokyo region)
+- [x] Stop the dev server (Ctrl+C)
 
 #### Step 2 STOP & COMMIT
 **STOP & COMMIT:** Pause here. Test the changes thoroughly, then stage and commit:
@@ -373,9 +373,9 @@ Add comprehensive test coverage for the new endpoint.
 
 #### Step 3.1: Add tests to test-api.js
 
-- [ ] Open the file `scripts/test-api.js`
-- [ ] Find the section where tests are defined (after the `makeRequest` function)
-- [ ] Add all test cases below BEFORE the final summary section at the end:
+- [x] Open the file `scripts/test-api.js`
+- [x] Find the section where tests are defined (after the `makeRequest` function)
+- [x] Add all test cases below BEFORE the final summary section at the end:
 
 ```javascript
   // ===================================================================
@@ -585,10 +585,10 @@ Add comprehensive test coverage for the new endpoint.
 
 #### Step 3 Verification Checklist
 
-- [ ] Run all API tests: `npm run test:api`
-- [ ] Verify all new nearest region tests pass (31 new tests)
-- [ ] Check that test summary shows 0 failures
-- [ ] Review test output for any unexpected warnings
+- [x] Run all API tests: `npm run test:api`
+- [x] Verify all new nearest region tests pass (31 new tests)
+- [x] Check that test summary shows 0 failures
+- [x] Review test output for any unexpected warnings
 
 #### Step 3 STOP & COMMIT
 **STOP & COMMIT:** Pause here. Verify all tests pass, then stage and commit:
@@ -605,9 +605,9 @@ Add documentation for the new endpoint to help LLMs and users discover and use i
 
 #### Step 4.1: Update llms.txt (concise reference)
 
-- [ ] Open the file `static/llms.txt`
-- [ ] Find the "KEY ENDPOINTS" section (around line 15-30)
-- [ ] Add the new endpoint after the regions list endpoint and before the services section:
+- [x] Open the file `static/llms.txt`
+- [x] Find the "KEY ENDPOINTS" section (around line 15-30)
+- [x] Add the new endpoint after the regions list endpoint and before the services section:
 
 ```markdown
 ### Get Nearest Regions
@@ -627,9 +627,9 @@ Response includes distance in km and miles for each region.
 
 #### Step 4.2: Update llms-full.txt (comprehensive guide)
 
-- [ ] Open the file `static/llms-full.txt`
-- [ ] Find the "REGIONS ENDPOINTS" section (around line 200-250)
-- [ ] Add the complete endpoint documentation after the existing regions endpoints:
+- [x] Open the file `static/llms-full.txt`
+- [x] Find the "REGIONS ENDPOINTS" section (around line 200-250)
+- [x] Add the complete endpoint documentation after the existing regions endpoints:
 
 ```markdown
 ### GET /api/v1/regions/nearest - Find Nearest Regions
@@ -755,10 +755,10 @@ Response includes distance in km and miles for each region.
 
 #### Step 4 Verification Checklist
 
-- [ ] Verify both documentation files are updated
-- [ ] Check that examples use realistic coordinates
-- [ ] Confirm parameter descriptions match code validation
-- [ ] Ensure formatting is consistent with existing docs
+- [x] Verify both documentation files are updated
+- [x] Check that examples use realistic coordinates
+- [x] Confirm parameter descriptions match code validation
+- [x] Ensure formatting is consistent with existing docs
 
 #### Step 4 STOP & COMMIT
 **STOP & COMMIT:** Pause here. Review documentation changes, then stage and commit:
@@ -773,31 +773,31 @@ git commit -m "docs: add nearest regions endpoint to LLM documentation"
 
 After completing all steps, perform these final checks:
 
-- [ ] Run full test suite: `npm run test`
-- [ ] Verify all tests pass (should have 31 new passing tests)
-- [ ] Run type checking: `npm run typecheck`
-- [ ] Build entire project: `npm run build`
-- [ ] Start dev server: `npm run dev`
-- [ ] Access OpenAPI docs at `http://localhost:8788/api/docs`
-- [ ] Verify "Nearest Regions" endpoint appears in documentation
-- [ ] Test endpoint manually with various filter combinations
-- [ ] Check that OpenAPI schema is auto-generated correctly at `http://localhost:8788/api/openapi.json`
+- [x] Run full test suite: `npm run test`
+- [x] Verify all tests pass (should have 31 new passing tests)
+- [x] Run type checking: `npm run typecheck`
+- [x] Build entire project: `npm run build`
+- [x] Start dev server: `npm run dev`
+- [x] Access OpenAPI docs at `http://localhost:8788/api/docs`
+- [x] Verify "Nearest Regions" endpoint appears in documentation
+- [x] Test endpoint manually with various filter combinations
+- [x] Check that OpenAPI schema is auto-generated correctly at `http://localhost:8788/api/openapi.json`
 
 ## Acceptance Criteria Verification
 
 Confirm all criteria from Issue #13 are met:
 
-- [ ] `GET /api/v1/regions/nearest?lat=35.6762&lng=139.6503` returns Tokyo first
-- [ ] `limit` defaults to 5, caps at 20; `limit=0` returns all
-- [ ] `provider` filter works correctly
-- [ ] `service` filter works correctly
-- [ ] Combined filters work (`provider` + `service`, `tier` + `edition`)
-- [ ] Deterministic ordering for equal distances (tie-break by `region.id`)
-- [ ] Invalid `lat`/`lng` returns `400`
-- [ ] Invalid filter combo (`tier`/`edition` without `service=vdc_vault`) returns `400`
-- [ ] OpenAPI spec auto-generated and accessible at `/api/openapi.json`
-- [ ] API integration tests added (31 new tests)
-- [ ] LLM docs updated (`llms.txt`, `llms-full.txt`)
+- [x] `GET /api/v1/regions/nearest?lat=35.6762&lng=139.6503` returns Tokyo first
+- [x] `limit` defaults to 5, caps at 20; `limit=0` returns all
+- [x] `provider` filter works correctly
+- [x] `service` filter works correctly
+- [x] Combined filters work (`provider` + `service`, `tier` + `edition`)
+- [x] Deterministic ordering for equal distances (tie-break by `region.id`)
+- [x] Invalid `lat`/`lng` returns `400`
+- [x] Invalid filter combo (`tier`/`edition` without `service=vdc_vault`) returns `400`
+- [x] OpenAPI spec auto-generated and accessible at `/api/openapi.json`
+- [x] API integration tests added (31 new tests)
+- [x] LLM docs updated (`llms.txt`, `llms-full.txt`)
 
 ## Push to Remote
 
