@@ -123,6 +123,7 @@ import { registerPingRoute } from './routes/v1/ping'
 import { registerServicesRoute } from './routes/v1/services'
 import { registerServiceByIdRoute } from './routes/v1/services-by-id'
 import { registerHealthRoute } from './routes/v1/health'
+import { registerNearestRegionsRoute } from './routes/v1/regions-nearest'
 import { registerRegionByIdRoute } from './routes/v1/regions-by-id'
 import { registerRegionsRoute } from './routes/v1/regions'
 
@@ -130,6 +131,7 @@ registerPingRoute(app)
 registerServicesRoute(app)
 registerServiceByIdRoute(app)
 registerHealthRoute(app)
+registerNearestRegionsRoute(app)
 registerRegionByIdRoute(app)
 registerRegionsRoute(app)
 
