@@ -29,7 +29,7 @@ function validateRegionFile(filePath) {
       message: e.message,
       file: filePath
     });
-    return { valid: false, errors };
+    return { valid: false, errors, data: null };
   }
   
   for (const field of REQUIRED_FIELDS) {
@@ -110,13 +110,34 @@ function validateRegionFile(filePath) {
   
   return {
     valid: errors.length === 0,
-    errors
+    errors,
+    data
   };
+}
+
+function checkDuplicateIds(validationResults, errors) {
+  const seenIds = new Map();
+  
+  for (const { filePath, data } of validationResults) {
+    if (data && data.id) {
+      if (seenIds.has(data.id)) {
+        errors.push({
+          type: 'duplicate_id',
+          id: data.id,
+          files: [seenIds.get(data.id), filePath],
+          message: `Duplicate ID "${data.id}" found in multiple files`,
+          file: filePath
+        });
+      } else {
+        seenIds.set(data.id, filePath);
+      }
+    }
+  }
 }
 
 function validateAllRegions(directory) {
   const errors = [];
-  const seenIds = new Map();
+  const validationResults = [];
   
   const files = fs.readdirSync(directory).filter(f => f.endsWith('.yaml'));
   
@@ -124,34 +145,17 @@ function validateAllRegions(directory) {
     const filePath = path.join(directory, file);
     const result = validateRegionFile(filePath);
     errors.push(...result.errors);
-    
-    const content = fs.readFileSync(filePath, 'utf8');
-    try {
-      const data = yaml.load(content);
-      if (data && data.id) {
-        if (seenIds.has(data.id)) {
-          errors.push({
-            type: 'duplicate_id',
-            id: data.id,
-            files: [seenIds.get(data.id), filePath],
-            message: `Duplicate ID "${data.id}" found in multiple files`,
-            file: filePath
-          });
-        } else {
-          seenIds.set(data.id, filePath);
-        }
-      }
-    } catch (e) {
-      // YAML parse error already reported by validateRegionFile
-    }
+    validationResults.push({ filePath, data: result.data });
   }
+  
+  checkDuplicateIds(validationResults, errors);
   
   return { valid: errors.length === 0, errors };
 }
 
 function validateAllRegionsRecursive(directory) {
   const allErrors = [];
-  const seenIds = new Map();
+  const validationResults = [];
   
   function walkDir(dir) {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -162,31 +166,14 @@ function validateAllRegionsRecursive(directory) {
       } else if (entry.name.endsWith('.yaml')) {
         const result = validateRegionFile(fullPath);
         allErrors.push(...result.errors);
-        
-        try {
-          const content = fs.readFileSync(fullPath, 'utf8');
-          const data = yaml.load(content);
-          if (data && data.id) {
-            if (seenIds.has(data.id)) {
-              allErrors.push({
-                type: 'duplicate_id',
-                id: data.id,
-                files: [seenIds.get(data.id), fullPath],
-                message: `Duplicate ID "${data.id}" found in multiple files`,
-                file: fullPath
-              });
-            } else {
-              seenIds.set(data.id, fullPath);
-            }
-          }
-        } catch (e) {
-          // YAML parse error already reported
-        }
+        validationResults.push({ filePath: fullPath, data: result.data });
       }
     }
   }
   
   walkDir(directory);
+  checkDuplicateIds(validationResults, allErrors);
+  
   return { valid: allErrors.length === 0, errors: allErrors };
 }
 
