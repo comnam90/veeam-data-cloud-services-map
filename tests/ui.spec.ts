@@ -292,7 +292,11 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     test('should close popup with close button', async ({ page }) => {
       const searchInput = page.getByRole('combobox', { name: 'Search regions...' });
       await searchInput.fill('US East 1');
-      await page.getByRole('option').first().click();
+      
+      const searchResults = page.getByRole('listbox', { name: 'Search results' });
+      await expect(searchResults).toBeVisible();
+      
+      await page.getByRole('option', { name: /US East 1/i }).click();
       await page.waitForTimeout(1000);
       
       const popup = page.locator('.leaflet-popup');
@@ -380,9 +384,9 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await page.waitForTimeout(1500);
       
       await expect(page.getByRole('button', { name: /Introduction/i })).toBeVisible();
-      await expect(page.getByRole('button', { name: /.*Regions/i })).toBeVisible();
-      await expect(page.getByRole('button', { name: /.*Services/i })).toBeVisible();
-      await expect(page.getByRole('button', { name: /.*Health/i })).toBeVisible();
+      await expect(page.getByRole('button', { name: /Group Regions/i })).toBeVisible();
+      await expect(page.getByRole('button', { name: /Group Services/i })).toBeVisible();
+      await expect(page.getByRole('button', { name: /Group Health/i })).toBeVisible();
     });
 
     test('should have expandable endpoints', async ({ page }) => {
