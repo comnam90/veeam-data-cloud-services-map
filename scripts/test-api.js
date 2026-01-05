@@ -290,6 +290,210 @@ async function runTests() {
     assert(res.data.code === 'REGION_NOT_FOUND', 'Expected REGION_NOT_FOUND error code');
   });
 
+  // ===================================================================
+  // Nearest Regions Endpoint Tests
+  // ===================================================================
+
+  await test('GET /api/v1/regions/nearest?lat=35.6762&lng=139.6503 returns 200', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=35.6762&lng=139.6503');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.results, 'Expected results array');
+    assert(res.data.count >= 1, 'Expected at least 1 result');
+  });
+
+  await test('Nearest regions returns Tokyo first for Tokyo coordinates', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=35.6762&lng=139.6503&limit=5&provider=AWS');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.results[0].region.id === 'aws-ap-northeast-1', 
+      `Expected Tokyo region first, got ${res.data.results[0].region.id}`);
+  });
+
+  await test('Nearest regions response includes distance in km and miles', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=35.6762&lng=139.6503&limit=1');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.results[0].distance, 'Expected distance object');
+    assert(typeof res.data.results[0].distance.km === 'number', 'Expected km as number');
+    assert(typeof res.data.results[0].distance.miles === 'number', 'Expected miles as number');
+  });
+
+  await test('Nearest regions echoes query parameters in response', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=40.7128&lng=-74.0060&limit=3');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.query.lat === 40.7128, 'Expected lat in query');
+    assert(res.data.query.lng === -74.0060, 'Expected lng in query');
+    assert(res.data.query.limit === 3, 'Expected limit in query');
+  });
+
+  await test('Nearest regions defaults to limit=5', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.count === 5, `Expected 5 results with default limit, got ${res.data.count}`);
+    assert(res.data.query.limit === 5, 'Expected limit=5 in query echo');
+  });
+
+  await test('Nearest regions limit=0 returns all regions', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&limit=0');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.count > 50, `Expected all regions (>50), got ${res.data.count}`);
+  });
+
+  await test('Nearest regions limit=20 is maximum', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&limit=20');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.count === 20, `Expected exactly 20 results, got ${res.data.count}`);
+  });
+
+  await test('Nearest regions filters by provider=AWS', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=35.6762&lng=139.6503&provider=AWS&limit=10');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.results.every(r => r.region.provider === 'AWS'), 'Expected all AWS regions');
+    assert(res.data.query.provider === 'AWS', 'Expected provider in query');
+  });
+
+  await test('Nearest regions filters by provider=Azure', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=35.6762&lng=139.6503&provider=Azure&limit=10');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.results.every(r => r.region.provider === 'Azure'), 'Expected all Azure regions');
+  });
+
+  await test('Nearest regions filters by service=vdc_vault', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&service=vdc_vault&limit=10');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.results.every(r => r.region.services.vdc_vault), 'Expected all regions with vdc_vault');
+    assert(res.data.query.service === 'vdc_vault', 'Expected service in query');
+  });
+
+  await test('Nearest regions filters by service=vdc_m365', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&service=vdc_m365&limit=10');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.results.every(r => r.region.services.vdc_m365 === true), 'Expected all regions with vdc_m365');
+  });
+
+  await test('Nearest regions combines provider and service filters', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&provider=AWS&service=vdc_vault&limit=10');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.results.every(r => r.region.provider === 'AWS'), 'Expected all AWS');
+    assert(res.data.results.every(r => r.region.services.vdc_vault), 'Expected all with vdc_vault');
+  });
+
+  await test('Nearest regions filters by tier=Core (with service=vdc_vault)', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&service=vdc_vault&tier=Core&limit=10');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    const allHaveCoreTier = res.data.results.every(r => 
+      r.region.services.vdc_vault?.some(config => config.tier === 'Core')
+    );
+    assert(allHaveCoreTier, 'Expected all regions with Core tier');
+    assert(res.data.query.tier === 'Core', 'Expected tier in query');
+  });
+
+  await test('Nearest regions filters by edition=Advanced (with service=vdc_vault)', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&service=vdc_vault&edition=Advanced&limit=10');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    const allHaveAdvanced = res.data.results.every(r => 
+      r.region.services.vdc_vault?.some(config => config.edition === 'Advanced')
+    );
+    assert(allHaveAdvanced, 'Expected all regions with Advanced edition');
+    assert(res.data.query.edition === 'Advanced', 'Expected edition in query');
+  });
+
+  await test('Nearest regions combines tier and edition filters', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&service=vdc_vault&tier=Core&edition=Advanced&limit=10');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    const allMatch = res.data.results.every(r => 
+      r.region.services.vdc_vault?.some(config => 
+        config.tier === 'Core' && config.edition === 'Advanced'
+      )
+    );
+    assert(allMatch, 'Expected all regions with Core+Advanced config');
+  });
+
+  await test('Nearest regions returns 400 for missing lat', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lng=139.6503');
+    assert(res.status === 400, `Expected 400 for missing lat, got ${res.status}`);
+    assert(res.data.code === 'INVALID_PARAMETER', 'Expected INVALID_PARAMETER code');
+  });
+
+  await test('Nearest regions returns 400 for missing lng', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=35.6762');
+    assert(res.status === 400, `Expected 400 for missing lng, got ${res.status}`);
+    assert(res.data.code === 'INVALID_PARAMETER', 'Expected INVALID_PARAMETER code');
+  });
+
+  await test('Nearest regions returns 400 for lat > 90', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=91&lng=0');
+    assert(res.status === 400, `Expected 400 for lat > 90, got ${res.status}`);
+  });
+
+  await test('Nearest regions returns 400 for lat < -90', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=-91&lng=0');
+    assert(res.status === 400, `Expected 400 for lat < -90, got ${res.status}`);
+  });
+
+  await test('Nearest regions returns 400 for lng > 180', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=181');
+    assert(res.status === 400, `Expected 400 for lng > 180, got ${res.status}`);
+  });
+
+  await test('Nearest regions returns 400 for lng < -180', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=-181');
+    assert(res.status === 400, `Expected 400 for lng < -180, got ${res.status}`);
+  });
+
+  await test('Nearest regions returns 400 for limit > 20', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&limit=21');
+    assert(res.status === 400, `Expected 400 for limit > 20, got ${res.status}`);
+  });
+
+  await test('Nearest regions returns 400 for invalid provider', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&provider=GCP');
+    assert(res.status === 400, `Expected 400 for invalid provider, got ${res.status}`);
+  });
+
+  await test('Nearest regions returns 400 for tier without service=vdc_vault', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&tier=Core');
+    assert(res.status === 400, `Expected 400 for tier without vdc_vault, got ${res.status}`);
+    assert(res.data.code === 'INVALID_PARAMETER', 'Expected INVALID_PARAMETER code');
+    assert(res.data.message.includes('vdc_vault'), 'Expected message about vdc_vault requirement');
+  });
+
+  await test('Nearest regions returns 400 for edition without service=vdc_vault', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&edition=Advanced');
+    assert(res.status === 400, `Expected 400 for edition without vdc_vault, got ${res.status}`);
+    assert(res.data.code === 'INVALID_PARAMETER', 'Expected INVALID_PARAMETER code');
+  });
+
+  await test('Nearest regions returns 400 for tier with service=vdc_m365', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&service=vdc_m365&tier=Core');
+    assert(res.status === 400, `Expected 400 for tier with non-vault service, got ${res.status}`);
+  });
+
+  await test('Nearest regions has deterministic ordering for equal distances', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&limit=20');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    
+    for (let i = 1; i < res.data.results.length; i++) {
+      const prev = res.data.results[i - 1];
+      const curr = res.data.results[i];
+      
+      if (prev.distance.km === curr.distance.km) {
+        assert(prev.region.id < curr.region.id, 
+          `Expected ${prev.region.id} < ${curr.region.id} for equal distances`);
+      }
+    }
+  });
+
+  await test('Nearest regions results are sorted by distance ascending', async () => {
+    const res = await makeRequest('/api/v1/regions/nearest?lat=0&lng=0&limit=20');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    
+    for (let i = 1; i < res.data.results.length; i++) {
+      const prev = res.data.results[i - 1];
+      const curr = res.data.results[i];
+      assert(prev.distance.km <= curr.distance.km, 
+        `Expected distances to be ascending: ${prev.distance.km} <= ${curr.distance.km}`);
+    }
+  });
+
   // Print summary
   console.log(`\n${colors.cyan}Test Summary${colors.reset}`);
   console.log(`${colors.green}Passed: ${TESTS_PASSED.length}${colors.reset}`);
