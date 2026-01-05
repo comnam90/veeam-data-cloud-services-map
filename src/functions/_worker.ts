@@ -2,6 +2,7 @@ import { OpenAPIHono } from '@hono/zod-openapi'
 import { cors } from 'hono/cors'
 import { secureHeaders } from 'hono/secure-headers'
 import { Scalar } from '@scalar/hono-api-reference'
+import yaml from 'js-yaml'
 import type { Env } from './types/env'
 
 // Create Hono app with OpenAPI support and custom validation error handling
@@ -57,8 +58,7 @@ app.use('/api/*', async (c, next) => {
   }
 })
 
-// OpenAPI documentation endpoint
-app.doc('/api/openapi.json', {
+const openApiConfig = {
   openapi: '3.1.0',
   info: {
     title: 'Veeam Data Cloud Service Availability API',
@@ -109,6 +109,16 @@ documentation for authoritative information.
       description: 'API health and status',
     },
   ],
+}
+
+// OpenAPI documentation endpoint (JSON)
+app.doc('/api/openapi.json', openApiConfig)
+
+// OpenAPI documentation endpoint (YAML)
+app.get('/api/openapi.yaml', (c) => {
+  const document = app.getOpenAPI31Document(openApiConfig)
+  const yamlString = yaml.dump(document)
+  return c.text(yamlString, 200, { 'Content-Type': 'application/yaml' })
 })
 
 // Serve interactive API documentation UI at /api/docs
