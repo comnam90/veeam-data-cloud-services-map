@@ -3,7 +3,7 @@ import type { OpenAPIHono } from '@hono/zod-openapi'
 import type { Env } from '../../types/env'
 import type { Region } from '../../types/data'
 import { RegionSchema, ErrorResponseSchema } from '../../schemas/common'
-import { getRegions } from '../../utils/data'
+import { getRegions, filterRegions } from '../../utils/data'
 import { calculateDistance } from '../../utils/geo'
 
 const NearestRegionsQuerySchema = z.object({
@@ -134,35 +134,15 @@ export function registerNearestRegionsRoute(app: OpenAPIHono<{ Bindings: Env }>)
       }, 400) as any
     }
 
-    let filteredRegions = getRegions()
-
-    if (provider) {
-      filteredRegions = filteredRegions.filter(r => r.provider === provider)
-    }
-
-    if (service) {
-      filteredRegions = filteredRegions.filter(r => {
-        const serviceData = r.services[service]
-        if (typeof serviceData === 'boolean') return serviceData
-        return Array.isArray(serviceData) && serviceData.length > 0
-      })
-    }
-
-    // Filter by tier (only applicable to vdc_vault)
-    if (tier && service === 'vdc_vault') {
-      filteredRegions = filteredRegions.filter(r => {
-        const vaultData = r.services.vdc_vault
-        return Array.isArray(vaultData) && vaultData.some(v => v.tier === tier)
-      })
-    }
-
-    // Filter by edition (only applicable to vdc_vault)
-    if (edition && service === 'vdc_vault') {
-      filteredRegions = filteredRegions.filter(r => {
-        const vaultData = r.services.vdc_vault
-        return Array.isArray(vaultData) && vaultData.some(v => v.edition === edition)
-      })
-    }
+    let allRegions = getRegions()
+    
+    // Apply filters using common utility
+    const filteredRegions = filterRegions(allRegions, {
+      provider,
+      service,
+      tier,
+      edition
+    })
 
     const regionsWithDistance = filteredRegions.map(region => {
       const [regionLat, regionLng] = region.coords

@@ -2,7 +2,7 @@ import { createRoute } from '@hono/zod-openapi'
 import { z } from '@hono/zod-openapi'
 import type { OpenAPIHono } from '@hono/zod-openapi'
 import type { Env } from '../../types/env'
-import { getRegions } from '../../utils/data'
+import { getRegions, filterRegions } from '../../utils/data'
 import type { Region } from '../../types/data'
 import { RegionSchema, VdcVaultConfigSchema, RegionServicesSchema, ErrorResponseSchema } from '../../schemas/common'
 
@@ -119,52 +119,16 @@ export function registerRegionsRoute(app: OpenAPIHono<{ Bindings: Env }>) {
     const country = query.country
 
     // Get all regions
-    let regions: Region[] = getRegions()
+    const allRegions: Region[] = getRegions()
 
-    // Apply filters
-    if (provider) {
-      regions = regions.filter(r => r.provider === provider)
-    }
-
-    if (country) {
-      const countryLower = country.toLowerCase()
-      regions = regions.filter(r => {
-        if (r.name.toLowerCase().includes(countryLower)) return true
-        if (r.aliases && Array.isArray(r.aliases)) {
-          return r.aliases.some(alias => alias.toLowerCase().includes(countryLower))
-        }
-        return false
-      })
-    }
-
-    if (service) {
-      regions = regions.filter(r => {
-        const hasService = r.services && r.services[service]
-        if (!hasService) return false
-
-        // For boolean services, just check existence
-        if (typeof r.services[service] === 'boolean') {
-          return r.services[service]
-        }
-
-        // For tiered services (vdc_vault), check array
-        return Array.isArray(r.services[service]) && r.services[service].length > 0
-      })
-    }
-
-    // Filter by tier (only applicable to vdc_vault)
-    if (tier && service === 'vdc_vault') {
-      regions = regions.filter(r => {
-        return r.services.vdc_vault?.some(v => v.tier === tier)
-      })
-    }
-
-    // Filter by edition (only applicable to vdc_vault)
-    if (edition && service === 'vdc_vault') {
-      regions = regions.filter(r => {
-        return r.services.vdc_vault?.some(v => v.edition === edition)
-      })
-    }
+    // Apply filters using common utility
+    const regions = filterRegions(allRegions, {
+      provider,
+      service,
+      tier,
+      edition,
+      country
+    })
 
     // Return filtered results
     return c.json({
