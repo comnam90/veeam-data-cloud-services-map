@@ -430,6 +430,81 @@ coords: [100, -77.4]
     }
   });
 
+  // Test 16: Empty YAML file fails validation
+  await test('Empty YAML file fails validation', async () => {
+    const emptyYaml = '';
+    const { filePath, cleanup } = createTempFile(emptyYaml);
+    try {
+      const result = validateRegionFile(filePath);
+      assert(result.valid === false, 'Expected validation to fail for empty file');
+      assert(
+        result.errors.some(e => e.type === 'invalid_structure'),
+        'Expected invalid_structure error'
+      );
+    } finally {
+      cleanup();
+    }
+  });
+
+  // Test 17: Unknown service name fails validation
+  await test('Unknown service name fails validation', async () => {
+    const unknownServiceYaml = `
+id: "aws-test-region"
+name: "Test Region"
+provider: "AWS"
+coords: [38.9, -77.4]
+services:
+  vdc_unknown_service: true
+`;
+    const { filePath, cleanup } = createTempFile(unknownServiceYaml);
+    try {
+      const result = validateRegionFile(filePath);
+      assert(result.valid === false, 'Expected validation to fail for unknown service');
+      assert(
+        result.errors.some(e => e.type === 'unknown_service'),
+        'Expected unknown_service error'
+      );
+    } finally {
+      cleanup();
+    }
+  });
+
+  // Test 18: Duplicate ID reports all files involved
+  await test('Duplicate ID error includes all affected files', async () => {
+    const region1 = `
+id: "aws-us-east-1"
+name: "US East 1"
+provider: "AWS"
+coords: [38.9, -77.4]
+`;
+    const region2 = `
+id: "aws-us-east-1"
+name: "US East 1 Copy"
+provider: "AWS"
+coords: [39.0, -78.0]
+`;
+    const region3 = `
+id: "aws-us-east-1"
+name: "US East 1 Another Copy"
+provider: "AWS"
+coords: [40.0, -79.0]
+`;
+    const { dirPath, cleanup } = createTempDir({
+      'region1.yaml': region1,
+      'region2.yaml': region2,
+      'region3.yaml': region3
+    });
+    try {
+      const result = validateAllRegions(dirPath);
+      assert(result.valid === false, 'Expected validation to fail for duplicate IDs');
+      const dupError = result.errors.find(e => e.type === 'duplicate_id');
+      assert(dupError, 'Expected duplicate_id error');
+      assert(dupError.files.length === 3, `Expected 3 files in duplicate error, got ${dupError.files.length}`);
+    } finally {
+      cleanup();
+    }
+  });
+
   // Summary
   console.log(`\n${colors.cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
   console.log(`${colors.green}Passed: ${TESTS_PASSED.length}${colors.reset}`);

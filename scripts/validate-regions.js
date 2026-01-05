@@ -19,7 +19,17 @@ const BOOLEAN_SERVICES = ['vdc_m365', 'vdc_entra_id', 'vdc_salesforce', 'vdc_azu
 function validateRegionFile(filePath) {
   const errors = [];
   
-  const content = fs.readFileSync(filePath, 'utf8');
+  let content;
+  try {
+    content = fs.readFileSync(filePath, 'utf8');
+  } catch (e) {
+    errors.push({
+      type: 'file_read_error',
+      message: `Cannot read file: ${e.message}`,
+      file: filePath
+    });
+    return { valid: false, errors, data: null };
+  }
   
   let data;
   try {
@@ -28,6 +38,15 @@ function validateRegionFile(filePath) {
     errors.push({
       type: 'yaml_syntax',
       message: e.message,
+      file: filePath
+    });
+    return { valid: false, errors, data: null };
+  }
+  
+  if (!data || typeof data !== 'object') {
+    errors.push({
+      type: 'invalid_structure',
+      message: 'File must contain a valid YAML object (not empty or null)',
       file: filePath
     });
     return { valid: false, errors, data: null };
@@ -148,6 +167,15 @@ function validateRegionFile(filePath) {
             file: filePath
           });
         }
+      } else {
+        const validServices = [...TIERED_SERVICES, ...BOOLEAN_SERVICES];
+        errors.push({
+          type: 'unknown_service',
+          service: serviceName,
+          value: serviceConfig,
+          message: `Unknown service "${serviceName}". Valid services are: ${validServices.join(', ')}`,
+          file: filePath
+        });
       }
     }
   }
@@ -160,21 +188,26 @@ function validateRegionFile(filePath) {
 }
 
 function checkDuplicateIds(validationResults, errors) {
-  const seenIds = new Map();
+  const idToFiles = new Map();
   
   for (const { filePath, data } of validationResults) {
     if (data && data.id) {
-      if (seenIds.has(data.id)) {
-        errors.push({
-          type: 'duplicate_id',
-          id: data.id,
-          files: [seenIds.get(data.id), filePath],
-          message: `Duplicate ID "${data.id}" found in multiple files`,
-          file: filePath
-        });
-      } else {
-        seenIds.set(data.id, filePath);
+      if (!idToFiles.has(data.id)) {
+        idToFiles.set(data.id, []);
       }
+      idToFiles.get(data.id).push(filePath);
+    }
+  }
+  
+  for (const [id, files] of idToFiles) {
+    if (files.length > 1) {
+      errors.push({
+        type: 'duplicate_id',
+        id,
+        files,
+        message: `Duplicate ID "${id}" found in ${files.length} files`,
+        file: files[0]
+      });
     }
   }
 }
@@ -183,7 +216,17 @@ function validateAllRegions(directory) {
   const errors = [];
   const validationResults = [];
   
-  const files = fs.readdirSync(directory).filter(f => f.endsWith('.yaml'));
+  let files;
+  try {
+    files = fs.readdirSync(directory).filter(f => f.endsWith('.yaml'));
+  } catch (e) {
+    errors.push({
+      type: 'directory_error',
+      message: `Cannot read directory: ${e.message}`,
+      file: directory
+    });
+    return { valid: false, errors };
+  }
   
   for (const file of files) {
     const filePath = path.join(directory, file);
@@ -202,7 +245,18 @@ function validateAllRegionsRecursive(directory) {
   const validationResults = [];
   
   function walkDir(dir) {
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    let entries;
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch (e) {
+      allErrors.push({
+        type: 'directory_error',
+        message: `Cannot read directory: ${e.message}`,
+        file: dir
+      });
+      return;
+    }
+    
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()) {
