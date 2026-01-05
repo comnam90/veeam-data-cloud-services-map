@@ -141,7 +141,6 @@ export function registerRegionsCompareRoute(app: OpenAPIHono<{ Bindings: Env }>)
         message: `The following region IDs were not found: ${notFoundIds.join(', ')}`,
         parameter: 'ids',
         value: idsParam,
-        allowedValues: notFoundIds,
       }, 404) as any
     }
     
