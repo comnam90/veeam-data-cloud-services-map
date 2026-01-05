@@ -704,10 +704,10 @@ async function runTests() {
   if (TESTS_FAILED.length > 0) {
     console.log(`\n${colors.red}Failed Tests:${colors.reset}`);
     TESTS_FAILED.forEach(({ name }) => console.log(`  - ${name}`));
-    process.exit(1);
+    return false;
   } else {
     console.log(`\n${colors.green}All tests passed! ✨${colors.reset}\n`);
-    process.exit(0);
+    return true;
   }
 }
 
@@ -716,10 +716,33 @@ console.log(`${colors.blue}Starting development server...${colors.reset}`);
 
 const server = spawn('npm', ['run', 'dev'], {
   stdio: 'pipe',
-  shell: true
+  shell: true,
+  detached: true
 });
 
 let serverReady = false;
+
+function cleanup() {
+  if (server.pid) {
+    try {
+      // Kill the process group to ensure all child processes (wrangler, etc) are killed
+      process.kill(-server.pid);
+    } catch (e) {
+      // Ignore if already dead
+    }
+  }
+}
+
+// Handle cleanup on exit
+process.on('SIGINT', () => {
+  cleanup();
+  process.exit();
+});
+
+process.on('SIGTERM', () => {
+  cleanup();
+  process.exit();
+});
 
 server.stdout.on('data', (data) => {
   const output = data.toString();
@@ -729,10 +752,16 @@ server.stdout.on('data', (data) => {
       serverReady = true;
       console.log(`${colors.green}Server ready!${colors.reset}`);
       // Wait a bit more to ensure server is fully ready
-      setTimeout(() => {
-        runTests().finally(() => {
-          server.kill();
-        });
+      setTimeout(async () => {
+        try {
+          const success = await runTests();
+          cleanup();
+          process.exit(success ? 0 : 1);
+        } catch (error) {
+          console.error(error);
+          cleanup();
+          process.exit(1);
+        }
       }, 1000);
     }
   }
@@ -749,6 +778,7 @@ server.stderr.on('data', (data) => {
 // Handle server errors
 server.on('error', (error) => {
   console.error(`${colors.red}Failed to start server:${colors.reset}`, error);
+  cleanup();
   process.exit(1);
 });
 
@@ -756,7 +786,7 @@ server.on('error', (error) => {
 setTimeout(() => {
   if (!serverReady) {
     console.error(`${colors.red}Server failed to start within 30 seconds${colors.reset}`);
-    server.kill();
+    cleanup();
     process.exit(1);
   }
 }, 30000);
