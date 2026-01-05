@@ -95,7 +95,7 @@ GET /api/v1/regions?provider=AWS&service=vdc_vault&edition=Advanced&tier=Core
 
 ## Documentation
 
-- **OpenAPI Specification:** `/api/openapi.json` (OpenAPI 3.1.0)
+- **OpenAPI Specification:** `/api/openapi.json` (JSON) or `/api/openapi.yaml` (YAML)
 - **Interactive Docs:** `/api/docs` (Scalar API Reference)
 - **Full Documentation:** `/llms-full.txt` (comprehensive guide)
 - **GitHub Repository:** https://github.com/comnam90/veeam-data-cloud-services-map
