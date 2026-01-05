@@ -273,6 +273,13 @@ async function runTests() {
     ), 'All regions should have Core tier');
   });
 
+  await test('GET /api/v1/regions?tier=Core without service=vdc_vault returns 400', async () => {
+    const res = await makeRequest('/api/v1/regions?tier=Core');
+    assert(res.status === 400, `Expected 400, got ${res.status}`);
+    assert(res.data.code === 'INVALID_PARAMETER', 'Expected INVALID_PARAMETER error code');
+    assert(res.data.message.includes('vdc_vault'), 'Error message should mention vdc_vault');
+  });
+
   // Region by ID endpoint tests
   await test('GET /api/v1/regions/{id} returns specific region', async () => {
     const allRegions = await makeRequest('/api/v1/regions');

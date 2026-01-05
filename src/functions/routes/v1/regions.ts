@@ -118,6 +118,17 @@ export function registerRegionsRoute(app: OpenAPIHono<{ Bindings: Env }>) {
     const edition = query.edition
     const country = query.country
 
+    // Validate tier/edition parameters
+    if ((tier || edition) && service !== 'vdc_vault') {
+      return c.json({
+        error: 'Invalid parameter combination',
+        code: 'INVALID_PARAMETER',
+        message: 'tier and edition parameters are only valid with service=vdc_vault',
+        parameter: tier ? 'tier' : 'edition',
+        value: tier || edition,
+      }, 400) as any
+    }
+
     // Get all regions
     const allRegions: Region[] = getRegions()
 

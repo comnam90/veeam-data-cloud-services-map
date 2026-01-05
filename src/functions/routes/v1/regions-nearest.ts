@@ -134,7 +134,7 @@ export function registerNearestRegionsRoute(app: OpenAPIHono<{ Bindings: Env }>)
       }, 400) as any
     }
 
-    let allRegions = getRegions()
+    const allRegions = getRegions()
     
     // Apply filters using common utility
     const filteredRegions = filterRegions(allRegions, {
