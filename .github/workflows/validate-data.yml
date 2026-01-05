@@ -2,6 +2,7 @@ name: Validate Region Data
 
 on:
   push:
+    branches: [main, develop]
     paths:
       - "data/regions/**/*.yaml"
       - "scripts/validate-regions.js"
