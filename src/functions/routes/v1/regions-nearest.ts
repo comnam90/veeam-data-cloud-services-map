@@ -143,24 +143,24 @@ export function registerNearestRegionsRoute(app: OpenAPIHono<{ Bindings: Env }>)
     if (service) {
       filteredRegions = filteredRegions.filter(r => {
         const serviceData = r.services[service]
-        if (serviceData === undefined) return false
-        if (typeof serviceData === 'boolean') {
-          // If strict filtering is active, boolean "true" (unknown configuration) is insufficient
-          if (service === 'vdc_vault' && (tier || edition)) return false
-          return serviceData
-        }
+        if (typeof serviceData === 'boolean') return serviceData
+        return Array.isArray(serviceData) && serviceData.length > 0
+      })
+    }
 
-        if (service === 'vdc_vault' && Array.isArray(serviceData)) {
-          if (!tier && !edition) return true
+    // Filter by tier (only applicable to vdc_vault)
+    if (tier && service === 'vdc_vault') {
+      filteredRegions = filteredRegions.filter(r => {
+        const vaultData = r.services.vdc_vault
+        return Array.isArray(vaultData) && vaultData.some(v => v.tier === tier)
+      })
+    }
 
-          return serviceData.some(config => {
-            const tierMatch = !tier || config.tier === tier
-            const editionMatch = !edition || config.edition === edition
-            return tierMatch && editionMatch
-          })
-        }
-
-        return false
+    // Filter by edition (only applicable to vdc_vault)
+    if (edition && service === 'vdc_vault') {
+      filteredRegions = filteredRegions.filter(r => {
+        const vaultData = r.services.vdc_vault
+        return Array.isArray(vaultData) && vaultData.some(v => v.edition === edition)
       })
     }
 
