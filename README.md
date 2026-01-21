@@ -95,6 +95,51 @@ Found incorrect or missing data? We have issue templates to make reporting easy:
 
 Want to submit a fix directly? PRs welcome! The PR template will guide you through providing source verification.
 
+## 🤖 Automated Region Maintenance
+
+To keep the map data up-to-date, we've implemented automated scraping and validation of Veeam's official documentation.
+
+### How It Works
+
+A weekly GitHub Actions workflow automatically:
+
+1. **Scrapes** official Veeam Data Cloud helpcenter pages for service availability:
+   - [Microsoft 365 Protection regions](https://helpcenter.veeam.com/docs/vdc/userguide/m365_region_availability.html)
+   - [Azure Protection regions](https://helpcenter.veeam.com/docs/vdc/userguide/azure_regions.html)
+   - [Entra ID Protection regions](https://helpcenter.veeam.com/docs/vdc/userguide/entra_id_regions.html)
+   - [Salesforce regions](https://helpcenter.veeam.com/docs/vdc/userguide/sf_regions.html)
+
+2. **Compares** scraped data with the repository's region YAML files
+
+3. **Creates GitHub issues** automatically for:
+   - Missing regions found in Veeam docs but not in the repo
+   - Missing services in existing regions
+   - Services that may have been removed (for verification)
+
+4. **Skips VDC Vault** as its region information is not available in public documentation (must be maintained manually)
+
+### Running Locally
+
+You can test the scraper and issue generator locally:
+
+```bash
+# Scrape Veeam documentation and compare with current data
+npm run scrape:regions
+
+# Generate issue data from discrepancies (dry run)
+npm run scrape:issues -- --dry-run
+
+# View the results
+cat region-discrepancies.json
+```
+
+### Workflow Schedule
+
+- **Automated run:** Every Monday at 9:00 AM UTC
+- **Manual trigger:** Available via GitHub Actions UI for testing
+
+Issues created by the automation are labeled with `automated` for easy identification and filtering.
+
 ## 🎨 Customization
 
 * **Icons:** defined in the `getServiceIcon()` function in `layouts/index.html`. They are inline SVGs.
