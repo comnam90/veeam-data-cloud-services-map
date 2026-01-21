@@ -128,7 +128,9 @@ jobs:
             echo "Creating issue: $TITLE"
             
             # Check if issue already exists to avoid duplicates
-            EXISTING=$(gh issue list --limit 100 --search "in:title \"$TITLE\"" --json title --jq 'length')
+            # Escape double quotes in title for search query
+            ESCAPED_TITLE=$(echo "$TITLE" | sed 's/"/\\"/g')
+            EXISTING=$(gh issue list --limit 100 --search "in:title \"$ESCAPED_TITLE\"" --json title --jq 'length')
             
             if [ "$EXISTING" -gt 0 ]; then
               echo "⚠️  Issue already exists, skipping: $TITLE"

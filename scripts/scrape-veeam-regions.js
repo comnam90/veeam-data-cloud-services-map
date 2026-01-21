@@ -348,7 +348,10 @@ function normalizeRegionText(text, removeSpaces = false) {
   let normalized = text.toLowerCase().trim();
   
   // Handle common abbreviations and variations
+  // Order matters: more specific patterns first
   normalized = normalized
+    .replace(/\bnorth europe\b/g, 'eu north')
+    .replace(/\bsouth europe\b/g, 'eu south')
     .replace(/\beuropean\b/g, 'eu')
     .replace(/\bamerica\b/g, 'us')
     .replace(/\bunited states\b/g, 'us')
@@ -381,49 +384,72 @@ function findMatchingRegion(scrapedRegion, currentRegions) {
     if (scrapedRegion.regionName) {
       const normalizedScrapedName = normalizeRegionText(scrapedRegion.regionName);
       const normalizedCurrentName = normalizeRegionText(data.name);
+      const currentNameWithoutParens = extractRegionNameWithoutParentheses(data.name);
+      const normalizedCurrentNameWithoutParens = normalizeRegionText(currentNameWithoutParens);
       
-      // Try exact match after normalization
+      // Priority 1: Exact match after normalization
+      // E.g., "east us" === "east us"
+      if (normalizedScrapedName === normalizedCurrentNameWithoutParens) {
+        return data;
+      }
+      
+      // Priority 2: Exact match with parenthetical content
+      // E.g., "east us" matches "east us (virginia)"
+      if (normalizedScrapedName === normalizedCurrentName) {
+        return data;
+      }
+      
+      // Priority 3: Word boundary match to avoid "West US" matching "West US 2"
+      // Use word boundaries to ensure we match complete words
+      const scrapedWords = normalizedScrapedName.split(/\s+/);
+      const currentWords = normalizedCurrentNameWithoutParens.split(/\s+/);
+      
+      // Check if all words from scraped name appear in current name in order
+      if (scrapedWords.length > 0 && currentWords.length > 0) {
+        let scrapedIdx = 0;
+        for (const currentWord of currentWords) {
+          if (scrapedIdx < scrapedWords.length && currentWord === scrapedWords[scrapedIdx]) {
+            scrapedIdx++;
+          }
+        }
+        // If all scraped words matched in order and counts match, it's a match
+        if (scrapedIdx === scrapedWords.length && scrapedWords.length === currentWords.length) {
+          return data;
+        }
+      }
+      
+      // Priority 4: Substring match (less specific, used for partial matches)
       // E.g., "East US" should match "East US (Virginia)"
       if (normalizedCurrentName.includes(normalizedScrapedName)) {
         return data;
       }
       
-      // Also check if the scraped name contains the current name
-      // E.g., "East US 2" might partially match "East US"
-      const currentNameWithoutParens = extractRegionNameWithoutParentheses(data.name);
-      if (normalizedScrapedName.includes(normalizeRegionText(currentNameWithoutParens))) {
-        return data;
-      }
-      
-      // Try matching without spaces
+      // Priority 5: Try matching without spaces for compound names
       const normalizedScrapedNoSpaces = normalizeRegionText(normalizedScrapedName, true);
       const normalizedCurrentNoSpaces = normalizeRegionText(currentNameWithoutParens, true);
       
-      if (normalizedCurrentNoSpaces.includes(normalizedScrapedNoSpaces) ||
-          normalizedScrapedNoSpaces.includes(normalizedCurrentNoSpaces)) {
+      if (normalizedScrapedNoSpaces === normalizedCurrentNoSpaces) {
         return data;
       }
       
-      // Check aliases if available
+      // Priority 6: Check aliases if available
       // E.g., "India Central" might match alias "India" in "Central India" region
       if (data.aliases && Array.isArray(data.aliases)) {
         for (const alias of data.aliases) {
           const normalizedAlias = normalizeRegionText(alias);
           
-          // Check if scraped name contains the alias
-          if (normalizedScrapedName.includes(normalizedAlias)) {
+          // Exact alias match
+          if (normalizedScrapedName === normalizedAlias) {
             return data;
           }
           
-          // Check if alias contains the scraped name
-          if (normalizedAlias.includes(normalizedScrapedName)) {
+          // Check if scraped name contains the alias (for longer aliases)
+          if (normalizedScrapedName.includes(normalizedAlias) && normalizedAlias.length > 3) {
             return data;
           }
           
-          // Check without spaces
-          const normalizedAliasNoSpaces = normalizeRegionText(alias, true);
-          if (normalizedScrapedNoSpaces.includes(normalizedAliasNoSpaces) ||
-              normalizedAliasNoSpaces.includes(normalizedScrapedNoSpaces)) {
+          // Check if alias contains the scraped name (for shorter aliases)
+          if (normalizedAlias.includes(normalizedScrapedName) && normalizedScrapedName.length > 3) {
             return data;
           }
         }

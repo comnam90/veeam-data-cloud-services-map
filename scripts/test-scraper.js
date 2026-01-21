@@ -274,7 +274,53 @@ async function runTests() {
            'Should not flag any missing services when both match');
   });
 
-  // Test 8: formatMissingRegionIssue creates valid issue
+  // Test 8: findMatchingRegion avoids false positives with similar names
+  await test('findMatchingRegion avoids false positives for similar region names', async () => {
+    const scrapedRegion = {
+      provider: 'Azure',
+      regionName: 'West US',
+      regionCode: null,
+      serviceKey: 'vdc_m365'
+    };
+    
+    const currentRegions = [
+      {
+        data: {
+          id: 'azure-westus',
+          name: 'West US (California)',
+          provider: 'Azure',
+          services: { vdc_m365: true }
+        }
+      },
+      {
+        data: {
+          id: 'azure-westus2',
+          name: 'West US 2 (Washington)',
+          provider: 'Azure',
+          services: { vdc_m365: true }
+        }
+      },
+      {
+        data: {
+          id: 'azure-westus3',
+          name: 'West US 3 (Arizona)',
+          provider: 'Azure',
+          services: { vdc_m365: true }
+        }
+      }
+    ];
+    
+    const matchedRegion = findMatchingRegion(scrapedRegion, currentRegions);
+    
+    // Should match "West US" exactly, not "West US 2" or "West US 3"
+    assert(matchedRegion !== null, 'Should find a matching region');
+    assertEqual(matchedRegion.id, 'azure-westus', 
+                'Should match "West US" exactly, not "West US 2" or "West US 3"');
+    assertEqual(matchedRegion.name, 'West US (California)',
+                'Should match the correct region by name');
+  });
+
+  // Test 9: formatMissingRegionIssue creates valid issue
   await test('formatMissingRegionIssue creates valid GitHub issue format', async () => {
     const region = {
       provider: 'AWS',
@@ -294,7 +340,7 @@ async function runTests() {
     assert(issue.labels.includes('automated'), 'Should have automated label');
   });
 
-  // Test 9: formatMissingServiceIssue creates valid issue
+  // Test 10: formatMissingServiceIssue creates valid issue
   await test('formatMissingServiceIssue creates valid GitHub issue format', async () => {
     const service = {
       regionId: 'aws-us-east-1',
@@ -313,7 +359,7 @@ async function runTests() {
     assert(issue.labels.includes('automated'), 'Should have automated label');
   });
 
-  // Test 10: formatExtraServiceIssue creates valid issue
+  // Test 11: formatExtraServiceIssue creates valid issue
   await test('formatExtraServiceIssue creates valid GitHub issue format', async () => {
     const service = {
       regionId: 'aws-us-east-1',
@@ -331,7 +377,7 @@ async function runTests() {
     assert(issue.labels.includes('needs-verification'), 'Should have needs-verification label');
   });
 
-  // Test 11: VEEAM_DOCS_URLS contains all expected services
+  // Test 12: VEEAM_DOCS_URLS contains all expected services
   await test('VEEAM_DOCS_URLS contains all required service URLs', async () => {
     assert(VEEAM_DOCS_URLS.vdc_m365, 'Should have M365 URL');
     assert(VEEAM_DOCS_URLS.vdc_azure_backup, 'Should have Azure backup URL');
@@ -351,7 +397,7 @@ async function runTests() {
            'vdc_vault URL should be from www.veeam.com');
   });
 
-  // Test 12: SERVICE_NAMES contains display names
+  // Test 13: SERVICE_NAMES contains display names
   await test('SERVICE_NAMES provides display names for all services', async () => {
     assert(SERVICE_NAMES.vdc_m365, 'Should have M365 display name');
     assert(SERVICE_NAMES.vdc_azure_backup, 'Should have Azure backup display name');
