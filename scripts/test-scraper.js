@@ -11,6 +11,7 @@ const fs = require('fs');
 
 const {
   parseRegionTable,
+  parseVaultFAQ,
   normalizeRegionCode,
   findMatchingRegion,
   compareRegions,
@@ -404,6 +405,114 @@ async function runTests() {
     assert(SERVICE_NAMES.vdc_entra_id, 'Should have Entra ID display name');
     assert(SERVICE_NAMES.vdc_salesforce, 'Should have Salesforce display name');
     assert(SERVICE_NAMES.vdc_vault, 'Should have Vault display name');
+  });
+
+  // Test 14: parseVaultFAQ handles Non-Core appearing before Core (regex lookbehind test)
+  await test('parseVaultFAQ handles Non-Core appearing before Core', async () => {
+    const html = `
+      <h3>Azure regions support?</h3>
+      <p>Here is the list:</p>
+      <p><strong>Non-Core Regions:</strong></p>
+      <ul>
+        <li>Region A</li>
+      </ul>
+      <p><strong>Core Regions:</strong></p>
+      <ul>
+        <li>Region B</li>
+      </ul>
+    `;
+    
+    const regions = parseVaultFAQ(html);
+    
+    const regionA = regions.find(r => r.regionName === 'Region A');
+    const regionB = regions.find(r => r.regionName === 'Region B');
+    
+    assert(regionA, 'Should find Region A');
+    assertEqual(regionA.tier, 'Non-Core', 'Region A should be Non-Core');
+    
+    assert(regionB, 'Should find Region B');
+    assertEqual(regionB.tier, 'Core', 'Region B should be Core');
+    
+    // Ensure Region A is NOT also marked as Core (which would happen with the regex bug)
+    const regionACore = regions.find(r => r.regionName === 'Region A' && r.tier === 'Core');
+    assert(!regionACore, 'Region A should NOT be marked as Core');
+  });
+
+  // Test 15: findMatchingRegion supports same words any order
+  await test('findMatchingRegion supports same words any order', async () => {
+    const scrapedRegion = {
+      provider: 'Azure',
+      regionName: 'India Central',
+      regionCode: null,
+      serviceKey: 'vdc_vault'
+    };
+    
+    const currentRegions = [
+      {
+        data: {
+          id: 'azure-india-central',
+          name: 'Central India (Pune)',
+          provider: 'Azure',
+          services: {}
+        }
+      }
+    ];
+    
+    const match = findMatchingRegion(scrapedRegion, currentRegions);
+    assert(match !== null, 'Should find match for India Central -> Central India');
+    assertEqual(match.name, 'Central India (Pune)', 'Should match correct region');
+  });
+
+  // Test 16: findMatchingRegion prevents false positive alias matches
+  await test('findMatchingRegion prevents false positive alias matches', async () => {
+    const scrapedRegion = {
+      provider: 'Azure',
+      regionName: 'Australia Southeast',
+      regionCode: null,
+      serviceKey: 'vdc_vault'
+    };
+    
+    const currentRegions = [
+      {
+        data: {
+          id: 'azure-au-east',
+          name: 'Australia East (Sydney)',
+          provider: 'Azure',
+          aliases: ['Australia', 'Sydney'],
+          services: {}
+        }
+      }
+    ];
+    
+    // "Australia Southeast" contains "Australia", but it shouldn't match "Australia East"
+    // just because of the alias, as it implies a different region
+    const match = findMatchingRegion(scrapedRegion, currentRegions);
+    assert(match === null, 'Should NOT match Australia Southeast to Australia East');
+  });
+
+  // Test 17: parseVaultFAQ handles asterisk in Core regions
+  await test('parseVaultFAQ handles asterisk in Core regions', async () => {
+    const html = `
+      <h3>Azure regions support?</h3>
+      <p><strong>Core Regions:</strong></p>
+      <ul>
+        <li>Region Standard</li>
+        <li>Region Restricted*</li>
+      </ul>
+    `;
+    
+    const regions = parseVaultFAQ(html);
+    
+    const standard = regions.find(r => r.regionName === 'Region Standard');
+    const restricted = regions.find(r => r.regionName === 'Region Restricted');
+    
+    assert(standard, 'Should find Region Standard');
+    assert(standard.edition.includes('Advanced'), 'Standard region should have Advanced edition');
+    
+    assert(restricted, 'Should find Region Restricted');
+    assert(restricted.edition.length === 1, 'Restricted region should have only 1 edition');
+    assert(restricted.edition[0] === 'Foundation', 'Restricted region should be Foundation only');
+    assert(!restricted.edition.includes('Advanced'), 'Restricted region should NOT have Advanced edition');
   });
 
   // Print summary

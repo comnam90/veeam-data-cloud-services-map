@@ -153,7 +153,7 @@ function parseVaultFAQ(html) {
     const azureSection = azureMatch[0];
     
     // Extract Core Regions
-    const coreMatch = azureSection.match(/Core Regions:[\s\S]*?<ul>([\s\S]*?)<\/ul>/i);
+    const coreMatch = azureSection.match(/(?<!Non-)Core Regions:[\s\S]*?<ul>([\s\S]*?)<\/ul>/i);
     if (coreMatch) {
       const coreList = coreMatch[1];
       const liPattern = /<li>(.*?)<\/li>/gi;
@@ -161,6 +161,11 @@ function parseVaultFAQ(html) {
       
       for (const match of coreRegions) {
         let regionName = match[1].replace(/<[^>]+>/g, '').trim();
+        
+        // Check if Advanced is unavailable (marked with *)
+        const hasAdvanced = !match[1].includes('*');
+        const editions = hasAdvanced ? ['Foundation', 'Advanced'] : ['Foundation'];
+
         // Remove footnote markers like *
         regionName = regionName.replace(/\*/g, '');
         
@@ -170,7 +175,7 @@ function parseVaultFAQ(html) {
             regionName: regionName,
             regionCode: null,
             serviceKey: 'vdc_vault',
-            edition: ['Foundation', 'Advanced'], // Might be limited, but start with both
+            edition: editions,
             tier: 'Core'
           });
         }
@@ -417,6 +422,19 @@ function findMatchingRegion(scrapedRegion, currentRegions) {
           return data;
         }
       }
+
+      // Priority 3.5: Same words, any order
+      // E.g. "India Central" matches "Central India"
+      if (scrapedWords.length > 0 && currentWords.length > 0) {
+        const scrapedWordsSet = new Set(scrapedWords);
+        const currentWordsSet = new Set(currentWords);
+        
+        if (scrapedWordsSet.size === currentWordsSet.size && 
+            scrapedWords.length === currentWords.length &&
+            [...scrapedWordsSet].every(word => currentWordsSet.has(word))) {
+          return data;
+        }
+      }
       
       // Priority 4: Substring match (less specific, used for partial matches)
       // E.g., "East US" should match "East US (Virginia)"
@@ -433,23 +451,13 @@ function findMatchingRegion(scrapedRegion, currentRegions) {
       }
       
       // Priority 6: Check aliases if available
-      // E.g., "India Central" might match alias "India" in "Central India" region
+      // E.g., scraped "South Africa" matches alias "South Africa" exactly
       if (data.aliases && Array.isArray(data.aliases)) {
         for (const alias of data.aliases) {
           const normalizedAlias = normalizeRegionText(alias);
           
           // Exact alias match
           if (normalizedScrapedName === normalizedAlias) {
-            return data;
-          }
-          
-          // Check if scraped name contains the alias (for longer aliases)
-          if (normalizedScrapedName.includes(normalizedAlias) && normalizedAlias.length > 3) {
-            return data;
-          }
-          
-          // Check if alias contains the scraped name (for shorter aliases)
-          if (normalizedAlias.includes(normalizedScrapedName) && normalizedScrapedName.length > 3) {
             return data;
           }
         }
