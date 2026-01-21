@@ -346,6 +346,14 @@ function normalizeRegionCode(code) {
 function normalizeRegionText(text, removeSpaces = false) {
   if (!text) return '';
   let normalized = text.toLowerCase().trim();
+  
+  // Handle common abbreviations and variations
+  normalized = normalized
+    .replace(/\beuropean\b/g, 'eu')
+    .replace(/\bamerica\b/g, 'us')
+    .replace(/\bunited states\b/g, 'us')
+    .replace(/\bmiddle east\b/g, 'me');
+  
   if (removeSpaces) {
     normalized = normalized.replace(/\s+/g, '');
   }
@@ -355,6 +363,7 @@ function normalizeRegionText(text, removeSpaces = false) {
 /**
  * Find matching region in current data
  * Updated to work primarily with region names since Veeam docs don't provide codes
+ * Also checks aliases for better matching
  */
 function findMatchingRegion(scrapedRegion, currentRegions) {
   // Since we don't have region codes from Veeam docs, match primarily by name
@@ -393,6 +402,31 @@ function findMatchingRegion(scrapedRegion, currentRegions) {
       if (normalizedCurrentNoSpaces.includes(normalizedScrapedNoSpaces) ||
           normalizedScrapedNoSpaces.includes(normalizedCurrentNoSpaces)) {
         return data;
+      }
+      
+      // Check aliases if available
+      // E.g., "India Central" might match alias "India" in "Central India" region
+      if (data.aliases && Array.isArray(data.aliases)) {
+        for (const alias of data.aliases) {
+          const normalizedAlias = normalizeRegionText(alias);
+          
+          // Check if scraped name contains the alias
+          if (normalizedScrapedName.includes(normalizedAlias)) {
+            return data;
+          }
+          
+          // Check if alias contains the scraped name
+          if (normalizedAlias.includes(normalizedScrapedName)) {
+            return data;
+          }
+          
+          // Check without spaces
+          const normalizedAliasNoSpaces = normalizeRegionText(alias, true);
+          if (normalizedScrapedNoSpaces.includes(normalizedAliasNoSpaces) ||
+              normalizedAliasNoSpaces.includes(normalizedScrapedNoSpaces)) {
+            return data;
+          }
+        }
       }
     }
   }
