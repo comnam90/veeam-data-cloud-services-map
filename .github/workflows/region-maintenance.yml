@@ -60,15 +60,21 @@ jobs:
           EXTRA_SERVICES=$(jq '.discrepancies.extraServices | length' region-discrepancies.json)
           ERRORS=$(jq '.errors | length' region-discrepancies.json)
           
-          TOTAL=$((MISSING_REGIONS + MISSING_SERVICES + EXTRA_SERVICES))
+          # Only count missing regions and services as actionable issues
+          # Extra services are informational and may be false positives if scraping fails
+          TOTAL=$((MISSING_REGIONS + MISSING_SERVICES))
           
           echo "Missing Regions: $MISSING_REGIONS"
           echo "Missing Services: $MISSING_SERVICES"
-          echo "Extra Services: $EXTRA_SERVICES"
+          echo "Extra Services: $EXTRA_SERVICES (informational)"
           echo "Scraping Errors: $ERRORS"
-          echo "Total Issues: $TOTAL"
+          echo "Actionable Issues: $TOTAL"
           
-          if [ $TOTAL -gt 0 ]; then
+          # If all scraping failed (4 errors), don't create issues for extra services
+          if [ $ERRORS -eq 4 ] && [ $TOTAL -eq 0 ]; then
+            echo "⚠️  All scraping failed - likely network issue. Skipping issue creation."
+            echo "has_discrepancies=false" >> $GITHUB_OUTPUT
+          elif [ $TOTAL -gt 0 ]; then
             echo "has_discrepancies=true" >> $GITHUB_OUTPUT
           else
             echo "has_discrepancies=false" >> $GITHUB_OUTPUT
@@ -77,15 +83,23 @@ jobs:
           echo "missing_regions=$MISSING_REGIONS" >> $GITHUB_OUTPUT
           echo "missing_services=$MISSING_SERVICES" >> $GITHUB_OUTPUT
           echo "extra_services=$EXTRA_SERVICES" >> $GITHUB_OUTPUT
+          echo "errors=$ERRORS" >> $GITHUB_OUTPUT
       
       - name: Generate issue data
         if: steps.check_discrepancies.outputs.has_discrepancies == 'true'
         run: |
+          # Skip extra services if there were many scraping errors
+          SKIP_EXTRA=""
+          if [ "${{ steps.check_discrepancies.outputs.errors }}" -ge 2 ]; then
+            echo "⚠️  Multiple scraping errors detected. Skipping 'extra services' issues."
+            SKIP_EXTRA="--skip-extra-services"
+          fi
+          
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             echo "🧪 Running in dry-run mode"
-            node scripts/create-region-issues.js region-discrepancies.json --dry-run
+            node scripts/create-region-issues.js region-discrepancies.json --dry-run $SKIP_EXTRA
           else
-            node scripts/create-region-issues.js region-discrepancies.json
+            node scripts/create-region-issues.js region-discrepancies.json $SKIP_EXTRA
           fi
       
       - name: Create GitHub issues
@@ -150,10 +164,14 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "- **Missing Regions:** ${{ steps.check_discrepancies.outputs.missing_regions }}" >> $GITHUB_STEP_SUMMARY
             echo "- **Missing Services:** ${{ steps.check_discrepancies.outputs.missing_services }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Extra Services:** ${{ steps.check_discrepancies.outputs.extra_services }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Extra Services:** ${{ steps.check_discrepancies.outputs.extra_services }} (informational)" >> $GITHUB_STEP_SUMMARY
+            echo "- **Scraping Errors:** ${{ steps.check_discrepancies.outputs.errors }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             
-            if [ "${{ steps.check_discrepancies.outputs.has_discrepancies }}" = "true" ]; then
+            if [ "${{ steps.check_discrepancies.outputs.errors }}" -eq 4 ]; then
+              echo "⚠️  All scraping attempts failed. This is likely a temporary network issue." >> $GITHUB_STEP_SUMMARY
+              echo "The workflow will retry on the next scheduled run." >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ steps.check_discrepancies.outputs.has_discrepancies }}" = "true" ]; then
               if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
                 echo "✅ Issues identified (dry run mode - no issues created)" >> $GITHUB_STEP_SUMMARY
               else
