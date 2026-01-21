@@ -33,6 +33,71 @@ export function getRegionStats() {
 }
 
 /**
+ * Filter criteria interface
+ */
+export interface RegionFilters {
+  provider?: string
+  service?: string
+  tier?: string
+  edition?: string
+  country?: string
+}
+
+/**
+ * Filter regions based on provided criteria
+ */
+export function filterRegions(regions: Region[], filters: RegionFilters): Region[] {
+  let filtered = [...regions]
+  const { provider, service, tier, edition, country } = filters
+
+  if (provider) {
+    filtered = filtered.filter(r => r.provider === provider)
+  }
+
+  if (country) {
+    const countryLower = country.toLowerCase()
+    filtered = filtered.filter(r => {
+      if (r.name.toLowerCase().includes(countryLower)) return true
+      if (r.aliases && Array.isArray(r.aliases)) {
+        return r.aliases.some(alias => alias.toLowerCase().includes(countryLower))
+      }
+      return false
+    })
+  }
+
+  if (service) {
+    filtered = filtered.filter(r => {
+      const hasService = r.services && (r.services as any)[service]
+      if (!hasService) return false
+
+      // For boolean services, just check existence
+      if (typeof (r.services as any)[service] === 'boolean') {
+        return (r.services as any)[service]
+      }
+
+      // For tiered services (vdc_vault), check array
+      return Array.isArray((r.services as any)[service]) && (r.services as any)[service].length > 0
+    })
+  }
+
+  // Filter by tier and/or edition (only applicable to vdc_vault)
+  if (service === 'vdc_vault' && (tier || edition)) {
+    filtered = filtered.filter(r => {
+      const vaultData = r.services.vdc_vault
+      if (!Array.isArray(vaultData)) return false
+
+      return vaultData.some(config => {
+        const tierMatch = !tier || config.tier === tier
+        const editionMatch = !edition || config.edition === edition
+        return tierMatch && editionMatch
+      })
+    })
+  }
+
+  return filtered
+}
+
+/**
  * Get all available services metadata
  */
 export function getServices(): Service[] {

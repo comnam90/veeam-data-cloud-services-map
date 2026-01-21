@@ -205,7 +205,338 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 ---
 
-### 3. GET /api/v1/services
+### 3. GET /api/v1/regions/nearest - Find Nearest Regions
+
+**Purpose:** Find the N closest Veeam Data Cloud regions to any geographic location
+
+**When to use:**
+- Infrastructure planning: Find closest regions for disaster recovery
+- Latency optimization: Identify nearest backup endpoints
+- Multi-region strategy: Discover geographically distributed options
+- Service discovery: Find closest regions with specific services
+
+**URL:** `GET /api/v1/regions/nearest`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Values | Description |
+|-----------|------|----------|--------|-------------|
+| `lat` | float | Yes | -90 to 90 | Latitude of source location in decimal degrees |
+| `lng` | float | Yes | -180 to 180 | Longitude of source location in decimal degrees |
+| `limit` | integer | No | 0-20 | Max results to return. Default: 5, Max: 20, 0=unlimited |
+| `provider` | string | No | `AWS`, `Azure` | Filter to specific cloud provider |
+| `service` | string | No | `vdc_vault`, `vdc_m365`, `vdc_entra_id`, `vdc_salesforce`, `vdc_azure_backup` | Filter to regions offering this service |
+| `tier` | string | No | `Core`, `Non-Core` | Filter vdc_vault by tier (requires `service=vdc_vault`) |
+| `edition` | string | No | `Foundation`, `Advanced` | Filter vdc_vault by edition (requires `service=vdc_vault`) |
+
+**Important Validation Rules:**
+- `tier` and `edition` are ONLY valid when `service=vdc_vault`
+- Passing `tier` or `edition` without `service=vdc_vault` returns 400 error
+- Provider is case-sensitive: must be exactly `AWS` or `Azure`
+
+**Response Schema:**
+
+```json
+{
+  "query": {
+    "lat": 35.6762,
+    "lng": 139.6503,
+    "limit": 5,
+    "service": "vdc_vault",
+    "provider": "AWS",
+    "tier": "Core",
+    "edition": null
+  },
+  "results": [
+    {
+      "region": {
+        "id": "aws-ap-northeast-1",
+        "name": "Asia Pacific (Tokyo)",
+        "provider": "AWS",
+        "coords": [35.6762, 139.2],
+        "aliases": ["Tokyo", "Japan"],
+        "services": {
+          "vdc_vault": [
+            { "edition": "Foundation", "tier": "Core" },
+            { "edition": "Advanced", "tier": "Core" }
+          ],
+          "vdc_m365": true
+        }
+      },
+      "distance": {
+        "km": 42.15,
+        "miles": 26.19
+      }
+    }
+  ],
+  "count": 1
+}
+```
+
+**Distance Calculation:**
+- Uses Haversine formula for great-circle distance
+- Accurate for Earth's spherical approximation
+- Returns distances rounded to 2 decimal places
+
+**Sorting & Tie-Breaking:**
+- Results sorted by distance ascending (closest first)
+- Equal distances tie-break by region.id alphabetically
+- Guarantees deterministic ordering
+
+**Example Queries:**
+
+1. Find 3 closest regions to Tokyo:
+   ```
+   GET /api/v1/regions/nearest?lat=35.6762&lng=139.6503&limit=3
+   ```
+
+2. Find closest AWS regions with vdc_vault:
+   ```
+   GET /api/v1/regions/nearest?lat=40.7128&lng=-74.0060&provider=AWS&service=vdc_vault
+   ```
+
+3. Find all Azure regions sorted by distance (unlimited):
+   ```
+   GET /api/v1/regions/nearest?lat=51.5074&lng=-0.1278&provider=Azure&limit=0
+   ```
+
+4. Find closest Core tier vdc_vault regions:
+   ```
+   GET /api/v1/regions/nearest?lat=37.7749&lng=-122.4194&service=vdc_vault&tier=Core&limit=10
+   ```
+
+5. Find closest Advanced edition Core tier regions:
+   ```
+   GET /api/v1/regions/nearest?lat=0&lng=0&service=vdc_vault&tier=Core&edition=Advanced
+   ```
+
+**Response Codes:**
+
+- `200 OK` - Successfully found nearest regions (may return 0 results if filters exclude all)
+- `400 Bad Request` - Invalid coordinates, limit out of range, or invalid filter combination
+
+**Common Error Scenarios:**
+
+```json
+{
+  "error": "Invalid parameter combination",
+  "code": "INVALID_PARAMETER",
+  "message": "tier and edition parameters are only valid with service=vdc_vault",
+  "parameter": "tier",
+  "value": "Core"
+}
+```
+
+**Use Cases:**
+
+1. **Disaster Recovery Planning:** Find 3-5 geographically distributed regions
+2. **Latency Optimization:** Identify single closest region for primary backup
+3. **Multi-Cloud Strategy:** Compare AWS vs Azure closest regions
+4. **Service Availability:** Check which nearby regions offer specific services
+5. **Cost Optimization:** Filter by Core tier to find most cost-effective nearby regions
+
+---
+
+### 4. GET /api/v1/regions/compare - Compare Multiple Regions
+
+**Purpose:** Compare service availability across 2-5 cloud regions to identify differences and commonalities, helping users make informed decisions when planning multi-region or hybrid cloud deployments.
+
+**When to use:**
+- Planning multi-region disaster recovery deployments
+- Comparing regions across cloud providers (AWS vs Azure)
+- Selecting a primary region based on service requirements
+- Identifying service gaps before deployment
+- Analyzing hybrid cloud deployment options
+- Building region selection tools or dashboards
+- Automating deployment validation checks
+
+**URL:** `GET /api/v1/regions/compare`
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Values | Description |
+|-----------|------|----------|--------|-------------|
+| `ids` | string | Yes | Comma-separated region IDs | List of 2-5 region IDs to compare (e.g., "aws-us-east-1,azure-us-east") |
+
+**Validation Rules:**
+- Minimum 2 region IDs required
+- Maximum 5 region IDs allowed (prevents overly large responses)
+- All region IDs must exist (returns 404 if any are invalid)
+- Duplicate IDs are automatically deduplicated
+- Whitespace around IDs is trimmed
+- Region IDs are case-sensitive
+
+**Response Schema:**
+
+```json
+{
+  "regions": [
+    {
+      "id": "aws-us-east-1",
+      "name": "US East 1 (N. Virginia)",
+      "provider": "AWS",
+      "coords": [38.9, -77.4],
+      "services": { "vdc_vault": [...], "vdc_m365": true }
+    },
+    {
+      "id": "azure-us-east",
+      "name": "East US (Virginia)",
+      "provider": "Azure",
+      "coords": [37.3719, -79.8164],
+      "services": { "vdc_vault": [...], "vdc_azure_backup": true }
+    }
+  ],
+  "comparison": {
+    "vdc_vault": {
+      "availableIn": ["aws-us-east-1", "azure-us-east"],
+      "missingFrom": [],
+      "isCommon": true,
+      "details": {
+        "aws-us-east-1": [
+          { "edition": "Foundation", "tier": "Core" },
+          { "edition": "Advanced", "tier": "Core" }
+        ],
+        "azure-us-east": [
+          { "edition": "Foundation", "tier": "Non-Core" },
+          { "edition": "Advanced", "tier": "Core" }
+        ]
+      }
+    },
+    "vdc_m365": {
+      "availableIn": ["azure-us-east"],
+      "missingFrom": ["aws-us-east-1"],
+      "isCommon": false,
+      "details": {
+        "azure-us-east": true
+      }
+    },
+    "vdc_entra_id": {
+      "availableIn": [],
+      "missingFrom": ["aws-us-east-1", "azure-us-east"],
+      "isCommon": false,
+      "details": {}
+    }
+  },
+  "summary": {
+    "totalServices": 5,
+    "commonServices": 2,
+    "partialServices": 2,
+    "unavailableServices": 1,
+    "commonServiceIds": ["vdc_vault", "vdc_azure_backup"],
+    "partialServiceIds": ["vdc_m365", "vdc_salesforce"],
+    "unavailableServiceIds": ["vdc_entra_id"]
+  }
+}
+```
+
+**Response Field Explanations:**
+
+1. **regions** - Full details of all compared regions (same structure as GET /api/v1/regions/{id})
+
+2. **comparison** - Service-by-service breakdown:
+   - **availableIn** - Array of region IDs where service is available
+   - **missingFrom** - Array of region IDs where service is NOT available
+   - **isCommon** - `true` if service is available in ALL compared regions
+   - **details** - Service configuration per region:
+     - For tiered services (vdc_vault): Array of edition/tier combinations
+     - For boolean services: `true` if available
+     - Missing from details = not available in that region
+
+3. **summary** - High-level statistics:
+   - **totalServices** - Total VDC services analyzed (always 5)
+   - **commonServices** - Services available in ALL regions
+   - **partialServices** - Services available in SOME but not all regions
+   - **unavailableServices** - Services not available in ANY region
+   - **commonServiceIds/partialServiceIds/unavailableServiceIds** - Lists of service IDs in each category
+
+**Example Queries:**
+
+1. **Compare US East regions across providers:**
+   ```
+   GET /api/v1/regions/compare?ids=aws-us-east-1,azure-us-east
+   ```
+   Use case: Hybrid cloud planning, comparing AWS vs Azure in same geographic area
+
+2. **Multi-region disaster recovery planning:**
+   ```
+   GET /api/v1/regions/compare?ids=aws-us-east-1,aws-eu-west-2,aws-ap-northeast-1
+   ```
+   Use case: Identify common services across 3 continents for global DR strategy
+
+3. **Hybrid Azure deployment:**
+   ```
+   GET /api/v1/regions/compare?ids=azure-us-east,azure-west-europe,azure-au-east
+   ```
+   Use case: Ensure required services available across Azure regions
+
+4. **Maximum comparison (5 regions):**
+   ```
+   GET /api/v1/regions/compare?ids=aws-us-east-1,azure-us-east,aws-eu-west-2,aws-ap-northeast-1,azure-west-europe
+   ```
+   Use case: Comprehensive multi-region, multi-provider analysis
+
+**Response Codes:**
+
+- `200 OK` - Successful comparison
+- `400 Bad Request` - Less than 2 or more than 5 region IDs provided
+- `404 Not Found` - One or more region IDs don't exist
+
+**Error Examples:**
+
+```json
+{
+  "error": "Invalid parameter",
+  "code": "INVALID_PARAMETER",
+  "message": "At least 2 region IDs are required for comparison",
+  "parameter": "ids",
+  "value": "aws-us-east-1"
+}
+```
+
+```json
+{
+  "error": "Region not found",
+  "code": "REGION_NOT_FOUND",
+  "message": "The following region IDs were not found: invalid-region, another-invalid",
+  "parameter": "ids",
+  "value": "aws-us-east-1,invalid-region,another-invalid",
+  "allowedValues": ["invalid-region", "another-invalid"]
+}
+```
+
+**Use Cases & Patterns:**
+
+1. **Pre-deployment Validation:**
+   - Compare target regions to ensure all required services are available
+   - Identify service gaps that could block deployment
+
+2. **Cost Analysis:**
+   - Compare vdc_vault tier availability (Core vs Non-Core)
+   - Identify regions with cost-optimized service options
+
+3. **Feature Parity Checks:**
+   - Ensure all regions in a deployment have same service capabilities
+   - Flag regions with partial service availability
+
+4. **Decision Support:**
+   - Show users side-by-side comparison when selecting regions
+   - Highlight differences to inform region selection
+
+5. **Automated Deployment:**
+   - Pre-flight check: verify services available before deployment
+   - Fail fast if required services missing
+
+**Integration Tips:**
+
+- Cache comparison results for frequently compared region sets
+- Use `summary.commonServiceIds` to quickly identify universally available services
+- Check `comparison[serviceId].isCommon === true` to validate service requirements
+- Use `details` to show specific tier/edition differences in UI
+- Process `missingFrom` array to warn users about service gaps
+
+---
+
+### 5. GET /api/v1/services
 
 **Purpose:** Retrieve metadata about all Veeam Data Cloud services with comprehensive regional availability statistics.
 
@@ -336,7 +667,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 ---
 
-### 4. GET /api/v1/services/{serviceId}
+### 6. GET /api/v1/services/{serviceId}
 
 **Purpose:** Retrieve comprehensive details about a specific VDC service, including complete lists of all regions where the service is available and detailed breakdowns by cloud provider and configuration.
 
@@ -507,7 +838,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 ---
 
-### 5. GET /api/v1/health
+### 7. GET /api/v1/health
 
 **Purpose:** Comprehensive health check that validates API functionality and data availability.
 
@@ -546,7 +877,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 ---
 
-### 6. GET /api/v1/ping
+### 8. GET /api/v1/ping
 
 **Purpose:** Lightweight connectivity test with no data dependencies.
 

@@ -13,6 +13,8 @@ This API provides comprehensive information about which Veeam Data Cloud (VDC) s
 **Key Endpoints:**
 - `GET /api/v1/regions` - List all regions with optional filtering
 - `GET /api/v1/regions/{id}` - Get specific region details
+- `GET /api/v1/regions/nearest` - Find N closest regions to geographic coordinates
+- `GET /api/v1/regions/compare` - Compare service availability across 2-5 regions
 - `GET /api/v1/services` - List all VDC services with regional statistics
 - `GET /api/v1/services/{serviceId}` - Get detailed service information with region lists
 - `GET /api/v1/health` - API health check with statistics
@@ -38,6 +40,11 @@ Returns all AWS regions offering VDC Vault in Core pricing tier.
 GET /api/v1/regions?service=vdc_m365
 ```
 
+**Find nearest regions to a location:**
+```
+GET /api/v1/regions/nearest?lat=35.6762&lng=139.6503&limit=5
+```
+
 **Get service availability statistics:**
 ```
 GET /api/v1/services
@@ -61,6 +68,16 @@ GET /api/v1/regions?provider=Azure
 **Combine filters for precise results:**
 ```
 GET /api/v1/regions?provider=AWS&service=vdc_vault&edition=Advanced&tier=Core
+```
+
+**Compare regions side-by-side:**
+```
+GET /api/v1/regions/compare?ids=aws-us-east-1,azure-us-east
+```
+
+**Compare multiple regions for multi-region deployment planning:**
+```
+GET /api/v1/regions/compare?ids=aws-us-east-1,aws-eu-west-2,aws-ap-northeast-1
 ```
 
 ## Data Structure
@@ -89,7 +106,7 @@ GET /api/v1/regions?provider=AWS&service=vdc_vault&edition=Advanced&tier=Core
 
 ## Documentation
 
-- **OpenAPI Specification:** `/api/openapi.json` (OpenAPI 3.1.0)
+- **OpenAPI Specification:** `/api/openapi.json` (JSON) or `/api/openapi.yaml` (YAML)
 - **Interactive Docs:** `/api/docs` (Scalar API Reference)
 - **Full Documentation:** `/llms-full.txt` (comprehensive guide)
 - **GitHub Repository:** https://github.com/comnam90/veeam-data-cloud-services-map

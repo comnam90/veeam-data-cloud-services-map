@@ -313,3 +313,83 @@ export const ServiceDetailTieredSchema = z.object({
     },
   }),
 })
+
+/**
+ * Service comparison detail for a single service across regions
+ */
+export const ServiceComparisonSchema = z.object({
+  availableIn: z.array(z.string()).openapi({
+    description: 'List of region IDs where this service is available',
+    example: ['aws-us-east-1', 'azure-us-east'],
+  }),
+  missingFrom: z.array(z.string()).openapi({
+    description: 'List of region IDs where this service is not available',
+    example: ['aws-eu-west-1'],
+  }),
+  isCommon: z.boolean().openapi({
+    description: 'True if the service is available in all compared regions',
+    example: false,
+  }),
+  details: z.record(z.string(), z.union([
+    z.boolean(),
+    z.array(VdcVaultConfigSchema)
+  ])).openapi({
+    description: 'Service configuration details per region. For boolean services, the value is true. For tiered services like vdc_vault, the value is an array of edition-tier configurations.',
+    example: {
+      'aws-us-east-1': [
+        { edition: 'Foundation', tier: 'Core' },
+        { edition: 'Advanced', tier: 'Core' }
+      ],
+      'azure-east-us': true
+    },
+  }),
+}).openapi('ServiceComparison')
+
+/**
+ * Summary of service availability across compared regions
+ */
+export const ComparisonSummarySchema = z.object({
+  totalServices: z.number().openapi({
+    description: 'Total number of distinct VDC services analyzed',
+    example: 5,
+  }),
+  commonServices: z.number().openapi({
+    description: 'Number of services available in all compared regions',
+    example: 2,
+  }),
+  partialServices: z.number().openapi({
+    description: 'Number of services available in some but not all regions',
+    example: 2,
+  }),
+  unavailableServices: z.number().openapi({
+    description: 'Number of services not available in any compared region',
+    example: 1,
+  }),
+  commonServiceIds: z.array(z.string()).openapi({
+    description: 'IDs of services available in all compared regions',
+    example: ['vdc_vault', 'vdc_azure_backup'],
+  }),
+  partialServiceIds: z.array(z.string()).openapi({
+    description: 'IDs of services available in some but not all regions',
+    example: ['vdc_m365', 'vdc_salesforce'],
+  }),
+  unavailableServiceIds: z.array(z.string()).openapi({
+    description: 'IDs of services not available in any compared region',
+    example: ['vdc_entra_id'],
+  }),
+}).openapi('ComparisonSummary')
+
+/**
+ * Complete regions comparison response
+ */
+export const RegionsComparisonResponseSchema = z.object({
+  regions: z.array(RegionSchema).openapi({
+    description: 'Full details of all compared regions',
+  }),
+  comparison: z.record(z.string(), ServiceComparisonSchema).openapi({
+    description: 'Service-by-service comparison across all regions. Keys are service IDs (e.g., vdc_vault, vdc_m365).',
+  }),
+  summary: ComparisonSummarySchema.openapi({
+    description: 'High-level summary of service availability patterns',
+  }),
+}).openapi('RegionsComparisonResponse')
