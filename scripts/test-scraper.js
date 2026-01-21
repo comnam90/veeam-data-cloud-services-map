@@ -434,8 +434,8 @@ async function runTests() {
     assertEqual(regionB.tier, 'Core', 'Region B should be Core');
     
     // Ensure Region A is NOT also marked as Core (which would happen with the regex bug)
-    const regionA_Core = regions.find(r => r.regionName === 'Region A' && r.tier === 'Core');
-    assert(!regionA_Core, 'Region A should NOT be marked as Core');
+    const regionACore = regions.find(r => r.regionName === 'Region A' && r.tier === 'Core');
+    assert(!regionACore, 'Region A should NOT be marked as Core');
   });
 
   // Test 15: findMatchingRegion supports same words any order

@@ -451,7 +451,7 @@ function findMatchingRegion(scrapedRegion, currentRegions) {
       }
       
       // Priority 6: Check aliases if available
-      // E.g., "India Central" might match alias "India" in "Central India" region
+      // E.g., scraped "South Africa" matches alias "South Africa" exactly
       if (data.aliases && Array.isArray(data.aliases)) {
         for (const alias of data.aliases) {
           const normalizedAlias = normalizeRegionText(alias);
