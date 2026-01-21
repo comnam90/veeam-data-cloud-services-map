@@ -17,6 +17,23 @@ const VEEAM_DOCS_URLS = {
   vdc_salesforce: 'https://helpcenter.veeam.com/docs/vdc/userguide/sf_regions.html'
 };
 
+// Pattern for global region markers in Veeam tables
+const GLOBAL_REGIONS_PATTERN = /^(AMER|APJ|EMEA)$/i;
+
+/**
+ * Check if a text value is a global region marker
+ */
+function isGlobalRegionMarker(text) {
+  return GLOBAL_REGIONS_PATTERN.test(text);
+}
+
+/**
+ * Extract region name without parentheses
+ */
+function extractRegionNameWithoutParentheses(name) {
+  return name.split('(')[0].trim();
+}
+
 /**
  * Fetch HTML content from a URL with retries
  */
@@ -90,7 +107,7 @@ function parseRegionTable(html, serviceKey) {
       // Single cell = region name (due to rowspan on previous row's global region)
       const cell = cells[0];
       // Skip if it's a global region marker
-      if (!/^(AMER|APJ|EMEA)$/i.test(cell)) {
+      if (!isGlobalRegionMarker(cell)) {
         regionName = cell;
       }
     } else if (cells.length >= 2) {
@@ -99,11 +116,11 @@ function parseRegionTable(html, serviceKey) {
       const secondCell = cells[1];
       
       // Skip if first cell is global region marker and no second cell
-      if (/^(AMER|APJ|EMEA)$/i.test(firstCell) && secondCell) {
+      if (isGlobalRegionMarker(firstCell) && secondCell) {
         regionName = secondCell;
       }
       // Otherwise, if first cell is not a global region, it's the region name
-      else if (!/^(AMER|APJ|EMEA)$/i.test(firstCell)) {
+      else if (!isGlobalRegionMarker(firstCell)) {
         regionName = firstCell;
       }
     }
@@ -167,6 +184,18 @@ function normalizeRegionCode(code) {
 }
 
 /**
+ * Normalize region text for comparison
+ */
+function normalizeRegionText(text, removeSpaces = false) {
+  if (!text) return '';
+  let normalized = text.toLowerCase().trim();
+  if (removeSpaces) {
+    normalized = normalized.replace(/\s+/g, '');
+  }
+  return normalized;
+}
+
+/**
  * Find matching region in current data
  * Updated to work primarily with region names since Veeam docs don't provide codes
  */
@@ -184,8 +213,8 @@ function findMatchingRegion(scrapedRegion, currentRegions) {
     
     // Match by region name
     if (scrapedRegion.regionName) {
-      const normalizedScrapedName = scrapedRegion.regionName.toLowerCase().trim();
-      const normalizedCurrentName = data.name.toLowerCase().trim();
+      const normalizedScrapedName = normalizeRegionText(scrapedRegion.regionName);
+      const normalizedCurrentName = normalizeRegionText(data.name);
       
       // Try exact match after normalization
       // E.g., "East US" should match "East US (Virginia)"
@@ -195,13 +224,14 @@ function findMatchingRegion(scrapedRegion, currentRegions) {
       
       // Also check if the scraped name contains the current name
       // E.g., "East US 2" might partially match "East US"
-      if (normalizedScrapedName.includes(normalizedCurrentName.split('(')[0].trim())) {
+      const currentNameWithoutParens = extractRegionNameWithoutParentheses(data.name);
+      if (normalizedScrapedName.includes(normalizeRegionText(currentNameWithoutParens))) {
         return data;
       }
       
       // Try matching without spaces
-      const normalizedScrapedNoSpaces = normalizedScrapedName.replace(/\s+/g, '');
-      const normalizedCurrentNoSpaces = normalizedCurrentName.replace(/\s+/g, '').split('(')[0];
+      const normalizedScrapedNoSpaces = normalizeRegionText(normalizedScrapedName, true);
+      const normalizedCurrentNoSpaces = normalizeRegionText(currentNameWithoutParens, true);
       
       if (normalizedCurrentNoSpaces.includes(normalizedScrapedNoSpaces) ||
           normalizedScrapedNoSpaces.includes(normalizedCurrentNoSpaces)) {
