@@ -23,6 +23,11 @@ const SERVICE_NAMES = {
 function formatMissingRegionIssue(region) {
   const serviceName = SERVICE_NAMES[region.service] || region.service;
   
+  let vaultInfo = '';
+  if (region.service === 'vdc_vault' && region.tier && region.edition) {
+    vaultInfo = `\n**Vault Tier:** ${region.tier}\n**Vault Edition:** ${Array.isArray(region.edition) ? region.edition.join(', ') : region.edition}\n`;
+  }
+
   return {
     title: `[Missing Region]: ${region.provider} - ${region.regionName}`,
     body: `## Missing Region Detected by Automated Scraper
@@ -33,7 +38,7 @@ function formatMissingRegionIssue(region) {
 
 **Region Code:** ${region.regionCode}
 
-**Service Found:** ${serviceName}
+**Service Found:** ${serviceName}${vaultInfo}
 
 **Source:** ${region.source}
 
@@ -54,6 +59,11 @@ This region was found in the official Veeam documentation but is not present in 
 function formatMissingServiceIssue(service) {
   const serviceName = SERVICE_NAMES[service.service] || service.service;
   
+  let vaultInfo = '';
+  if (service.service === 'vdc_vault' && service.tier && service.edition) {
+    vaultInfo = `\n**Vault Tier:** ${service.tier}\n**Vault Edition:** ${Array.isArray(service.edition) ? service.edition.join(', ') : service.edition}\n`;
+  }
+
   return {
     title: `[Missing Service]: ${serviceName} in ${service.provider} ${service.regionName}`,
     body: `## Missing Service Detected by Automated Scraper
@@ -64,7 +74,7 @@ function formatMissingServiceIssue(service) {
 
 **Region Name:** ${service.regionName}
 
-**Missing Service:** ${serviceName}
+**Missing Service:** ${serviceName}${vaultInfo}
 
 **Source:** ${service.source}
 

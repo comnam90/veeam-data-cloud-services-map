@@ -483,13 +483,21 @@ function compareRegions(scrapedData, currentRegions) {
     
     if (!matchingRegion) {
       // Region exists in Veeam docs but not in our data
-      discrepancies.missingRegions.push({
+      const discrepancy = {
         provider: scrapedRegion.provider || 'Unknown',
         regionName: scrapedRegion.regionName,
         regionCode: scrapedRegion.regionCode,
         service: scrapedRegion.serviceKey,
         source: VEEAM_DOCS_URLS[scrapedRegion.serviceKey]
-      });
+      };
+
+      // For Vault, include edition and tier info
+      if (scrapedRegion.serviceKey === 'vdc_vault' && scrapedRegion.edition && scrapedRegion.tier) {
+        discrepancy.edition = scrapedRegion.edition;
+        discrepancy.tier = scrapedRegion.tier;
+      }
+
+      discrepancies.missingRegions.push(discrepancy);
     } else {
       // Region exists, check if service is listed
       const hasService = matchingRegion.services && 
