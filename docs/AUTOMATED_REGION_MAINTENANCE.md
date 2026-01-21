@@ -22,6 +22,7 @@ This document describes the automated region maintenance system for the Veeam Da
 - Azure: https://helpcenter.veeam.com/docs/vdc/userguide/azure_regions.html
 - Entra ID: https://helpcenter.veeam.com/docs/vdc/userguide/entra_id_regions.html
 - Salesforce: https://helpcenter.veeam.com/docs/vdc/userguide/sf_regions.html
+- Vault: https://www.veeam.com/products/veeam-data-cloud/cloud-storage-vault.html (FAQ page with edition/tier info)
 
 **Output**: `region-discrepancies.json` containing:
 ```json
@@ -153,8 +154,8 @@ gh run view <run-id> --log
 ### Why Parse HTML Instead of Using an API?
 Veeam doesn't provide a public API for service availability. The helpcenter pages are the authoritative source, so we parse HTML tables.
 
-### Why Skip VDC Vault?
-VDC Vault availability is not publicly documented in the helpcenter pages that we scrape. It must be maintained manually.
+### Vault Scraping
+VDC Vault availability is scraped from the Veeam product page FAQ section, which lists both Azure and AWS regions with edition (Foundation/Advanced) and tier (Core/Non-Core) information. The scraper handles the nested list structure and correctly identifies which editions are available in each region.
 
 ### Why Limit to 10 Issues Per Run?
 To avoid spam if there are many discrepancies. The workflow can run multiple times to create all issues gradually.
@@ -172,9 +173,11 @@ Different sources may format region codes differently (e.g., "us-east-1" vs "us_
 
 ### Adding a New Service
 1. Add the service URL to `VEEAM_DOCS_URLS` in `scripts/scrape-veeam-regions.js`
-2. Add the service display name to `SERVICE_NAMES` in `scripts/create-region-issues.js`
-3. Update the README documentation
-4. Add tests for the new service
+2. If the service has a unique page structure (like Vault), create a custom parser function
+3. Add the service display name to `SERVICE_NAMES` in `scripts/create-region-issues.js`
+4. Update the README documentation
+5. Update workflow error handling to reflect the new service count
+6. Add tests for the new service
 
 ### Modifying Parsing Logic
 The `parseRegionTable()` function may need updates if Veeam changes their HTML table structure. Check the function if scraping starts failing consistently.
@@ -217,13 +220,13 @@ node scripts/create-region-issues.js region-discrepancies.json --dry-run
 4. **Webhook integration**: Trigger scraping when Veeam docs are updated
 5. **Dashboard**: Create a web dashboard showing scraping history and trends
 6. **Email notifications**: Send summary emails to maintainers
-7. **Vault scraping**: If Veeam publishes Vault availability, add it to the scraper
+7. **PDF scraping**: Parse the Vault comparison PDF for additional details
 
 ### Known Limitations
-1. **HTML parsing fragility**: Changes to Veeam's HTML structure may break parsing
+1. **HTML parsing fragility**: Changes to Veeam's HTML structure may break parsing (each page has different structure)
 2. **Manual verification required**: Automated issues still need human review
 3. **No real-time updates**: Weekly schedule means up to 7 days lag
-4. **No Vault support**: Vault availability must be manually maintained
+4. **Vault regions use display names**: AWS regions on Vault page use generic names like "North Europe 1" instead of standard codes
 
 ## Security Considerations
 

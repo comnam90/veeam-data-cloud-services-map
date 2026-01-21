@@ -14,7 +14,8 @@ const VEEAM_DOCS_URLS = {
   vdc_m365: 'https://helpcenter.veeam.com/docs/vdc/userguide/m365_region_availability.html',
   vdc_azure_backup: 'https://helpcenter.veeam.com/docs/vdc/userguide/azure_regions.html',
   vdc_entra_id: 'https://helpcenter.veeam.com/docs/vdc/userguide/entra_id_regions.html',
-  vdc_salesforce: 'https://helpcenter.veeam.com/docs/vdc/userguide/sf_regions.html'
+  vdc_salesforce: 'https://helpcenter.veeam.com/docs/vdc/userguide/sf_regions.html',
+  vdc_vault: 'https://www.veeam.com/products/veeam-data-cloud/cloud-storage-vault.html'
 };
 
 // Pattern for global region markers in Veeam tables
@@ -133,6 +134,162 @@ function parseRegionTable(html, serviceKey) {
         regionCode: null, // Codes not provided in HTML, will match by name
         serviceKey
       });
+    }
+  }
+  
+  return regions;
+}
+
+/**
+ * Parse Vault FAQ page to extract region information
+ * The Vault page has a different structure with nested lists showing editions and tiers
+ */
+function parseVaultFAQ(html) {
+  const regions = [];
+  
+  // Extract Azure regions section
+  const azureMatch = html.match(/Azure regions[^?]*?support[^?]*?\?[\s\S]{0,8000}/i);
+  if (azureMatch) {
+    const azureSection = azureMatch[0];
+    
+    // Extract Core Regions
+    const coreMatch = azureSection.match(/Core Regions:[\s\S]*?<ul>([\s\S]*?)<\/ul>/i);
+    if (coreMatch) {
+      const coreList = coreMatch[1];
+      const liPattern = /<li>(.*?)<\/li>/gi;
+      const coreRegions = [...coreList.matchAll(liPattern)];
+      
+      for (const match of coreRegions) {
+        let regionName = match[1].replace(/<[^>]+>/g, '').trim();
+        // Remove footnote markers like *
+        regionName = regionName.replace(/\*/g, '');
+        
+        if (regionName && !regionName.toLowerCase().includes('edition')) {
+          regions.push({
+            provider: 'Azure',
+            regionName: regionName,
+            regionCode: null,
+            serviceKey: 'vdc_vault',
+            edition: ['Foundation', 'Advanced'], // Might be limited, but start with both
+            tier: 'Core'
+          });
+        }
+      }
+    }
+    
+    // Extract Non-Core Regions
+    const nonCoreMatch = azureSection.match(/Non-Core Regions:[\s\S]*?<ul>([\s\S]*?)<\/ul>/i);
+    if (nonCoreMatch) {
+      const nonCoreList = nonCoreMatch[1];
+      const liPattern = /<li>(.*?)<\/li>/gi;
+      const nonCoreRegions = [...nonCoreList.matchAll(liPattern)];
+      
+      for (const match of nonCoreRegions) {
+        let regionName = match[1].replace(/<[^>]+>/g, '').trim();
+        regionName = regionName.replace(/\*/g, '');
+        
+        // Check if Advanced is unavailable (marked with *)
+        const hasAdvanced = !match[1].includes('*');
+        const editions = hasAdvanced ? ['Foundation', 'Advanced'] : ['Foundation'];
+        
+        if (regionName && !regionName.toLowerCase().includes('edition')) {
+          regions.push({
+            provider: 'Azure',
+            regionName: regionName,
+            regionCode: null,
+            serviceKey: 'vdc_vault',
+            edition: editions,
+            tier: 'Non-Core'
+          });
+        }
+      }
+    }
+  }
+  
+  // Extract AWS regions section
+  const awsMatch = html.match(/AWS regions[^?]*?support[^?]*?\?[\s\S]{0,8000}/i);
+  if (awsMatch) {
+    const awsSection = awsMatch[0];
+    
+    // Foundation Core
+    const foundationCoreMatch = awsSection.match(/Foundation Core regions:[\s\S]*?<ul>([\s\S]*?)<\/ul>/i);
+    if (foundationCoreMatch) {
+      const list = foundationCoreMatch[1];
+      const liPattern = /<li>(.*?)<\/li>/gi;
+      const awsRegions = [...list.matchAll(liPattern)];
+      
+      for (const match of awsRegions) {
+        const regionName = match[1].replace(/<[^>]+>/g, '').trim();
+        if (regionName) {
+          regions.push({
+            provider: 'AWS',
+            regionName: regionName,
+            regionCode: null,
+            serviceKey: 'vdc_vault',
+            edition: ['Foundation'],
+            tier: 'Core'
+          });
+        }
+      }
+    }
+    
+    // Advanced Core
+    const advancedCoreMatch = awsSection.match(/Advanced Core Regions:[\s\S]*?<ul>([\s\S]*?)<\/ul>/i);
+    if (advancedCoreMatch) {
+      const list = advancedCoreMatch[1];
+      const liPattern = /<li>(.*?)<\/li>/gi;
+      const awsRegions = [...list.matchAll(liPattern)];
+      
+      for (const match of awsRegions) {
+        const regionName = match[1].replace(/<[^>]+>/g, '').trim();
+        if (regionName) {
+          // Check if this region already exists in Foundation Core
+          const existingIdx = regions.findIndex(r => 
+            r.provider === 'AWS' && 
+            r.regionName === regionName &&
+            r.tier === 'Core'
+          );
+          
+          if (existingIdx >= 0) {
+            // Add Advanced to existing entry
+            if (!regions[existingIdx].edition.includes('Advanced')) {
+              regions[existingIdx].edition.push('Advanced');
+            }
+          } else {
+            // New entry for Advanced only
+            regions.push({
+              provider: 'AWS',
+              regionName: regionName,
+              regionCode: null,
+              serviceKey: 'vdc_vault',
+              edition: ['Advanced'],
+              tier: 'Core'
+            });
+          }
+        }
+      }
+    }
+    
+    // Foundation Non-Core
+    const foundationNonCoreMatch = awsSection.match(/Foundation Non-Core Regions:[\s\S]*?<ul>([\s\S]*?)<\/ul>/i);
+    if (foundationNonCoreMatch) {
+      const list = foundationNonCoreMatch[1];
+      const liPattern = /<li>(.*?)<\/li>/gi;
+      const awsRegions = [...list.matchAll(liPattern)];
+      
+      for (const match of awsRegions) {
+        const regionName = match[1].replace(/<[^>]+>/g, '').trim();
+        if (regionName) {
+          regions.push({
+            provider: 'AWS',
+            regionName: regionName,
+            regionCode: null,
+            serviceKey: 'vdc_vault',
+            edition: ['Foundation'],
+            tier: 'Non-Core'
+          });
+        }
+      }
     }
   }
   
@@ -271,19 +428,50 @@ function compareRegions(scrapedData, currentRegions) {
                         matchingRegion.services[scrapedRegion.serviceKey];
       
       if (!hasService) {
-        discrepancies.missingServices.push({
+        const discrepancy = {
           regionId: matchingRegion.id,
           regionName: matchingRegion.name,
           provider: matchingRegion.provider,
           service: scrapedRegion.serviceKey,
           source: VEEAM_DOCS_URLS[scrapedRegion.serviceKey]
-        });
+        };
+        
+        // For Vault, include edition and tier info
+        if (scrapedRegion.serviceKey === 'vdc_vault' && scrapedRegion.edition && scrapedRegion.tier) {
+          discrepancy.edition = scrapedRegion.edition;
+          discrepancy.tier = scrapedRegion.tier;
+        }
+        
+        discrepancies.missingServices.push(discrepancy);
+      } else if (scrapedRegion.serviceKey === 'vdc_vault' && scrapedRegion.edition && scrapedRegion.tier) {
+        // For Vault, check if the edition/tier matches
+        const currentVaultConfig = matchingRegion.services.vdc_vault;
+        if (Array.isArray(currentVaultConfig)) {
+          // Check if each scraped edition/tier combo exists
+          for (const scrapedEdition of scrapedRegion.edition) {
+            const found = currentVaultConfig.some(config => 
+              config.edition === scrapedEdition && config.tier === scrapedRegion.tier
+            );
+            
+            if (!found) {
+              discrepancies.missingServices.push({
+                regionId: matchingRegion.id,
+                regionName: matchingRegion.name,
+                provider: matchingRegion.provider,
+                service: scrapedRegion.serviceKey,
+                edition: [scrapedEdition],
+                tier: scrapedRegion.tier,
+                source: VEEAM_DOCS_URLS[scrapedRegion.serviceKey],
+                note: `Edition "${scrapedEdition}" with tier "${scrapedRegion.tier}" not found in current data`
+              });
+            }
+          }
+        }
       }
     }
   }
   
   // Check for services in our data that aren't in scraped data (potential removals)
-  // Note: This is informational - Vault isn't scraped, so we shouldn't flag it
   const scrapedServicesByRegion = new Map();
   
   for (const scraped of scrapedData) {
@@ -300,9 +488,6 @@ function compareRegions(scrapedData, currentRegions) {
     const normalizedId = normalizeRegionCode(data.id);
     
     for (const serviceKey of Object.keys(data.services)) {
-      // Skip vault as it's not scraped
-      if (serviceKey === 'vdc_vault') continue;
-      
       // Check if this is a scraped service
       if (!Object.keys(VEEAM_DOCS_URLS).includes(serviceKey)) continue;
       
@@ -349,7 +534,14 @@ async function scrapeVeeamRegions() {
     
     try {
       const html = await fetchWithRetry(url);
-      const regions = parseRegionTable(html, serviceKey);
+      
+      // Use different parser for Vault FAQ page
+      let regions;
+      if (serviceKey === 'vdc_vault') {
+        regions = parseVaultFAQ(html);
+      } else {
+        regions = parseRegionTable(html, serviceKey);
+      }
       
       console.log(`   ✓ Found ${regions.length} regions for ${serviceKey}`);
       allScrapedData.push(...regions);
@@ -402,6 +594,7 @@ async function scrapeVeeamRegions() {
 module.exports = {
   scrapeVeeamRegions,
   parseRegionTable,
+  parseVaultFAQ,
   loadCurrentRegions,
   compareRegions,
   normalizeRegionCode,

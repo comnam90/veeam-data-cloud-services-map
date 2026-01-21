@@ -70,8 +70,8 @@ jobs:
           echo "Scraping Errors: $ERRORS"
           echo "Actionable Issues: $TOTAL"
           
-          # If all scraping failed (4 errors), don't create issues for extra services
-          if [ $ERRORS -eq 4 ] && [ $TOTAL -eq 0 ]; then
+          # If all scraping failed (5 errors for all services), don't create issues for extra services
+          if [ $ERRORS -eq 5 ] && [ $TOTAL -eq 0 ]; then
             echo "⚠️  All scraping failed - likely network issue. Skipping issue creation."
             echo "has_discrepancies=false" >> $GITHUB_OUTPUT
           elif [ $TOTAL -gt 0 ]; then
@@ -168,7 +168,7 @@ jobs:
             echo "- **Scraping Errors:** ${{ steps.check_discrepancies.outputs.errors }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             
-            if [ "${{ steps.check_discrepancies.outputs.errors }}" -eq 4 ]; then
+            if [ "${{ steps.check_discrepancies.outputs.errors }}" -eq 5 ]; then
               echo "⚠️  All scraping attempts failed. This is likely a temporary network issue." >> $GITHUB_STEP_SUMMARY
               echo "The workflow will retry on the next scheduled run." >> $GITHUB_STEP_SUMMARY
             elif [ "${{ steps.check_discrepancies.outputs.has_discrepancies }}" = "true" ]; then

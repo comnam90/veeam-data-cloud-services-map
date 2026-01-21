@@ -234,14 +234,22 @@ async function runTests() {
                 'Should identify the correct region');
   });
 
-  // Test 7: compareRegions skips vault in extra services
-  await test('compareRegions skips vault when checking extra services', async () => {
+  // Test 7: compareRegions now includes vault in scraping
+  await test('compareRegions includes vault when checking services', async () => {
     const scrapedData = [
       {
         provider: 'AWS',
         regionName: 'US East 1',
         regionCode: 'us-east-1',
         serviceKey: 'vdc_m365'
+      },
+      {
+        provider: 'AWS',
+        regionName: 'US East 1',
+        regionCode: null,
+        serviceKey: 'vdc_vault',
+        edition: ['Foundation'],
+        tier: 'Core'
       }
     ];
     
@@ -261,9 +269,9 @@ async function runTests() {
     
     const discrepancies = compareRegions(scrapedData, currentRegions);
     
-    // vdc_vault should not be flagged as extra since it's not scraped
-    const vaultInExtra = discrepancies.extraServices.some(s => s.service === 'vdc_vault');
-    assert(!vaultInExtra, 'Should not flag vdc_vault as extra service');
+    // Both services are properly tracked, no discrepancies expected
+    assert(discrepancies.missingServices.length === 0, 
+           'Should not flag any missing services when both match');
   });
 
   // Test 8: formatMissingRegionIssue creates valid issue
@@ -329,11 +337,18 @@ async function runTests() {
     assert(VEEAM_DOCS_URLS.vdc_azure_backup, 'Should have Azure backup URL');
     assert(VEEAM_DOCS_URLS.vdc_entra_id, 'Should have Entra ID URL');
     assert(VEEAM_DOCS_URLS.vdc_salesforce, 'Should have Salesforce URL');
+    assert(VEEAM_DOCS_URLS.vdc_vault, 'Should have Vault URL');
     
-    for (const [key, url] of Object.entries(VEEAM_DOCS_URLS)) {
-      assert(url.startsWith('https://helpcenter.veeam.com'), 
+    // Most URLs are from helpcenter, but Vault is from product page
+    const helpcenterServices = ['vdc_m365', 'vdc_azure_backup', 'vdc_entra_id', 'vdc_salesforce'];
+    for (const key of helpcenterServices) {
+      assert(VEEAM_DOCS_URLS[key].startsWith('https://helpcenter.veeam.com'), 
              `${key} URL should be from helpcenter.veeam.com`);
     }
+    
+    // Vault URL is from the product page
+    assert(VEEAM_DOCS_URLS.vdc_vault.startsWith('https://www.veeam.com'),
+           'vdc_vault URL should be from www.veeam.com');
   });
 
   // Test 12: SERVICE_NAMES contains display names
