@@ -161,6 +161,11 @@ function parseVaultFAQ(html) {
       
       for (const match of coreRegions) {
         let regionName = match[1].replace(/<[^>]+>/g, '').trim();
+        
+        // Check if Advanced is unavailable (marked with *)
+        const hasAdvanced = !match[1].includes('*');
+        const editions = hasAdvanced ? ['Foundation', 'Advanced'] : ['Foundation'];
+
         // Remove footnote markers like *
         regionName = regionName.replace(/\*/g, '');
         
@@ -170,7 +175,7 @@ function parseVaultFAQ(html) {
             regionName: regionName,
             regionCode: null,
             serviceKey: 'vdc_vault',
-            edition: ['Foundation', 'Advanced'], // Might be limited, but start with both
+            edition: editions,
             tier: 'Core'
           });
         }

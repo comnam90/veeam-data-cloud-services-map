@@ -490,6 +490,31 @@ async function runTests() {
     assert(match === null, 'Should NOT match Australia Southeast to Australia East');
   });
 
+  // Test 17: parseVaultFAQ handles asterisk in Core regions
+  await test('parseVaultFAQ handles asterisk in Core regions', async () => {
+    const html = `
+      <h3>Azure regions support?</h3>
+      <p><strong>Core Regions:</strong></p>
+      <ul>
+        <li>Region Standard</li>
+        <li>Region Restricted*</li>
+      </ul>
+    `;
+    
+    const regions = parseVaultFAQ(html);
+    
+    const standard = regions.find(r => r.regionName === 'Region Standard');
+    const restricted = regions.find(r => r.regionName === 'Region Restricted');
+    
+    assert(standard, 'Should find Region Standard');
+    assert(standard.edition.includes('Advanced'), 'Standard region should have Advanced edition');
+    
+    assert(restricted, 'Should find Region Restricted');
+    assert(restricted.edition.length === 1, 'Restricted region should have only 1 edition');
+    assert(restricted.edition[0] === 'Foundation', 'Restricted region should be Foundation only');
+    assert(!restricted.edition.includes('Advanced'), 'Restricted region should NOT have Advanced edition');
+  });
+
   // Print summary
   console.log(`\n${'='.repeat(60)}`);
   console.log(`${colors.cyan}Test Summary${colors.reset}`);
