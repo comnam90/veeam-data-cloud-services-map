@@ -1,0 +1,167 @@
+name: Automated Region Maintenance
+
+on:
+  # Run weekly on Mondays at 9:00 AM UTC
+  schedule:
+    - cron: '0 9 * * 1'
+  
+  # Allow manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (do not create actual issues)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+permissions:
+  contents: read
+  issues: write  # Required to create issues
+
+jobs:
+  scrape-and-validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Scrape Veeam region data
+        id: scrape
+        run: |
+          echo "🔍 Starting region scraper..."
+          node scripts/scrape-veeam-regions.js || echo "scrape_failed=true" >> $GITHUB_OUTPUT
+        continue-on-error: true
+      
+      - name: Check for discrepancies
+        id: check_discrepancies
+        run: |
+          if [ ! -f region-discrepancies.json ]; then
+            echo "No discrepancies file generated"
+            echo "has_discrepancies=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Check if there are any discrepancies
+          MISSING_REGIONS=$(jq '.discrepancies.missingRegions | length' region-discrepancies.json)
+          MISSING_SERVICES=$(jq '.discrepancies.missingServices | length' region-discrepancies.json)
+          EXTRA_SERVICES=$(jq '.discrepancies.extraServices | length' region-discrepancies.json)
+          ERRORS=$(jq '.errors | length' region-discrepancies.json)
+          
+          TOTAL=$((MISSING_REGIONS + MISSING_SERVICES + EXTRA_SERVICES))
+          
+          echo "Missing Regions: $MISSING_REGIONS"
+          echo "Missing Services: $MISSING_SERVICES"
+          echo "Extra Services: $EXTRA_SERVICES"
+          echo "Scraping Errors: $ERRORS"
+          echo "Total Issues: $TOTAL"
+          
+          if [ $TOTAL -gt 0 ]; then
+            echo "has_discrepancies=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_discrepancies=false" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "missing_regions=$MISSING_REGIONS" >> $GITHUB_OUTPUT
+          echo "missing_services=$MISSING_SERVICES" >> $GITHUB_OUTPUT
+          echo "extra_services=$EXTRA_SERVICES" >> $GITHUB_OUTPUT
+      
+      - name: Generate issue data
+        if: steps.check_discrepancies.outputs.has_discrepancies == 'true'
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "🧪 Running in dry-run mode"
+            node scripts/create-region-issues.js region-discrepancies.json --dry-run
+          else
+            node scripts/create-region-issues.js region-discrepancies.json
+          fi
+      
+      - name: Create GitHub issues
+        if: steps.check_discrepancies.outputs.has_discrepancies == 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ ! -f issues-to-create.json ]; then
+            echo "No issues file generated"
+            exit 0
+          fi
+          
+          # Read the issues and create them one by one
+          ISSUES=$(jq -r '.issues[] | @json' issues-to-create.json)
+          
+          if [ -z "$ISSUES" ]; then
+            echo "No issues to create"
+            exit 0
+          fi
+          
+          echo "$ISSUES" | while IFS= read -r issue; do
+            TITLE=$(echo "$issue" | jq -r '.title')
+            BODY=$(echo "$issue" | jq -r '.body')
+            LABELS=$(echo "$issue" | jq -r '.labels | join(",")')
+            
+            echo "Creating issue: $TITLE"
+            
+            # Check if issue already exists to avoid duplicates
+            EXISTING=$(gh issue list --limit 100 --search "in:title \"$TITLE\"" --json title --jq 'length')
+            
+            if [ "$EXISTING" -gt 0 ]; then
+              echo "⚠️  Issue already exists, skipping: $TITLE"
+            else
+              gh issue create \
+                --title "$TITLE" \
+                --body "$BODY" \
+                --label "$LABELS" || echo "Failed to create issue: $TITLE"
+              
+              # Rate limiting: wait 1 second between issue creations
+              sleep 1
+            fi
+          done
+      
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: region-maintenance-results
+          path: |
+            region-discrepancies.json
+            issues-to-create.json
+          retention-days: 30
+      
+      - name: Post summary
+        if: always()
+        run: |
+          echo "## Region Maintenance Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f region-discrepancies.json ]; then
+            echo "### Discrepancies Found" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Missing Regions:** ${{ steps.check_discrepancies.outputs.missing_regions }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Missing Services:** ${{ steps.check_discrepancies.outputs.missing_services }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Extra Services:** ${{ steps.check_discrepancies.outputs.extra_services }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            if [ "${{ steps.check_discrepancies.outputs.has_discrepancies }}" = "true" ]; then
+              if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+                echo "✅ Issues identified (dry run mode - no issues created)" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "✅ Issues created for discrepancies" >> $GITHUB_STEP_SUMMARY
+              fi
+            else
+              echo "✅ No discrepancies found - data is up to date!" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "⚠️ No discrepancies file was generated. Check the scraping step for errors." >> $GITHUB_STEP_SUMMARY
+          fi

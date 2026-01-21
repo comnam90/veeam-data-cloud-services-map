@@ -14,7 +14,9 @@
     "test:api": "node scripts/test-api.js",
     "test:validate": "node scripts/test-validate-regions.js",
     "validate": "node scripts/validate-regions.js",
-    "clean": "rm -rf public functions/regions.json functions/_worker.js"
+    "scrape:regions": "node scripts/scrape-veeam-regions.js",
+    "scrape:issues": "node scripts/create-region-issues.js",
+    "clean": "rm -rf public functions/regions.json functions/_worker.js region-discrepancies.json issues-to-create.json"
   },
   "keywords": [
     "veeam",

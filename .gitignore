@@ -7,3 +7,7 @@ node_modules
 functions/_worker.js
 .cloudflare/
 .wrangler/
+
+# Automated region maintenance outputs
+region-discrepancies.json
+issues-to-create.json
