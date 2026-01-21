@@ -25,7 +25,7 @@ async function fetchWithRetry(url, maxRetries = 3) {
     try {
       const response = await fetch(url, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.5',
         }
@@ -64,6 +64,8 @@ function parseRegionTable(html, serviceKey) {
   
   for (let i = 0; i < rows.length; i++) {
     const rowHtml = rows[i][1];
+    // Simple HTML stripping - adequate for table cells
+    // For more complex parsing, consider using cheerio or jsdom
     const cells = [...rowHtml.matchAll(cellPattern)].map(match => 
       match[1].replace(/<[^>]+>/g, '').trim()
     );
