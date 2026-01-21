@@ -49,14 +49,18 @@ async function fetchWithRetry(url, maxRetries = 3) {
 
 /**
  * Parse HTML table to extract region information
- * Tables typically have structure like:
- * | Cloud Provider | Region Name | Region Code |
+ * Actual Veeam table structure (verified with live data):
+ * | Global Region | Azure Region |
+ * | AMER/APJ/EMEA | East US, West US, etc. |
+ * 
+ * Due to rowspan, subsequent rows in a group only have the region name cell.
+ * Note: Tables only list region display names, not codes.
+ * All services are Azure-based (no AWS in these docs).
  */
 function parseRegionTable(html, serviceKey) {
   const regions = [];
   
-  // Extract table rows - looking for common patterns in Veeam docs
-  // This is a simplified parser; may need adjustment based on actual HTML structure
+  // Extract table rows
   const tableRowPattern = /<tr[^>]*>(.*?)<\/tr>/gis;
   const cellPattern = /<t[dh][^>]*>(.*?)<\/t[dh]>/gis;
   
@@ -70,51 +74,46 @@ function parseRegionTable(html, serviceKey) {
       match[1].replace(/<[^>]+>/g, '').trim()
     );
     
-    // Skip header rows (usually the first row or rows with typical header text)
-    if (cells.length < 2 || 
-        cells.some(cell => /^(cloud provider|region name|region|location|provider)$/i.test(cell))) {
+    // Skip empty rows
+    if (cells.length === 0) {
       continue;
     }
     
-    // Try to identify provider, region name, and region code
-    // Common patterns:
-    // [Provider, Region Name, Region Code]
-    // [Region Name, Region Code] (provider inferred from page)
-    
-    let provider = null;
-    let regionName = null;
-    let regionCode = null;
-    
-    if (cells.length >= 3) {
-      // Format: [Provider, Region Name, Region Code]
-      provider = cells[0];
-      regionName = cells[1];
-      regionCode = cells[2];
-    } else if (cells.length >= 2) {
-      // Format: [Region Name, Region Code] - need to infer provider
-      regionName = cells[0];
-      regionCode = cells[1];
+    // Skip header row: "Global Region" | "Azure Region"
+    if (cells.some(cell => /^(global region|azure region|cloud provider|region name)$/i.test(cell))) {
+      continue;
     }
     
-    // Normalize provider names
-    if (provider) {
-      if (/aws|amazon/i.test(provider)) {
-        provider = 'AWS';
-      } else if (/azure|microsoft/i.test(provider)) {
-        provider = 'Azure';
+    let regionName = null;
+    
+    if (cells.length === 1) {
+      // Single cell = region name (due to rowspan on previous row's global region)
+      const cell = cells[0];
+      // Skip if it's a global region marker
+      if (!/^(AMER|APJ|EMEA)$/i.test(cell)) {
+        regionName = cell;
+      }
+    } else if (cells.length >= 2) {
+      // Two cells = [Global Region, Region Name]
+      const firstCell = cells[0];
+      const secondCell = cells[1];
+      
+      // Skip if first cell is global region marker and no second cell
+      if (/^(AMER|APJ|EMEA)$/i.test(firstCell) && secondCell) {
+        regionName = secondCell;
+      }
+      // Otherwise, if first cell is not a global region, it's the region name
+      else if (!/^(AMER|APJ|EMEA)$/i.test(firstCell)) {
+        regionName = firstCell;
       }
     }
     
-    // Normalize region codes
-    if (regionCode) {
-      regionCode = regionCode.toLowerCase().trim();
-    }
-    
-    if (regionName && regionCode) {
+    if (regionName) {
+      // All regions in these docs are Azure
       regions.push({
-        provider,
-        regionName,
-        regionCode,
+        provider: 'Azure',
+        regionName: regionName,
+        regionCode: null, // Codes not provided in HTML, will match by name
         serviceKey
       });
     }
@@ -169,45 +168,44 @@ function normalizeRegionCode(code) {
 
 /**
  * Find matching region in current data
+ * Updated to work primarily with region names since Veeam docs don't provide codes
  */
 function findMatchingRegion(scrapedRegion, currentRegions) {
-  const normalizedScrapedCode = normalizeRegionCode(scrapedRegion.regionCode);
-  
+  // Since we don't have region codes from Veeam docs, match primarily by name
   for (const { data } of currentRegions) {
-    if (!data || !data.id) continue;
+    if (!data || !data.name) continue;
     
-    const normalizedCurrentId = normalizeRegionCode(data.id);
-    
-    // Match by ID or region code
-    if (normalizedCurrentId.includes(normalizedScrapedCode) || 
-        normalizedScrapedCode.includes(normalizedCurrentId)) {
-      
-      // Additional check: provider should match if specified
-      if (scrapedRegion.provider && data.provider) {
-        if (scrapedRegion.provider !== data.provider) {
-          continue;
-        }
+    // Provider must match
+    if (scrapedRegion.provider && data.provider) {
+      if (scrapedRegion.provider !== data.provider) {
+        continue;
       }
-      
-      return data;
     }
     
-    // Also try matching by region name
-    if (data.name && scrapedRegion.regionName) {
-      const normalizedScrapedName = scrapedRegion.regionName.toLowerCase();
-      const normalizedCurrentName = data.name.toLowerCase();
+    // Match by region name
+    if (scrapedRegion.regionName) {
+      const normalizedScrapedName = scrapedRegion.regionName.toLowerCase().trim();
+      const normalizedCurrentName = data.name.toLowerCase().trim();
       
-      if (normalizedCurrentName.includes(normalizedScrapedName) ||
-          normalizedScrapedName.includes(normalizedCurrentName)) {
-        
-        // Verify provider if specified
-        if (scrapedRegion.provider && data.provider) {
-          if (scrapedRegion.provider === data.provider) {
-            return data;
-          }
-        } else {
-          return data;
-        }
+      // Try exact match after normalization
+      // E.g., "East US" should match "East US (Virginia)"
+      if (normalizedCurrentName.includes(normalizedScrapedName)) {
+        return data;
+      }
+      
+      // Also check if the scraped name contains the current name
+      // E.g., "East US 2" might partially match "East US"
+      if (normalizedScrapedName.includes(normalizedCurrentName.split('(')[0].trim())) {
+        return data;
+      }
+      
+      // Try matching without spaces
+      const normalizedScrapedNoSpaces = normalizedScrapedName.replace(/\s+/g, '');
+      const normalizedCurrentNoSpaces = normalizedCurrentName.replace(/\s+/g, '').split('(')[0];
+      
+      if (normalizedCurrentNoSpaces.includes(normalizedScrapedNoSpaces) ||
+          normalizedScrapedNoSpaces.includes(normalizedCurrentNoSpaces)) {
+        return data;
       }
     }
   }

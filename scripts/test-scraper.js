@@ -70,34 +70,35 @@ async function runTests() {
     assertEqual(normalizeRegionCode('East US (Virginia)'), 'eastusvirginia', 'Should remove parentheses');
   });
 
-  // Test 2: parseRegionTable function with sample HTML
-  await test('parseRegionTable parses basic table structure', async () => {
+  // Test 2: parseRegionTable function with sample HTML matching real Veeam structure
+  await test('parseRegionTable parses real Veeam table structure', async () => {
     const sampleHtml = `
-      <table>
+      <table class="Blue_Table">
         <tr>
-          <th>Cloud Provider</th>
-          <th>Region Name</th>
-          <th>Region Code</th>
+          <th><p><span>Global Region</span></p></th>
+          <th><p><span>Azure Region</span></p></th>
         </tr>
         <tr>
-          <td>AWS</td>
-          <td>US East 1 (N. Virginia)</td>
-          <td>us-east-1</td>
+          <td rowspan="3"><p><span>AMER</span></p></td>
+          <td><p><span>East US</span></p></td>
         </tr>
         <tr>
-          <td>Azure</td>
-          <td>East US (Virginia)</td>
-          <td>eastus</td>
+          <td><p><span>West US</span></p></td>
+        </tr>
+        <tr>
+          <td><p><span>Central US</span></p></td>
         </tr>
       </table>
     `;
     
     const regions = parseRegionTable(sampleHtml, 'vdc_m365');
     
-    assert(regions.length >= 2, `Should parse at least 2 regions, got ${regions.length}`);
+    assert(regions.length === 3, `Should parse 3 regions, got ${regions.length}`);
     assert(regions[0].serviceKey === 'vdc_m365', 'Should set service key');
-    assert(regions.some(r => r.regionCode && r.regionCode.includes('east')), 
-           'Should have region codes');
+    assert(regions[0].provider === 'Azure', 'Should set provider to Azure');
+    assert(regions.some(r => r.regionName === 'East US'), 'Should have East US');
+    assert(regions.some(r => r.regionName === 'West US'), 'Should have West US');
+    assert(regions.some(r => r.regionName === 'Central US'), 'Should have Central US');
   });
 
   // Test 3: findMatchingRegion function
