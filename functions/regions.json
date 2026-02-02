@@ -13,7 +13,8 @@
       "ZA",
       "CPT",
       "Western Cape",
-      "Africa"
+      "Africa",
+      "Africa South 1"
     ],
     "services": {
       "vdc_vault": [
@@ -595,7 +596,8 @@
       "Brazil",
       "BR",
       "GRU",
-      "South America"
+      "South America",
+      "South America East 1"
     ],
     "services": {
       "vdc_vault": [
@@ -902,6 +904,10 @@
       "vdc_vault": [
         {
           "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Advanced",
           "tier": "Core"
         }
       ],
@@ -1307,7 +1313,8 @@
           "edition": "Advanced",
           "tier": "Core"
         }
-      ]
+      ],
+      "vdc_m365": true
     }
   },
   {
@@ -1364,7 +1371,8 @@
           "edition": "Advanced",
           "tier": "Core"
         }
-      ]
+      ],
+      "vdc_salesforce": true
     }
   },
   {
@@ -1455,7 +1463,8 @@
         }
       ],
       "vdc_m365": true,
-      "vdc_azure_backup": true
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
     }
   },
   {
@@ -1635,7 +1644,8 @@
         }
       ],
       "vdc_m365": true,
-      "vdc_azure_backup": true
+      "vdc_azure_backup": true,
+      "vdc_entra_id": true
     }
   },
   {

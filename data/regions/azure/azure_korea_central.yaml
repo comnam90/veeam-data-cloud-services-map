@@ -15,3 +15,4 @@ services:
       tier: "Core"
     - edition: "Advanced"
       tier: "Core"
+  vdc_m365: true
