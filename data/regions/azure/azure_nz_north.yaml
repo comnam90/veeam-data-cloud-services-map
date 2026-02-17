@@ -16,3 +16,4 @@ services:
     - edition: "Advanced"
       tier: "Core"
   vdc_salesforce: true
+  vdc_azure_backup: true
