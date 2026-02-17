@@ -1,0 +1,12 @@
+id: "azure-chile-central"
+name: "Chile Central (Santiago)"
+provider: "Azure"
+coords: [-33.4489, -70.6693]
+aliases:
+  - "Santiago"
+  - "Chile"
+  - "CL"
+  - "SCL"
+  - "South America"
+services:
+  vdc_azure_backup: true

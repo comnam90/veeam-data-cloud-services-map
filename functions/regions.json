@@ -735,6 +735,26 @@
     }
   },
   {
+    "id": "azure-australia-central",
+    "name": "Australia Central (Canberra)",
+    "provider": "Azure",
+    "coords": [
+      -35.3075,
+      149.1244
+    ],
+    "aliases": [
+      "Canberra",
+      "Australia",
+      "AU",
+      "CBR",
+      "ACT",
+      "Australian Capital Territory"
+    ],
+    "services": {
+      "vdc_azure_backup": true
+    }
+  },
+  {
     "id": "azure-au-east",
     "name": "Australia East (Sydney)",
     "provider": "Azure",
@@ -818,6 +838,25 @@
           "tier": "Core"
         }
       ]
+    }
+  },
+  {
+    "id": "azure-belgium-central",
+    "name": "Belgium Central (Brussels)",
+    "provider": "Azure",
+    "coords": [
+      50.8503,
+      4.3517
+    ],
+    "aliases": [
+      "Brussels",
+      "Belgium",
+      "BE",
+      "BRU",
+      "Benelux"
+    ],
+    "services": {
+      "vdc_azure_backup": true
     }
   },
   {
@@ -979,6 +1018,25 @@
       "vdc_m365": true,
       "vdc_azure_backup": true,
       "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-chile-central",
+    "name": "Chile Central (Santiago)",
+    "provider": "Azure",
+    "coords": [
+      -33.4489,
+      -70.6693
+    ],
+    "aliases": [
+      "Santiago",
+      "Chile",
+      "CL",
+      "SCL",
+      "South America"
+    ],
+    "services": {
+      "vdc_azure_backup": true
     }
   },
   {
@@ -1320,6 +1378,26 @@
     }
   },
   {
+    "id": "azure-korea-south",
+    "name": "Korea South (Busan)",
+    "provider": "Azure",
+    "coords": [
+      35.1796,
+      129.0756
+    ],
+    "aliases": [
+      "Busan",
+      "Pusan",
+      "South Korea",
+      "Korea",
+      "KR",
+      "PUS"
+    ],
+    "services": {
+      "vdc_azure_backup": true
+    }
+  },
+  {
     "id": "azure-malaysia-west",
     "name": "Malaysia West (Kuala Lumpur)",
     "provider": "Azure",
@@ -1345,6 +1423,26 @@
           "tier": "Core"
         }
       ],
+      "vdc_azure_backup": true
+    }
+  },
+  {
+    "id": "azure-mexico-central",
+    "name": "Mexico Central (Querétaro)",
+    "provider": "Azure",
+    "coords": [
+      20.5888,
+      -100.3899
+    ],
+    "aliases": [
+      "Querétaro",
+      "Queretaro",
+      "Mexico",
+      "MX",
+      "QRO",
+      "North America"
+    ],
+    "services": {
       "vdc_azure_backup": true
     }
   },
@@ -1587,6 +1685,25 @@
     }
   },
   {
+    "id": "azure-spain-central",
+    "name": "Spain Central (Madrid)",
+    "provider": "Azure",
+    "coords": [
+      40.4168,
+      -3.7038
+    ],
+    "aliases": [
+      "Madrid",
+      "Spain",
+      "ES",
+      "MAD",
+      "Iberia"
+    ],
+    "services": {
+      "vdc_azure_backup": true
+    }
+  },
+  {
     "id": "azure-sweden-central",
     "name": "Sweden Central (Gävle)",
     "provider": "Azure",
@@ -1714,6 +1831,26 @@
     }
   },
   {
+    "id": "azure-us-west-central",
+    "name": "West Central US (Wyoming)",
+    "provider": "Azure",
+    "coords": [
+      41.14,
+      -104.8202
+    ],
+    "aliases": [
+      "Wyoming",
+      "United States",
+      "USA",
+      "US",
+      "WY",
+      "West Central"
+    ],
+    "services": {
+      "vdc_azure_backup": true
+    }
+  },
+  {
     "id": "azure-west-europe",
     "name": "West Europe (Netherlands)",
     "provider": "Azure",
@@ -1743,6 +1880,26 @@
       "vdc_salesforce": true,
       "vdc_azure_backup": true,
       "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-west-india",
+    "name": "West India (Mumbai)",
+    "provider": "Azure",
+    "coords": [
+      19.076,
+      72.8777
+    ],
+    "aliases": [
+      "Mumbai",
+      "Bombay",
+      "India",
+      "IN",
+      "BOM",
+      "Maharashtra"
+    ],
+    "services": {
+      "vdc_azure_backup": true
     }
   },
   {

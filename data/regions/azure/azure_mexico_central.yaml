@@ -1,0 +1,13 @@
+id: "azure-mexico-central"
+name: "Mexico Central (Querétaro)"
+provider: "Azure"
+coords: [20.5888, -100.3899]
+aliases:
+  - "Querétaro"
+  - "Queretaro"
+  - "Mexico"
+  - "MX"
+  - "QRO"
+  - "North America"
+services:
+  vdc_azure_backup: true
