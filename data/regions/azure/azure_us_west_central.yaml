@@ -1,0 +1,13 @@
+id: "azure-us-west-central"
+name: "West Central US (Wyoming)"
+provider: "Azure"
+coords: [41.1400, -104.8202]
+aliases:
+  - "Wyoming"
+  - "United States"
+  - "USA"
+  - "US"
+  - "WY"
+  - "West Central"
+services:
+  vdc_azure_backup: true

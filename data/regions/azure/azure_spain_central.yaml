@@ -1,0 +1,12 @@
+id: "azure-spain-central"
+name: "Spain Central (Madrid)"
+provider: "Azure"
+coords: [40.4168, -3.7038]
+aliases:
+  - "Madrid"
+  - "Spain"
+  - "ES"
+  - "MAD"
+  - "Iberia"
+services:
+  vdc_azure_backup: true

@@ -1,0 +1,13 @@
+id: "azure-australia-central"
+name: "Australia Central (Canberra)"
+provider: "Azure"
+coords: [-35.3075, 149.1244]
+aliases:
+  - "Canberra"
+  - "Australia"
+  - "AU"
+  - "CBR"
+  - "ACT"
+  - "Australian Capital Territory"
+services:
+  vdc_azure_backup: true

@@ -1,0 +1,13 @@
+id: "azure-korea-south"
+name: "Korea South (Busan)"
+provider: "Azure"
+coords: [35.1796, 129.0756]
+aliases:
+  - "Busan"
+  - "Pusan"
+  - "South Korea"
+  - "Korea"
+  - "KR"
+  - "PUS"
+services:
+  vdc_azure_backup: true
