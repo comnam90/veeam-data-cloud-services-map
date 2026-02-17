@@ -1165,7 +1165,8 @@
         }
       ],
       "vdc_m365": true,
-      "vdc_entra_id": true
+      "vdc_entra_id": true,
+      "vdc_azure_backup": true
     }
   },
   {
@@ -1314,7 +1315,8 @@
           "tier": "Core"
         }
       ],
-      "vdc_m365": true
+      "vdc_m365": true,
+      "vdc_entra_id": true
     }
   },
   {
@@ -1342,7 +1344,8 @@
           "edition": "Advanced",
           "tier": "Core"
         }
-      ]
+      ],
+      "vdc_azure_backup": true
     }
   },
   {
