@@ -8,6 +8,6 @@ aliases:
   - "Mexico"
   - "MX"
   - "QRO"
-  - "Central America"
+  - "North America"
 services:
   vdc_azure_backup: true
