@@ -70,9 +70,17 @@ jobs:
         run: npm test
         timeout-minutes: 2
 
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: public/
+          retention-days: 1
+
   ui-tests:
     name: Playwright UI Tests
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -91,20 +99,11 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
+      - name: Download build output
+        uses: actions/download-artifact@v4
         with:
-          hugo-version: 'latest'
-          extended: true
-
-      - name: Build site
-        env:
-          HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
-          TZ: America/Los_Angeles
-        run: |
-          npm run build:data
-          npm run build:worker
-          hugo --gc --minify
+          name: build-output
+          path: public/
 
       - name: Run Playwright tests
         run: npx playwright test --project=chromium
