@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- Search result selection now opens popups for all regions, including those inside clusters (#23)
+
+### Added
+- Playwright UI test suite with 33 tests covering search, filters, theme, popups, accessibility, and responsive design
+- Playwright UI tests job in PR validation CI workflow, reusing the Hugo build artifact from the existing build job
+
 ## [1.2.0] - 2026-03-21
 
 ### Added

@@ -17,7 +17,11 @@
     "validate": "node scripts/validate-regions.js",
     "scrape:regions": "node scripts/scrape-veeam-regions.js",
     "scrape:issues": "node scripts/create-region-issues.js",
-    "clean": "rm -rf public functions/regions.json functions/_worker.js region-discrepancies.json issues-to-create.json"
+    "clean": "rm -rf public functions/regions.json functions/_worker.js region-discrepancies.json issues-to-create.json",
+    "test:ui": "playwright test",
+    "test:ui:headed": "playwright test --headed",
+    "test:ui:debug": "playwright test --debug",
+    "test:ui:report": "playwright show-report"
   },
   "keywords": [
     "veeam",
@@ -38,6 +42,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260103.0",
     "@types/js-yaml": "^4.0.9",
+    "@playwright/test": "^1.57.0",
     "@types/node": "^25.0.3",
     "esbuild": "^0.27.2",
     "typescript": "^5.9.3",

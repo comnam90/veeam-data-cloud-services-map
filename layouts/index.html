@@ -1405,14 +1405,17 @@
             const EPSILON = 0.0001;
             
             if (region.coords && Array.isArray(region.coords)) {
-                map.setView(region.coords, 5, { animate: true });
-                
+                let found = false;
                 clusterGroup.eachLayer(marker => {
+                    if (found) return;
                     const markerLat = marker.getLatLng().lat;
                     const markerLng = marker.getLatLng().lng;
-                    if (Math.abs(markerLat - region.coords[0]) < EPSILON && 
+                    if (Math.abs(markerLat - region.coords[0]) < EPSILON &&
                         Math.abs(markerLng - region.coords[1]) < EPSILON) {
-                        setTimeout(() => marker.openPopup(), 300);
+                        found = true;
+                        const targetZoom = Math.max(map.getZoom(), CLUSTER_CONFIG.DISABLE_AT_ZOOM);
+                        map.setView(region.coords, targetZoom, { animate: true });
+                        map.once('moveend', () => marker.openPopup());
                     }
                 });
             }
