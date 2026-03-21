@@ -518,9 +518,9 @@
             padding: 0.625rem 0.75rem;
             cursor: pointer;
             transition: background 0.15s ease;
-            border-bottom: 1px solid #334155;
             background: transparent;
             border: none;
+            border-bottom: 1px solid #334155;
             width: 100%;
             text-align: left;
         }
@@ -648,7 +648,7 @@
                     <span><span id="visibleCount" class="font-semibold text-white light:text-slate-900">0</span> of <span id="totalCount" class="font-semibold">0</span> regions</span>
                 </div>
 
-                <button id="resetFilters" aria-label="Reset all filters" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/20 light:bg-amber-100 border border-amber-500/40 light:border-amber-400 text-amber-400 light:text-amber-700 hover:bg-amber-500/30 light:hover:bg-amber-200 text-xs font-medium transition-all duration-200 flex-shrink-0" title="Reset all filters">
+                <button id="resetFilters" aria-label="Reset all filters" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/20 light:bg-amber-100 border border-amber-500/40 light:border-amber-400 text-amber-400 light:text-amber-700 hover:bg-amber-500/30 light:hover:bg-amber-200 text-xs font-medium transition-colors duration-200 flex-shrink-0" title="Reset all filters">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -945,6 +945,7 @@
         }
 
         let map;
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         try {
             if (typeof L === 'undefined') {
                 throw new Error('Leaflet library failed to load');
@@ -958,7 +959,10 @@
                 zoomControl: false,
                 worldCopyJump: true,
                 maxBoundsViscosity: 1.0,
-                maxBounds: [[-60, -185], [90, 185]]
+                maxBounds: [[-60, -185], [90, 185]],
+                fadeAnimation: !reducedMotion,
+                zoomAnimation: !reducedMotion,
+                markerZoomAnimation: !reducedMotion
             });
         } catch (e) {
             console.error('Map initialization failed:', e);
@@ -1122,7 +1126,7 @@
             disableClusteringAtZoom: CLUSTER_CONFIG.DISABLE_AT_ZOOM,
             iconCreateFunction: createClusterIcon,
             spiderfyDistanceMultiplier: CLUSTER_CONFIG.SPIDERFY_DISTANCE,
-            animate: true
+            animate: !reducedMotion
         });
         map.addLayer(clusterGroup);
 
@@ -1411,13 +1415,13 @@
                 const matchInfo = item.matchType === 'alias' ? `<span class="match-text">via "${escapeHtml(item.matchText)}"</span>` : '';
                 
                 return `
-                    <button type="button" class="search-result-item" data-index="${index}" id="search-result-${index}" role="option" aria-selected="false">
+                    <div class="search-result-item" data-index="${index}" id="search-result-${index}" role="option" aria-selected="false">
                         <span class="provider-dot" style="background-color: ${providerColor}"></span>
                         <div>
                             <div class="region-name">${escapeHtml(item.region.name)}</div>
                             ${matchInfo}
                         </div>
-                    </button>
+                    </div>
                 `;
             }).join('');
         }
@@ -1439,7 +1443,7 @@
                         Math.abs(markerLng - region.coords[1]) < EPSILON) {
                         found = true;
                         const targetZoom = Math.max(map.getZoom(), CLUSTER_CONFIG.DISABLE_AT_ZOOM);
-                        map.setView(region.coords, targetZoom, { animate: true });
+                        map.setView(region.coords, targetZoom, { animate: !reducedMotion });
                         map.once('moveend', () => marker.openPopup());
                     }
                 });
