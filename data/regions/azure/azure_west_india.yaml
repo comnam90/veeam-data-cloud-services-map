@@ -1,0 +1,13 @@
+id: "azure-west-india"
+name: "West India (Mumbai)"
+provider: "Azure"
+coords: [19.0760, 72.8777]
+aliases:
+  - "Mumbai"
+  - "Bombay"
+  - "India"
+  - "IN"
+  - "BOM"
+  - "Maharashtra"
+services:
+  vdc_azure_backup: true

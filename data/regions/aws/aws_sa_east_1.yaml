@@ -9,6 +9,7 @@ aliases:
   - "BR"
   - "GRU"
   - "South America"
+  - "South America East 1"
 services:
   vdc_vault:
     - edition: "Advanced"

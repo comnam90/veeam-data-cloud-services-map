@@ -1,0 +1,12 @@
+id: "azure-belgium-central"
+name: "Belgium Central (Brussels)"
+provider: "Azure"
+coords: [50.8503, 4.3517]
+aliases:
+  - "Brussels"
+  - "Belgium"
+  - "BE"
+  - "BRU"
+  - "Benelux"
+services:
+  vdc_azure_backup: true

@@ -9,6 +9,7 @@ aliases:
   - "CPT"
   - "Western Cape"
   - "Africa"
+  - "Africa South 1"
 services:
   vdc_vault:
     - edition: "Advanced"

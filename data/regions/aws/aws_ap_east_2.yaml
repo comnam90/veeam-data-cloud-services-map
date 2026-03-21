@@ -1,5 +1,5 @@
-id: "aws-ap-east-1-taipei"
-name: "Taipei"
+id: "aws-ap-east-2"
+name: "AP East 2 (Taipei)"
 provider: "AWS"
 coords: [25.033, 121.5654]
 aliases:
