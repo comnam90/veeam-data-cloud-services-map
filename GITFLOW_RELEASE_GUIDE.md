@@ -44,12 +44,14 @@ npm run build
 
 The release branch should be merged to `main` via a Pull Request:
 
+> ⚠️ **Important:** When creating the PR, always verify that the **base branch is set to `main`**, not `develop`. GitHub may default to a different base depending on how the branch was created.
+
 ```bash
 # Push release branch
 git push origin release/1.1.1
 
-# Create PR: release/1.1.1 → main
-# Title: "Release v1.1.1"
+# Create PR: release/1.1.1 → main   ← base MUST be main
+# Title: "chore(release): v1.1.1"
 # Include:
 # - List of changes since last release
 # - Version bump details
