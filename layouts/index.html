@@ -1413,9 +1413,9 @@
                     if (Math.abs(markerLat - region.coords[0]) < EPSILON &&
                         Math.abs(markerLng - region.coords[1]) < EPSILON) {
                         found = true;
-                        clusterGroup.zoomToShowLayer(marker, () => {
-                            marker.openPopup();
-                        });
+                        const targetZoom = Math.max(map.getZoom(), CLUSTER_CONFIG.DISABLE_AT_ZOOM);
+                        map.setView(region.coords, targetZoom, { animate: true });
+                        map.once('moveend', () => marker.openPopup());
                     }
                 });
             }
