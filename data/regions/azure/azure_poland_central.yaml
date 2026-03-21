@@ -1,0 +1,12 @@
+id: "azure-poland-central"
+name: "Poland Central (Warsaw)"
+provider: "Azure"
+coords: [52.2297, 21.0122]
+aliases:
+  - "Warsaw"
+  - "Poland"
+  - "PL"
+  - "WAW"
+services:
+  vdc_m365: true
+  vdc_entra_id: true
