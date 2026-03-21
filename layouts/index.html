@@ -1414,7 +1414,6 @@
                         Math.abs(markerLng - region.coords[1]) < EPSILON) {
                         found = true;
                         clusterGroup.zoomToShowLayer(marker, () => {
-                            map.panTo(region.coords);
                             marker.openPopup();
                         });
                     }
