@@ -189,10 +189,10 @@ Without merging back to develop:
 
 ## Current Release Status
 
-For the v1.1.1 release:
+For the v1.2.0 release:
 
 ✅ **Step 1**: Release branch created from develop
-✅ **Step 2**: Version bumped to 1.1.1  
+✅ **Step 2**: Version bumped to 1.2.0
 ✅ **Step 3**: Ready to merge to main (via current PR)
 ⏳ **Step 4**: After main merge, needs to merge back to develop
 ⏳ **Step 5**: Cleanup release branch
