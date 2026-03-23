@@ -72,7 +72,7 @@ const testCases = {
       steps: [
         'Navigate to homepage',
         'Select "Azure" from provider dropdown',
-        'Verify counter shows fewer than 63 regions',
+        'Verify counter shows fewer than 72 regions',
         'Verify "Reset" button appears',
         'Verify map markers are reduced'
       ]
@@ -82,7 +82,7 @@ const testCases = {
       steps: [
         'Navigate to homepage',
         'Select "AWS" from provider dropdown',
-        'Verify counter shows fewer than 63 regions',
+        'Verify counter shows fewer than 72 regions',
         'Verify "Reset" button appears'
       ]
     }
@@ -136,7 +136,7 @@ const testCases = {
         'Check "M365" checkbox',
         'Uncheck "M365" checkbox',
         'Verify button label returns to "All Services"',
-        'Verify counter shows all 63 regions'
+        'Verify counter shows all 72 regions'
       ]
     }
   ],
@@ -162,7 +162,7 @@ const testCases = {
         'Click "Reset" button',
         'Verify provider dropdown shows "All Providers"',
         'Verify service button shows "All Services"',
-        'Verify counter shows "63 of 63 regions"',
+        'Verify counter shows "72 of 72 regions"',
         'Verify "Reset" button disappears'
       ]
     }
@@ -441,10 +441,9 @@ console.log('\n═════════════════════�
 console.log(`  Total Test Cases: ${totalTests}`);
 console.log('═══════════════════════════════════════════════════════════════\n');
 
-console.log('💡 To implement these tests with Playwright:');
-console.log('   1. Install: npm install -D @playwright/test');
-console.log('   2. Create: tests/ui.spec.ts');
-console.log('   3. Run: npx playwright test\n');
+console.log('💡 To run the Playwright UI tests for this project:');
+console.log('   1. Install dependencies: npm install');
+console.log('   2. Run: npm run test:ui\n');
 
 console.log('📚 Test Coverage Summary:');
 console.log('   • Search & Filter Functionality');

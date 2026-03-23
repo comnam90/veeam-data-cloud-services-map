@@ -54,7 +54,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     });
 
     test('should open region popup when selecting non-clustered region from search', async ({ page }, testInfo) => {
-      test.skip(testInfo.project.name === 'webkit', 'Leaflet map navigation causes webkit instability on Linux');
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet map navigation causes webkit instability on Linux');
       // Control test: Canada Central is NOT in a cluster, should open popup correctly
       // This contrasts with clustered regions like US East which may fail to open popup
       const searchInput = page.getByRole('combobox', { name: 'Search regions' });
@@ -74,7 +74,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     });
 
     test('should open region popup when selecting search result', async ({ page }, testInfo) => {
-      test.skip(testInfo.project.name === 'webkit', 'Leaflet map navigation causes webkit instability on Linux');
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet map navigation causes webkit instability on Linux');
       // Regression test for issue #23: clustered regions now correctly open popup when selected from search
       const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await searchInput.fill('East US 2');
@@ -216,7 +216,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     });
 
     test('should show combined results for multiple services', async ({ page }, testInfo) => {
-      test.skip(testInfo.project.name === 'webkit', 'Checking multiple filters triggers Leaflet re-render that hangs webkit on Linux');
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Checking multiple filters triggers Leaflet re-render that hangs webkit on Linux');
       const serviceButton = page.getByRole('button', { name: /all services/i });
       await serviceButton.click();
       
@@ -233,7 +233,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     });
 
     test('should show all regions when unchecking all services', async ({ page }, testInfo) => {
-      test.skip(testInfo.project.name === 'webkit', 'Leaflet map re-render after filter change causes webkit instability on Linux');
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet map re-render after filter change causes webkit instability on Linux');
       // Option 2: Skip multiple mobile platforms
       const mobilePlatforms = ['Mobile Chrome', 'Mobile Safari'];
       test.skip(
@@ -277,7 +277,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     });
 
     test('should clear all filters with reset button', async ({ page }, testInfo) => {
-      test.skip(testInfo.project.name === 'webkit', 'Leaflet map re-render after filter reset causes webkit instability on Linux');
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet map re-render after filter reset causes webkit instability on Linux');
       const mobilePlatforms = ['Mobile Chrome', 'Mobile Safari'];
       const isMobile = mobilePlatforms.includes(testInfo.project.name);
 
@@ -317,7 +317,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
   test.describe('Theme Toggle', () => {
     
     test('should cycle through theme options', async ({ page }, testInfo) => {
-      test.skip(testInfo.project.name === 'webkit', 'Leaflet tile layer swap during theme change causes webkit instability on Linux');
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet tile layer swap during theme change causes webkit instability on Linux');
       const themeButton = page.getByRole('button', { name: /theme/i });
 
       await expect(themeButton).toHaveAttribute('title', /system/i);
@@ -532,7 +532,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
   test.describe('Accessibility', () => {
     
     test('should be keyboard navigable', async ({ page }, testInfo) => {
-      test.skip(testInfo.project.name === 'webkit', 'Dynamic aria-hidden accessibility tree updates are unreliable in webkit on Linux');
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Dynamic aria-hidden accessibility tree updates are unreliable in webkit on Linux');
       test.skip(testInfo.project.name === 'Mobile Safari', 'Hardware keyboard navigation does not apply to mobile');
       await page.keyboard.press('Tab');
       

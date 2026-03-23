@@ -39,7 +39,7 @@ npm run clean            # Remove build artifacts
 ### Data Flow
 
 ```
-data/regions/{aws,azure}/*.yaml   ← Source of truth (63 regions)
+data/regions/{aws,azure}/*.yaml   ← Source of truth for region data
           ↓
    build:data script
           ↓
