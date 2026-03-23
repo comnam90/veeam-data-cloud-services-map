@@ -18,7 +18,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
   test.describe('Search Functionality', () => {
     
     test('should display matching regions when searching', async ({ page }) => {
-      const searchInput = page.getByRole('combobox', { name: 'Search regions...' });
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await searchInput.fill('US East');
       
       const searchResults = page.getByRole('listbox');
@@ -31,7 +31,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     });
 
     test('should work with region aliases', async ({ page }) => {
-      const searchInput = page.getByRole('combobox', { name: 'Search regions...' });
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await searchInput.fill('Virginia');
       
       const searchResults = page.getByRole('listbox');
@@ -44,7 +44,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     });
 
     test('should handle no results gracefully', async ({ page }) => {
-      const searchInput = page.getByRole('combobox', { name: 'Search regions...' });
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await searchInput.fill('zzz999xxx');
       
       await page.waitForTimeout(500);
@@ -57,7 +57,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       test.skip(testInfo.project.name === 'webkit', 'Leaflet map navigation causes webkit instability on Linux');
       // Control test: Canada Central is NOT in a cluster, should open popup correctly
       // This contrasts with clustered regions like US East which may fail to open popup
-      const searchInput = page.getByRole('combobox', { name: 'Search regions...' });
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await searchInput.fill('Canada Central');
       
       const searchResults = page.getByRole('listbox', { name: 'Search results' });
@@ -76,7 +76,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     test('should open region popup when selecting search result', async ({ page }, testInfo) => {
       test.skip(testInfo.project.name === 'webkit', 'Leaflet map navigation causes webkit instability on Linux');
       // Regression test for issue #23: clustered regions now correctly open popup when selected from search
-      const searchInput = page.getByRole('combobox', { name: 'Search regions...' });
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await searchInput.fill('East US 2');
       
       const searchResults = page.getByRole('listbox', { name: 'Search results' });
@@ -324,11 +324,11 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
 
       await themeButton.click();
       await expect(themeButton).toHaveAttribute('title', /dark/i);
-      await page.waitForTimeout(300);
+      await expect(page.locator('html')).toHaveClass(/dark/);
 
       await themeButton.click();
       await expect(themeButton).toHaveAttribute('title', /light/i);
-      await page.waitForTimeout(300);
+      await expect(page.locator('html')).toHaveClass(/light/);
 
       await themeButton.click();
       await expect(themeButton).toHaveAttribute('title', /system/i);
@@ -368,7 +368,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     });
 
     test('should show correct service details in popup', async ({ page }) => {
-      const searchInput = page.getByRole('combobox', { name: 'Search regions...' });
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await searchInput.fill('US East 1');
       
       const searchResults = page.getByRole('listbox', { name: 'Search results' });
@@ -384,7 +384,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     });
 
     test('should close popup with close button', async ({ page }) => {
-      const searchInput = page.getByRole('combobox', { name: 'Search regions...' });
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await searchInput.fill('Canada Central 1');
       
       const searchResults = page.getByRole('listbox', { name: 'Search results' });
@@ -400,7 +400,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await expect(popup).toBeVisible({ timeout: 5000 });
       
       const closeButton = page.getByRole('button', { name: /close popup/i });
-      await closeButton.evaluate((el: HTMLElement) => el.click());
+      await closeButton.click();
       
       await expect(popup).not.toBeVisible();
     });
@@ -518,7 +518,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
   test.describe('Error Handling', () => {
     
     test('should handle invalid search gracefully', async ({ page }) => {
-      const searchInput = page.getByRole('combobox', { name: 'Search regions...' });
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await searchInput.fill('InvalidRegion999');
       
       await page.waitForTimeout(500);
@@ -535,7 +535,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       test.skip(testInfo.project.name === 'Mobile Safari', 'Hardware keyboard navigation does not apply to mobile');
       await page.keyboard.press('Tab');
       
-      const searchInput = page.getByRole('combobox', { name: 'Search regions...' });
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await expect(searchInput).toBeFocused();
       
       await page.keyboard.press('Tab');
@@ -567,7 +567,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await page.setViewportSize({ width: 375, height: 667 });
       await page.reload();
       
-      const searchInput = page.getByRole('combobox', { name: 'Search regions...' });
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await expect(searchInput).toBeVisible();
       
       const providerFilter = page.locator('#providerFilter');
@@ -581,7 +581,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await page.setViewportSize({ width: 768, height: 1024 });
       await page.reload();
       
-      const searchInput = page.getByRole('combobox', { name: 'Search regions...' });
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await expect(searchInput).toBeVisible();
       
       const counter = page.getByText(/72 of 72 regions/i);

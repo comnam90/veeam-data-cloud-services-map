@@ -18,7 +18,7 @@ const testCases = {
         'Verify results include "US East 1 (N. Virginia)"'
       ],
       selectors: {
-        searchInput: '[role="combobox"][name="Search regions..."]',
+        searchInput: '[role="combobox"][aria-label="Search regions"]',
         searchResults: '[role="listbox"]',
         firstResult: '[role="option"]'
       }
@@ -59,12 +59,12 @@ const testCases = {
       name: 'Provider filter should show all providers by default',
       steps: [
         'Navigate to homepage',
-        'Verify counter shows "63 of 63 regions"',
+        'Verify counter shows "72 of 72 regions"',
         'Verify provider dropdown is set to "All Providers"'
       ],
       selectors: {
         providerFilter: '#providerFilter',
-        regionCounter: 'text=of 63 regions'
+        regionCounter: 'text=of 72 regions'
       }
     },
     {

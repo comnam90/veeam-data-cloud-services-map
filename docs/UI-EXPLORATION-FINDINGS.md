@@ -12,7 +12,7 @@ Explored the production website and identified **5 core features** with **32 com
 
 ### 1. Region Search ✅
 **Functionality:** Autocomplete search with alias support  
-**Locator:** `[role="combobox"][name="Search regions..."]`
+**Locator:** `[role="combobox"][aria-label="Search regions"]`
 
 **Observations:**
 - Search query "US East" returned 4 results
@@ -27,8 +27,8 @@ Explored the production website and identified **5 core features** with **32 com
 **Locator:** `#providerFilter`
 
 **Observations:**
-- Default shows "63 of 63 regions" (all providers)
-- Azure filter reduced to "36 of 63 regions"
+- Default shows "72 of 72 regions" (all providers)
+- Azure filter reduced to "45 of 72 regions"
 - Reset button appears when filter is active
 - Works seamlessly with service filters
 
@@ -40,7 +40,7 @@ Explored the production website and identified **5 core features** with **32 com
 
 **Observations:**
 - 5 services available: Vault, M365, Entra ID, Salesforce, Azure Backup
-- M365 filter reduced to "23 of 63 regions"
+- M365 filter reduced to "25 of 72 regions"
 - Button label changes dynamically (e.g., "All Services" → "M365")
 - Checkboxes allow multi-select
 
