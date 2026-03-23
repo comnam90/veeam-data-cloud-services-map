@@ -109,6 +109,39 @@ These are strict — validation will fail otherwise:
 
 **New service type:** Update YAML files, `layouts/index.html` (icon, display name, filter dropdown), Zod schemas in `src/functions/schemas/common.ts`, route enums in `regions.ts`, and `static/llms*.txt`
 
+## Branching & Commits
+
+This project uses **Gitflow**. See `GITFLOW_RELEASE_GUIDE.md` for the full release process.
+
+| Branch | Purpose |
+|--------|---------|
+| `main` | Production only — never commit directly |
+| `develop` | Integration branch — PRs target here by default |
+| `feature/*` | New features, branched from `develop` |
+| `release/X.Y.Z` | Release prep, branched from `develop`, merged to `main` then back to `develop` |
+| `chore/*`, `fix/*`, etc. | Other work types, branched from `develop` |
+
+All commits must follow **Conventional Commits**:
+
+```
+<type>(<scope>): <description>
+
+Types: feat, fix, docs, test, chore, refactor, perf, ci, style
+Examples:
+  feat(api): add region clustering endpoint
+  fix(ui): correct marker position on mobile Safari
+  chore(release): bump version to 1.3.0
+```
+
+## Development Principles
+
+New code in this project should follow these principles, even where existing code does not:
+
+- **TDD**: Write tests before implementation. For API endpoints, write integration tests in `scripts/test-api.js` first. For UI behaviour, write Playwright tests in `tests/ui.spec.ts` first.
+- **DRY**: Extract shared logic to `src/functions/utils/`. Shared Zod schemas belong in `src/functions/schemas/common.ts`.
+- **SOLID**: Each route file owns one endpoint. Keep handlers thin — push business logic to utils. Don't modify existing route files to add new behaviour; add new files.
+- **KISS**: Prefer explicit, readable code over clever abstractions. The API is stateless and data is static — don't over-engineer.
+
 ## LLM Documentation
 
 `static/llms.txt` and `static/llms-full.txt` are API docs optimized for AI consumption. Keep these synchronized with endpoint changes.
