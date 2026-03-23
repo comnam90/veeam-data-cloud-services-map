@@ -605,7 +605,7 @@
                                 aria-activedescendant=""
                                 class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg pl-8 pr-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 placeholder-slate-400 light:placeholder-slate-500 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm">
                     </div>
-                    <div id="searchResults" role="listbox" aria-label="Search results"></div>
+                    <div id="searchResults" role="listbox" aria-label="Search results" aria-hidden="true"></div>
                 </div>
 
                 <select id="providerFilter" aria-label="Filter by provider" class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm min-w-0">
@@ -621,7 +621,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
-                    <div class="multiselect-dropdown" id="serviceDropdown">
+                    <div class="multiselect-dropdown" id="serviceDropdown" aria-hidden="true">
                         <label class="multiselect-option text-white light:text-slate-900">
                             <input type="checkbox" value="vdc_vault"> Vault
                         </label>
@@ -1140,12 +1140,23 @@
             e.stopPropagation();
             const isOpen = serviceDropdown.classList.toggle('open');
             serviceBtn.setAttribute('aria-expanded', isOpen);
+            serviceDropdown.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        });
+
+        serviceBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const isOpen = serviceDropdown.classList.toggle('open');
+                serviceBtn.setAttribute('aria-expanded', isOpen);
+                serviceDropdown.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+            }
         });
 
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#serviceMultiselect')) {
                 serviceDropdown.classList.remove('open');
                 serviceBtn.setAttribute('aria-expanded', 'false');
+                serviceDropdown.setAttribute('aria-hidden', 'true');
             }
         });
 
@@ -1359,6 +1370,7 @@
             } else {
                 searchResults.classList.remove('open');
             }
+            searchResults.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
             searchInput.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
             if (!isOpen) {
                 searchInput.setAttribute('aria-activedescendant', '');
