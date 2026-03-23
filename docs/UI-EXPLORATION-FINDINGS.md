@@ -103,11 +103,11 @@ Explored the production website and identified **5 core features** with **32 com
 
 | Element | Locator | Notes |
 |---------|---------|-------|
-| Search Input | `[role="combobox"][name="Search regions..."]` | Autocomplete |
+| Search Input | `[role="combobox"][aria-label="Search regions"]` | Autocomplete |
 | Search Results | `[role="listbox"]` | Dropdown |
 | Provider Filter | `#providerFilter` | Select dropdown |
 | Service Filter Button | `button:has-text("All Services")` | Dynamic label |
-| Region Counter | Text pattern: `X of 63 regions` | Live updates |
+| Region Counter | Text pattern: `X of 72 regions` | Live updates |
 | Reset Button | `button:has-text("Reset")` | Conditional display |
 | Theme Button | `button[aria-label*="Theme"]` | Cycles themes |
 | About Button | `button[aria-label="Open about panel"]` | Opens dialog |
