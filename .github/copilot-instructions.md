@@ -126,10 +126,56 @@ All UI code in `layouts/index.html` (1500+ lines):
 ## Testing
 
 ```bash
-npm run test                   # Preferred way to run API integration tests
+npm run test                   # All tests: validate + scraper + API
+npm run test:api               # API integration tests (scripts/test-api.js)
+npm run test:validate          # YAML validation tests
+npm run test:ui                # Playwright UI tests (headless, 5 browser targets)
+npm run test:ui:headed         # Playwright with browser UI
+npm run test:ui:debug          # Playwright debug mode
+npm run test:ui:report         # View Playwright HTML report
 ```
 
-Tests live in `scripts/test-api.js`. When adding new endpoints or modifying API behavior, extend this file to maintain test coverage.
+- API tests live in `scripts/test-api.js` — extend when adding or modifying endpoints
+- UI tests live in `tests/ui.spec.ts` — Playwright covers Chromium, Firefox, WebKit, Mobile Chrome (Pixel 7), Mobile Safari (iPhone 15 Pro)
+- Some WebKit tests are skipped due to Leaflet instability on Linux CI
+
+### Test-Driven Development
+Write tests before implementation:
+- **New API endpoint**: add integration tests to `scripts/test-api.js` first
+- **New UI behaviour**: add Playwright tests to `tests/ui.spec.ts` first
+
+## Branching & Commits
+
+This project uses **Gitflow**. See `GITFLOW_RELEASE_GUIDE.md` for the full release process.
+
+| Branch | Purpose |
+|--------|---------|
+| `main` | Production only — never commit directly |
+| `develop` | Integration branch — PRs target here by default |
+| `feature/*` | New features, branched from `develop` |
+| `release/X.Y.Z` | Release prep, branched from `develop`, merged to `main` then back to `develop` |
+| `chore/*`, `fix/*`, etc. | Other work types, branched from `develop` |
+
+All commits must follow **Conventional Commits**:
+
+```
+<type>(<scope>): <description>
+
+Types: feat, fix, docs, test, chore, refactor, perf, ci, style
+Examples:
+  feat(api): add region clustering endpoint
+  fix(ui): correct marker position on mobile Safari
+  chore(release): bump version to 1.3.0
+```
+
+## Development Principles
+
+New code should follow these principles, even where existing code does not:
+
+- **TDD**: Write tests before implementation (see Testing section above)
+- **DRY**: Extract shared logic to `src/functions/utils/`. Shared Zod schemas belong in `src/functions/schemas/common.ts`
+- **SOLID**: Each route file owns one endpoint. Keep handlers thin — push business logic to utils. Don't modify existing route files to add new behaviour; add new files
+- **KISS**: Prefer explicit, readable code over clever abstractions. The API is stateless and data is static — don't over-engineer
 
 ## Deployment
 
