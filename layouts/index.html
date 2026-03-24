@@ -38,6 +38,7 @@
             flex-direction: column;
             height: 100vh;
             height: 100dvh;
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
         .map-container {
@@ -82,8 +83,14 @@
 
         /* Select dropdown styling */
         select {
+            background-color: #1e293b; /* dark */
+            color: white;
             transition: border-color 0.2s ease;
             cursor: pointer;
+        }
+        .light select {
+            background-color: white;
+            color: #0f172a;
         }
         select:hover {
             border-color: #00d15f !important;
@@ -698,7 +705,7 @@
                 </div>
                 <div>
                     <h3 class="text-lg font-semibold text-white light:text-slate-900 mb-1">Failed to Load Map</h3>
-                    <p class="text-slate-400 light:text-slate-500 text-sm max-w-xs">There was a problem loading the map. Please check your internet connection and try refreshing the page.</p>
+                    <p class="text-slate-400 light:text-slate-500 text-sm max-w-xs">The map failed to load. Please check your internet connection and try refreshing the page.</p>
                 </div>
                 <button onclick="location.reload()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors">
                     Refresh Page
