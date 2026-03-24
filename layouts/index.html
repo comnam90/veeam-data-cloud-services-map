@@ -594,7 +594,7 @@
                 <!-- Search Input -->
                 <div class="search-container">
                     <div class="relative">
-                        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                         <input type="text" id="regionSearch" placeholder="Search regions…" autocomplete="off" aria-label="Search regions"
@@ -617,7 +617,7 @@
                 <div class="multiselect" id="serviceMultiselect">
                     <button type="button" id="serviceFilterBtn" aria-expanded="false" class="multiselect-btn bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 shadow-sm backdrop-blur-sm min-w-0">
                         <span id="serviceFilterLabel">All Services</span>
-                        <svg class="multiselect-chevron w-3 h-3 sm:w-4 sm:h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" class="multiselect-chevron w-3 h-3 sm:w-4 sm:h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
@@ -641,7 +641,7 @@
                 </div>
 
                 <div id="regionCount" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/60 light:bg-slate-100 rounded-lg border border-slate-600/30 light:border-slate-300 text-xs text-slate-300 light:text-slate-600">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
@@ -649,20 +649,20 @@
                 </div>
 
                 <button id="resetFilters" aria-label="Reset all filters" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/20 light:bg-amber-100 border border-amber-500/40 light:border-amber-400 text-amber-400 light:text-amber-700 hover:bg-amber-500/30 light:hover:bg-amber-200 text-xs font-medium transition-colors duration-200 flex-shrink-0" title="Reset all filters">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                     <span class="hidden sm:inline">Reset</span>
                 </button>
 
                 <button id="themeToggle" aria-label="Toggle theme" class="p-2 sm:p-2.5 rounded-lg bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-100 hover:border-green-500/50 shadow-sm backdrop-blur-sm flex-shrink-0" title="Toggle theme">
-                    <svg id="iconSystem" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 light:text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+                    <svg aria-hidden="true" id="iconSystem" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 light:text-slate-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/>
                     </svg>
-                    <svg id="iconLight" class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 hidden" fill="currentColor" viewBox="0 0 20 20">
+                    <svg aria-hidden="true" id="iconLight" class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 hidden" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
                     </svg>
-                    <svg id="iconDark" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 hidden" fill="currentColor" viewBox="0 0 20 20">
+                    <svg aria-hidden="true" id="iconDark" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 hidden" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
                     </svg>
                 </button>
@@ -681,7 +681,7 @@
         
         <div id="mapLoading" class="absolute inset-0 sm:m-4 lg:m-6 flex items-center justify-center bg-slate-900/90 light:bg-slate-100/90 backdrop-blur-sm rounded-xl z-[1000]">
             <div class="flex flex-col items-center gap-3">
-                <svg class="loading-spinner w-10 h-10 text-green-500" fill="none" viewBox="0 0 24 24">
+                <svg aria-hidden="true" class="loading-spinner w-10 h-10 text-green-500" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -692,7 +692,7 @@
         <div id="mapError" class="absolute inset-0 sm:m-4 lg:m-6 items-center justify-center bg-slate-900 light:bg-slate-100 rounded-xl z-[1000]">
             <div class="flex flex-col items-center gap-4 p-6 text-center">
                 <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
-                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                     </svg>
                 </div>
@@ -715,7 +715,7 @@
         <div class="flex items-center justify-between mb-4">
             <h2 id="infoPanelTitle" class="text-xl font-bold text-white light:text-slate-900">About This Map</h2>
             <button id="closeInfoPanel" class="p-2 rounded-lg hover:bg-slate-800 light:hover:bg-slate-100 transition-colors" aria-label="Close panel">
-                <svg class="w-5 h-5 text-slate-400 light:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" class="w-5 h-5 text-slate-400 light:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
@@ -723,7 +723,7 @@
 
         <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4">
             <div class="flex gap-2.5">
-                <svg class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
                 <div>
@@ -759,7 +759,7 @@
                     <div class="text-white light:text-slate-900 font-medium group-hover:text-green-400 transition-colors">@comnam90</div>
                     <div class="text-xs text-slate-400 light:text-slate-500">GitHub</div>
                 </div>
-                <svg class="w-4 h-4 text-slate-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" class="w-4 h-4 text-slate-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                 </svg>
             </a>
@@ -769,29 +769,29 @@
             <h3 class="text-sm font-semibold text-slate-400 light:text-slate-500 uppercase tracking-wider mb-2">Quick Links</h3>
             <div class="space-y-1.5">
                 <a href="https://github.com/comnam90/veeam-data-cloud-services-map" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-800/50 light:bg-slate-100 border border-slate-700/50 light:border-slate-200 hover:border-green-500/50 transition-colors group">
-                    <svg class="w-5 h-5 text-slate-400 group-hover:text-green-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" class="w-5 h-5 text-slate-400 group-hover:text-green-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                     </svg>
                     <span class="text-slate-300 light:text-slate-600 text-sm group-hover:text-green-400 transition-colors">View on GitHub</span>
-                    <svg class="w-4 h-4 text-slate-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" class="w-4 h-4 text-slate-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                     </svg>
                 </a>
                 <a href="/api/docs" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-800/50 light:bg-slate-100 border border-slate-700/50 light:border-slate-200 hover:border-green-500/50 transition-colors group">
-                    <svg class="w-5 h-5 text-slate-400 group-hover:text-green-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" class="w-5 h-5 text-slate-400 group-hover:text-green-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                     </svg>
                     <span class="text-slate-300 light:text-slate-600 text-sm group-hover:text-green-400 transition-colors">API Documentation</span>
-                    <svg class="w-4 h-4 text-slate-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" class="w-4 h-4 text-slate-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                     </svg>
                 </a>
                 <a href="https://www.veeam.com/products/veeam-data-cloud.html" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-800/50 light:bg-slate-100 border border-slate-700/50 light:border-slate-200 hover:border-green-500/50 transition-colors group">
-                    <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 144 144">
+                    <svg aria-hidden="true" class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 144 144">
                         <path d="M118.21 117.2c0 .49-.2.94-.53 1.27-.33.32-.77.53-1.27.53l-21.51.11v12.01H105c3.21 0 6.3-1.28 8.57-3.55l13.2-13.2c2.27-2.27 3.55-5.36 3.55-8.57V94.65h-12.11v22.56zM25.79 26.8c0-.49.2-.94.53-1.27.32-.32.77-.53 1.27-.53l21.51-.11V12.88H39c-3.21 0-6.3 1.28-8.57 3.55l-13.2 13.2a12.14 12.14 0 0 0-3.55 8.57v11.15h12.11V26.79zm-.47 90.68a1.8 1.8 0 0 1-.52-1.27l-.11-21.51H12.68v10.1c0 3.21 1.28 6.3 3.55 8.57l13.2 13.2c2.27 2.27 5.36 3.55 8.57 3.55h11.15v-12.11H26.59c-.49-.01-.94-.21-1.27-.54zm102.46-86.86-13.2-13.2a12.14 12.14 0 0 0-8.57-3.55H94.86v12.11h22.56c.49.01.94.21 1.27.54.32.32.52.77.52 1.27l.11 21.51h12.01V39.2c0-3.21-1.28-6.3-3.55-8.57zM71.86 78.79a6.65 6.65 0 1 0 0-13.3 6.65 6.65 0 0 0 0 13.3"/>
                     </svg>
                     <span class="text-slate-300 light:text-slate-600 text-sm group-hover:text-green-400 transition-colors">Official Veeam Data Cloud</span>
-                    <svg class="w-4 h-4 text-slate-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" class="w-4 h-4 text-slate-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                     </svg>
                 </a>
