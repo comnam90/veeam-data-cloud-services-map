@@ -1210,10 +1210,8 @@
             providerFilter.value = (provider && SUPPORTED_PROVIDERS.has(provider)) ? provider : 'all';
             const servicesParam = params.get('services');
             if (servicesParam) {
-                const requested = servicesParam.split(',');
-                serviceCheckboxes.forEach(cb => {
-                    cb.checked = requested.includes(cb.value) && SUPPORTED_SERVICES.has(cb.value);
-                });
+                const allowedRequested = new Set(servicesParam.split(',').filter(s => SUPPORTED_SERVICES.has(s)));
+                serviceCheckboxes.forEach(cb => { cb.checked = allowedRequested.has(cb.value); });
             } else {
                 serviceCheckboxes.forEach(cb => { cb.checked = false; });
             }
@@ -1234,7 +1232,7 @@
             clusterGroup.clearLayers();
             let visibleCount = 0;
 
-            const pFilter = document.getElementById('providerFilter').value;
+            const pFilter = providerFilter.value;
             const selectedServices = getSelectedServices();
 
             regions.forEach(region => {
@@ -1370,9 +1368,7 @@
         }
 
         function hasActiveFilters() {
-            const providerFilter = document.getElementById('providerFilter').value;
-            const selectedServices = getSelectedServices();
-            return providerFilter !== 'all' || selectedServices.length > 0;
+            return providerFilter.value !== 'all' || getSelectedServices().length > 0;
         }
 
         function updateResetButtonVisibility() {
