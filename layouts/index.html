@@ -130,13 +130,13 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             opacity: 0;
-            visibility: hidden;
+            pointer-events: none;
             transform: translateY(-8px);
-            transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
         .multiselect-dropdown.open {
             opacity: 1;
-            visibility: visible;
+            pointer-events: auto;
             transform: translateY(0);
         }
         .light .multiselect-dropdown {
@@ -628,7 +628,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
-                    <div class="multiselect-dropdown" id="serviceDropdown" aria-hidden="true">
+                    <div class="multiselect-dropdown" id="serviceDropdown">
                         <label class="multiselect-option text-white light:text-slate-900">
                             <input type="checkbox" value="vdc_vault"> Vault
                         </label>
@@ -1147,7 +1147,6 @@
             e.stopPropagation();
             const isOpen = serviceDropdown.classList.toggle('open');
             serviceBtn.setAttribute('aria-expanded', isOpen);
-            serviceDropdown.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
         });
 
         serviceBtn.addEventListener('keydown', (e) => {
@@ -1155,7 +1154,6 @@
                 e.preventDefault();
                 const isOpen = serviceDropdown.classList.toggle('open');
                 serviceBtn.setAttribute('aria-expanded', isOpen);
-                serviceDropdown.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
             }
         });
 
@@ -1163,7 +1161,6 @@
             if (!e.target.closest('#serviceMultiselect')) {
                 serviceDropdown.classList.remove('open');
                 serviceBtn.setAttribute('aria-expanded', 'false');
-                serviceDropdown.setAttribute('aria-hidden', 'true');
             }
         });
 
@@ -1186,11 +1183,51 @@
             }
         }
 
+        const providerFilter = document.getElementById('providerFilter');
+        const SUPPORTED_PROVIDERS = new Set(['all', 'Azure', 'AWS']);
+        const SUPPORTED_SERVICES = new Set(['vdc_vault', 'vdc_m365', 'vdc_entra_id', 'vdc_salesforce', 'vdc_azure_backup']);
+
+        function getCurrentFilterState() {
+            return { provider: providerFilter.value, services: getSelectedServices() };
+        }
+
+        function syncFilterStateToUrl(mode = 'replace') {
+            const { provider, services } = getCurrentFilterState();
+            const params = new URLSearchParams();
+            if (provider !== 'all') params.set('provider', provider);
+            if (services.length > 0) params.set('services', services.join(','));
+            const url = params.toString() ? `?${params}` : location.pathname;
+            if (mode === 'push') {
+                history.pushState({ provider, services }, '', url);
+            } else {
+                history.replaceState({ provider, services }, '', url);
+            }
+        }
+
+        function applyFilterStateFromUrl() {
+            const params = new URLSearchParams(location.search);
+            const provider = params.get('provider');
+            providerFilter.value = (provider && SUPPORTED_PROVIDERS.has(provider)) ? provider : 'all';
+            const servicesParam = params.get('services');
+            if (servicesParam) {
+                const requested = servicesParam.split(',');
+                serviceCheckboxes.forEach(cb => {
+                    cb.checked = requested.includes(cb.value) && SUPPORTED_SERVICES.has(cb.value);
+                });
+            } else {
+                serviceCheckboxes.forEach(cb => { cb.checked = false; });
+            }
+            updateServiceLabel();
+        }
+
+        function handleFilterChange(historyMode = 'push') {
+            updateServiceLabel();
+            renderMap();
+            syncFilterStateToUrl(historyMode);
+        }
+
         serviceCheckboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-                updateServiceLabel();
-                renderMap();
-            });
+            cb.addEventListener('change', () => handleFilterChange('push'));
         });
 
         function renderMap() {
@@ -1316,7 +1353,7 @@
             updateResetButtonVisibility();
         }
 
-        document.getElementById('providerFilter').addEventListener('change', renderMap);
+        providerFilter.addEventListener('change', () => handleFilterChange('push'));
 
         function updateRegionCount(visible, total) {
             document.getElementById('visibleCount').textContent = visible;
@@ -1350,15 +1387,21 @@
         }
 
         function resetAllFilters() {
-            document.getElementById('providerFilter').value = 'all';
+            providerFilter.value = 'all';
             serviceCheckboxes.forEach(cb => cb.checked = false);
-            updateServiceLabel();
-            renderMap();
+            handleFilterChange('push');
         }
 
         document.getElementById('resetFilters').addEventListener('click', resetAllFilters);
 
+        window.addEventListener('popstate', () => {
+            applyFilterStateFromUrl();
+            renderMap();
+        });
+
         updateRegionCount(0, regions.length);
+        applyFilterStateFromUrl();
+        syncFilterStateToUrl('replace');
         renderMap();
 
         // Hide loading overlay once tiles are loaded
