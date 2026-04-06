@@ -1186,18 +1186,56 @@
             }
         }
 
+        const providerFilter = document.getElementById('providerFilter');
+        const SUPPORTED_PROVIDERS = new Set(Array.from(providerFilter.options, option => option.value));
+        const SUPPORTED_SERVICES = new Set(Array.from(serviceCheckboxes, checkbox => checkbox.value));
+
+        function getCurrentFilterState() {
+            return { provider: providerFilter.value, services: getSelectedServices() };
+        }
+
+        function syncFilterStateToUrl(mode = 'replace') {
+            const { provider, services } = getCurrentFilterState();
+            const params = new URLSearchParams();
+            if (provider !== 'all') params.set('provider', provider);
+            if (services.length > 0) params.set('services', services.join(','));
+            const url = params.toString() ? `?${params}` : location.pathname;
+            if (mode === 'push') {
+                history.pushState(null, '', url);
+            } else {
+                history.replaceState(null, '', url);
+            }
+        }
+
+        function applyFilterStateFromUrl() {
+            const params = new URLSearchParams(location.search);
+            const provider = params.get('provider');
+            providerFilter.value = (provider && SUPPORTED_PROVIDERS.has(provider)) ? provider : 'all';
+            const servicesParam = params.get('services');
+            if (servicesParam) {
+                const allowedRequested = new Set(servicesParam.split(',').filter(s => SUPPORTED_SERVICES.has(s)));
+                serviceCheckboxes.forEach(cb => { cb.checked = allowedRequested.has(cb.value); });
+            } else {
+                serviceCheckboxes.forEach(cb => { cb.checked = false; });
+            }
+            updateServiceLabel();
+        }
+
+        function handleFilterChange(historyMode = 'push') {
+            updateServiceLabel();
+            renderMap();
+            syncFilterStateToUrl(historyMode);
+        }
+
         serviceCheckboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-                updateServiceLabel();
-                renderMap();
-            });
+            cb.addEventListener('change', () => handleFilterChange('push'));
         });
 
         function renderMap() {
             clusterGroup.clearLayers();
             let visibleCount = 0;
 
-            const pFilter = document.getElementById('providerFilter').value;
+            const pFilter = providerFilter.value;
             const selectedServices = getSelectedServices();
 
             regions.forEach(region => {
@@ -1316,7 +1354,7 @@
             updateResetButtonVisibility();
         }
 
-        document.getElementById('providerFilter').addEventListener('change', renderMap);
+        providerFilter.addEventListener('change', () => handleFilterChange('push'));
 
         function updateRegionCount(visible, total) {
             document.getElementById('visibleCount').textContent = visible;
@@ -1333,9 +1371,7 @@
         }
 
         function hasActiveFilters() {
-            const providerFilter = document.getElementById('providerFilter').value;
-            const selectedServices = getSelectedServices();
-            return providerFilter !== 'all' || selectedServices.length > 0;
+            return providerFilter.value !== 'all' || getSelectedServices().length > 0;
         }
 
         function updateResetButtonVisibility() {
@@ -1350,15 +1386,21 @@
         }
 
         function resetAllFilters() {
-            document.getElementById('providerFilter').value = 'all';
+            providerFilter.value = 'all';
             serviceCheckboxes.forEach(cb => cb.checked = false);
-            updateServiceLabel();
-            renderMap();
+            handleFilterChange('push');
         }
 
         document.getElementById('resetFilters').addEventListener('click', resetAllFilters);
 
+        window.addEventListener('popstate', () => {
+            applyFilterStateFromUrl();
+            renderMap();
+        });
+
         updateRegionCount(0, regions.length);
+        applyFilterStateFromUrl();
+        syncFilterStateToUrl('replace');
         renderMap();
 
         // Hide loading overlay once tiles are loaded

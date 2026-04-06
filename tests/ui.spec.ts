@@ -314,6 +314,133 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     });
   });
 
+  test.describe('Filter URL Deep-Linking', () => {
+
+    test('syncs provider filter to the URL', async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet re-render on filter change causes webkit instability on Linux');
+      const providerFilter = page.locator('#providerFilter');
+      await providerFilter.selectOption('Azure');
+      await expect(page).toHaveURL(/[\?&]provider=Azure/);
+
+      await providerFilter.selectOption('all');
+      await expect(page).not.toHaveURL(/provider=/);
+    });
+
+    test('syncs service filters to the URL and clears them on reset', async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet re-render on filter change causes webkit instability on Linux');
+      await page.getByRole('button', { name: /all services/i }).click();
+      await page.getByRole('checkbox', { name: 'M365' }).check();
+      await expect(page).toHaveURL(/[\?&]services=vdc_m365/);
+
+      await page.getByRole('button', { name: /reset/i }).click();
+      await expect(page).not.toHaveURL(/services=/);
+      await expect(page).not.toHaveURL(/provider=/);
+    });
+
+    test('hydrates filters from URL on load and after reload', async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet re-render on filter hydration causes webkit instability on Linux');
+      const mobilePlatforms = ['Mobile Chrome', 'Mobile Safari'];
+      test.skip(mobilePlatforms.includes(testInfo.project.name), `Counter elements not visible on mobile: ${testInfo.project.name}`);
+      await page.goto(`${BASE_URL}/?provider=Azure&services=vdc_m365`);
+      const totalCount = await page.locator('#totalCount').textContent();
+      expect(totalCount, '#totalCount element was empty or missing').not.toBeNull();
+      await expect(page.locator('#providerFilter')).toHaveValue('Azure');
+      await expect(page.locator('#serviceDropdown input[value="vdc_m365"]')).toBeChecked();
+      await expect(page.locator('#visibleCount')).not.toHaveText(totalCount!);
+
+      await page.reload();
+      await expect(page.locator('#providerFilter')).toHaveValue('Azure');
+      await expect(page.locator('#serviceDropdown input[value="vdc_m365"]')).toBeChecked();
+      await expect(page.locator('#visibleCount')).not.toHaveText(totalCount!);
+    });
+
+    test('replays filter changes with browser back and forward', async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet re-render during history navigation causes webkit instability on Linux');
+      const mobilePlatforms = ['Mobile Chrome', 'Mobile Safari'];
+      test.skip(mobilePlatforms.includes(testInfo.project.name), `Complex history navigation unstable on mobile: ${testInfo.project.name}`);
+      const providerFilter = page.locator('#providerFilter');
+      await providerFilter.selectOption('Azure');
+      await page.getByRole('button', { name: /all services/i }).click();
+      await page.getByRole('checkbox', { name: 'M365' }).check();
+      await page.keyboard.press('Escape');
+
+      await page.goBack();
+      await expect(providerFilter).toHaveValue('Azure');
+      await expect(page.locator('#serviceDropdown input[value="vdc_m365"]')).not.toBeChecked();
+
+      await page.goForward();
+      await expect(providerFilter).toHaveValue('Azure');
+      await expect(page.locator('#serviceDropdown input[value="vdc_m365"]')).toBeChecked();
+    });
+
+    test('hydrates service params for checkbox values present in the DOM', async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet re-render on filter hydration causes webkit instability on Linux');
+      await page.route('**/*', async route => {
+        if (route.request().resourceType() !== 'document') {
+          await route.continue();
+          return;
+        }
+
+        const response = await route.fetch();
+        const html = await response.text();
+        const injectedHtml = html.replace(
+          /(<input type=checkbox value=vdc_azure_backup> Azure<\/label>)(<\/div>)/,
+          '$1<label class="multiselect-option text-white light:text-slate-900"><input type=checkbox value=vdc_test_service> Test Service</label>$2'
+        );
+
+        expect(injectedHtml).not.toBe(html);
+        await route.fulfill({ response, body: injectedHtml });
+      });
+
+      await page.goto(`${BASE_URL}/?services=vdc_test_service`);
+
+      await expect(page.locator('#serviceDropdown input[value="vdc_test_service"]')).toBeChecked();
+      await expect(page).toHaveURL(/[\?&]services=vdc_test_service/);
+    });
+
+    test('hydrates provider params for select options present in the DOM', async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet re-render on filter hydration causes webkit instability on Linux');
+      await page.route('**/*', async route => {
+        if (route.request().resourceType() !== 'document') {
+          await route.continue();
+          return;
+        }
+
+        const response = await route.fetch();
+        const html = await response.text();
+        const injectedHtml = html.replace(
+          /(<option value=AWS>AWS<\/option>)(<\/select>)/,
+          '$1<option value=GCP>GCP</option>$2'
+        );
+
+        expect(injectedHtml).not.toBe(html);
+        await route.fulfill({ response, body: injectedHtml });
+      });
+
+      await page.goto(`${BASE_URL}/?provider=GCP`);
+
+      await expect(page.locator('#providerFilter option[value="GCP"]')).toHaveCount(1);
+      await expect(page.locator('#providerFilter')).toHaveValue('GCP');
+      await expect(page).toHaveURL(/[\?&]provider=GCP/);
+    });
+
+    test('keeps history.state unused while syncing filter URLs', async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet re-render during URL sync causes webkit instability on Linux');
+      expect(await page.evaluate(() => window.history.state)).toBeNull();
+
+      const providerFilter = page.locator('#providerFilter');
+      await providerFilter.selectOption('Azure');
+      await expect(page).toHaveURL(/[\?&]provider=Azure/);
+      expect(await page.evaluate(() => window.history.state)).toBeNull();
+
+      await page.getByRole('button', { name: /all services/i }).click();
+      await page.getByRole('checkbox', { name: 'M365' }).check();
+      await expect(page).toHaveURL(/[\?&]services=vdc_m365/);
+      expect(await page.evaluate(() => window.history.state)).toBeNull();
+    });
+
+  });
+
   test.describe('Theme Toggle', () => {
     
     test('should cycle through theme options', async ({ page }, testInfo) => {
