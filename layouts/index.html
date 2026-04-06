@@ -130,13 +130,13 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             opacity: 0;
-            pointer-events: none;
+            visibility: hidden;
             transform: translateY(-8px);
-            transition: opacity 0.2s ease, transform 0.2s ease;
+            transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
         }
         .multiselect-dropdown.open {
             opacity: 1;
-            pointer-events: auto;
+            visibility: visible;
             transform: translateY(0);
         }
         .light .multiselect-dropdown {
@@ -628,7 +628,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
-                    <div class="multiselect-dropdown" id="serviceDropdown">
+                    <div class="multiselect-dropdown" id="serviceDropdown" aria-hidden="true">
                         <label class="multiselect-option text-white light:text-slate-900">
                             <input type="checkbox" value="vdc_vault"> Vault
                         </label>
@@ -1147,6 +1147,7 @@
             e.stopPropagation();
             const isOpen = serviceDropdown.classList.toggle('open');
             serviceBtn.setAttribute('aria-expanded', isOpen);
+            serviceDropdown.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
         });
 
         serviceBtn.addEventListener('keydown', (e) => {
@@ -1154,6 +1155,7 @@
                 e.preventDefault();
                 const isOpen = serviceDropdown.classList.toggle('open');
                 serviceBtn.setAttribute('aria-expanded', isOpen);
+                serviceDropdown.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
             }
         });
 
@@ -1161,6 +1163,7 @@
             if (!e.target.closest('#serviceMultiselect')) {
                 serviceDropdown.classList.remove('open');
                 serviceBtn.setAttribute('aria-expanded', 'false');
+                serviceDropdown.setAttribute('aria-hidden', 'true');
             }
         });
 

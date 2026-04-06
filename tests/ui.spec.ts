@@ -345,12 +345,12 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       const totalCount = await page.locator('#totalCount').textContent();
       expect(totalCount, '#totalCount element was empty or missing').not.toBeNull();
       await expect(page.locator('#providerFilter')).toHaveValue('Azure');
-      await expect(page.getByRole('checkbox', { name: 'M365' })).toBeChecked();
+      await expect(page.locator('#serviceDropdown input[value="vdc_m365"]')).toBeChecked();
       await expect(page.locator('#visibleCount')).not.toHaveText(totalCount!);
 
       await page.reload();
       await expect(page.locator('#providerFilter')).toHaveValue('Azure');
-      await expect(page.getByRole('checkbox', { name: 'M365' })).toBeChecked();
+      await expect(page.locator('#serviceDropdown input[value="vdc_m365"]')).toBeChecked();
       await expect(page.locator('#visibleCount')).not.toHaveText(totalCount!);
     });
 
@@ -366,11 +366,11 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
 
       await page.goBack();
       await expect(providerFilter).toHaveValue('Azure');
-      await expect(page.getByRole('checkbox', { name: 'M365' })).not.toBeChecked();
+      await expect(page.locator('#serviceDropdown input[value="vdc_m365"]')).not.toBeChecked();
 
       await page.goForward();
       await expect(providerFilter).toHaveValue('Azure');
-      await expect(page.getByRole('checkbox', { name: 'M365' })).toBeChecked();
+      await expect(page.locator('#serviceDropdown input[value="vdc_m365"]')).toBeChecked();
     });
 
   });
