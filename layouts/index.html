@@ -1188,7 +1188,7 @@
 
         const providerFilter = document.getElementById('providerFilter');
         const SUPPORTED_PROVIDERS = new Set(['all', 'Azure', 'AWS']);
-        const SUPPORTED_SERVICES = new Set(['vdc_vault', 'vdc_m365', 'vdc_entra_id', 'vdc_salesforce', 'vdc_azure_backup']);
+        const SUPPORTED_SERVICES = new Set(Array.from(serviceCheckboxes, checkbox => checkbox.value));
 
         function getCurrentFilterState() {
             return { provider: providerFilter.value, services: getSelectedServices() };
@@ -1201,9 +1201,9 @@
             if (services.length > 0) params.set('services', services.join(','));
             const url = params.toString() ? `?${params}` : location.pathname;
             if (mode === 'push') {
-                history.pushState({ provider, services }, '', url);
+                history.pushState(null, '', url);
             } else {
-                history.replaceState({ provider, services }, '', url);
+                history.replaceState(null, '', url);
             }
         }
 

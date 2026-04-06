@@ -373,6 +373,46 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await expect(page.locator('#serviceDropdown input[value="vdc_m365"]')).toBeChecked();
     });
 
+    test('hydrates service params for checkbox values present in the DOM', async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet re-render on filter hydration causes webkit instability on Linux');
+      await page.route('**/*', async route => {
+        if (route.request().resourceType() !== 'document') {
+          await route.continue();
+          return;
+        }
+
+        const response = await route.fetch();
+        const html = await response.text();
+        const injectedHtml = html.replace(
+          /(<input type=checkbox value=vdc_azure_backup> Azure<\/label>)(<\/div>)/,
+          '$1<label class="multiselect-option text-white light:text-slate-900"><input type=checkbox value=vdc_test_service> Test Service</label>$2'
+        );
+
+        expect(injectedHtml).not.toBe(html);
+        await route.fulfill({ response, body: injectedHtml });
+      });
+
+      await page.goto(`${BASE_URL}/?services=vdc_test_service`);
+
+      await expect(page.locator('#serviceDropdown input[value="vdc_test_service"]')).toBeChecked();
+      await expect(page).toHaveURL(/[\?&]services=vdc_test_service/);
+    });
+
+    test('keeps history.state unused while syncing filter URLs', async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet re-render during URL sync causes webkit instability on Linux');
+      expect(await page.evaluate(() => window.history.state)).toBeNull();
+
+      const providerFilter = page.locator('#providerFilter');
+      await providerFilter.selectOption('Azure');
+      await expect(page).toHaveURL(/[\?&]provider=Azure/);
+      expect(await page.evaluate(() => window.history.state)).toBeNull();
+
+      await page.getByRole('button', { name: /all services/i }).click();
+      await page.getByRole('checkbox', { name: 'M365' }).check();
+      await expect(page).toHaveURL(/[\?&]services=vdc_m365/);
+      expect(await page.evaluate(() => window.history.state)).toBeNull();
+    });
+
   });
 
   test.describe('Theme Toggle', () => {
