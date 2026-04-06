@@ -398,6 +398,32 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await expect(page).toHaveURL(/[\?&]services=vdc_test_service/);
     });
 
+    test('hydrates provider params for select options present in the DOM', async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet re-render on filter hydration causes webkit instability on Linux');
+      await page.route('**/*', async route => {
+        if (route.request().resourceType() !== 'document') {
+          await route.continue();
+          return;
+        }
+
+        const response = await route.fetch();
+        const html = await response.text();
+        const injectedHtml = html.replace(
+          /(<option value=AWS>AWS<\/option>)(<\/select>)/,
+          '$1<option value=GCP>GCP</option>$2'
+        );
+
+        expect(injectedHtml).not.toBe(html);
+        await route.fulfill({ response, body: injectedHtml });
+      });
+
+      await page.goto(`${BASE_URL}/?provider=GCP`);
+
+      await expect(page.locator('#providerFilter option[value="GCP"]')).toHaveCount(1);
+      await expect(page.locator('#providerFilter')).toHaveValue('GCP');
+      await expect(page).toHaveURL(/[\?&]provider=GCP/);
+    });
+
     test('keeps history.state unused while syncing filter URLs', async ({ page }, testInfo) => {
       test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet re-render during URL sync causes webkit instability on Linux');
       expect(await page.evaluate(() => window.history.state)).toBeNull();

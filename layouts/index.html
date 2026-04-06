@@ -1187,7 +1187,7 @@
         }
 
         const providerFilter = document.getElementById('providerFilter');
-        const SUPPORTED_PROVIDERS = new Set(['all', 'Azure', 'AWS']);
+        const SUPPORTED_PROVIDERS = new Set(Array.from(providerFilter.options, option => option.value));
         const SUPPORTED_SERVICES = new Set(Array.from(serviceCheckboxes, checkbox => checkbox.value));
 
         function getCurrentFilterState() {
