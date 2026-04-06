@@ -343,14 +343,15 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       test.skip(mobilePlatforms.includes(testInfo.project.name), `Counter elements not visible on mobile: ${testInfo.project.name}`);
       await page.goto(`${BASE_URL}/?provider=Azure&services=vdc_m365`);
       const totalCount = await page.locator('#totalCount').textContent();
+      expect(totalCount, '#totalCount element was empty or missing').not.toBeNull();
       await expect(page.locator('#providerFilter')).toHaveValue('Azure');
       await expect(page.getByRole('checkbox', { name: 'M365' })).toBeChecked();
-      await expect(page.locator('#visibleCount')).not.toHaveText(totalCount ?? '');
+      await expect(page.locator('#visibleCount')).not.toHaveText(totalCount!);
 
       await page.reload();
       await expect(page.locator('#providerFilter')).toHaveValue('Azure');
       await expect(page.getByRole('checkbox', { name: 'M365' })).toBeChecked();
-      await expect(page.locator('#visibleCount')).not.toHaveText(totalCount ?? '');
+      await expect(page.locator('#visibleCount')).not.toHaveText(totalCount!);
     });
 
     test('replays filter changes with browser back and forward', async ({ page }, testInfo) => {
@@ -361,12 +362,14 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await providerFilter.selectOption('Azure');
       await page.getByRole('button', { name: /all services/i }).click();
       await page.getByRole('checkbox', { name: 'M365' }).check();
+      await page.keyboard.press('Escape');
 
       await page.goBack();
       await expect(providerFilter).toHaveValue('Azure');
       await expect(page.getByRole('checkbox', { name: 'M365' })).not.toBeChecked();
 
       await page.goForward();
+      await expect(providerFilter).toHaveValue('Azure');
       await expect(page.getByRole('checkbox', { name: 'M365' })).toBeChecked();
     });
 
