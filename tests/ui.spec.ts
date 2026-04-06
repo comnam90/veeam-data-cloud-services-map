@@ -314,6 +314,56 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     });
   });
 
+  test.describe('Filter URL Deep-Linking', () => {
+
+    test('syncs provider filter to the URL', async ({ page }) => {
+      const providerFilter = page.locator('#providerFilter');
+      await providerFilter.selectOption('Azure');
+      await expect(page).toHaveURL(/[\?&]provider=Azure/);
+
+      await providerFilter.selectOption('all');
+      await expect(page).not.toHaveURL(/provider=/);
+    });
+
+    test('syncs service filters to the URL and clears them on reset', async ({ page }) => {
+      await page.getByRole('button', { name: /all services/i }).click();
+      await page.getByRole('checkbox', { name: 'M365' }).check();
+      await expect(page).toHaveURL(/[\?&]services=vdc_m365/);
+
+      await page.getByRole('button', { name: /reset/i }).click();
+      await expect(page).not.toHaveURL(/services=/);
+      await expect(page).not.toHaveURL(/provider=/);
+    });
+
+    test('hydrates filters from URL on load and after reload', async ({ page }) => {
+      await page.goto(`${BASE_URL}/?provider=Azure&services=vdc_m365`);
+      const totalCount = await page.locator('#totalCount').textContent();
+      await expect(page.locator('#providerFilter')).toHaveValue('Azure');
+      await expect(page.getByRole('checkbox', { name: 'M365' })).toBeChecked();
+      await expect(page.locator('#visibleCount')).not.toHaveText(totalCount ?? '');
+
+      await page.reload();
+      await expect(page.locator('#providerFilter')).toHaveValue('Azure');
+      await expect(page.getByRole('checkbox', { name: 'M365' })).toBeChecked();
+      await expect(page.locator('#visibleCount')).not.toHaveText(totalCount ?? '');
+    });
+
+    test('replays filter changes with browser back and forward', async ({ page }) => {
+      const providerFilter = page.locator('#providerFilter');
+      await providerFilter.selectOption('Azure');
+      await page.getByRole('button', { name: /all services/i }).click();
+      await page.getByRole('checkbox', { name: 'M365' }).check();
+
+      await page.goBack();
+      await expect(providerFilter).toHaveValue('Azure');
+      await expect(page.getByRole('checkbox', { name: 'M365' })).not.toBeChecked();
+
+      await page.goForward();
+      await expect(page.getByRole('checkbox', { name: 'M365' })).toBeChecked();
+    });
+
+  });
+
   test.describe('Theme Toggle', () => {
     
     test('should cycle through theme options', async ({ page }, testInfo) => {
