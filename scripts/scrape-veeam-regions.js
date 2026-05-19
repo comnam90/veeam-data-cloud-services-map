@@ -77,12 +77,24 @@ async function fetchWithRetry(url, maxRetries = 3) {
  */
 function parseRegionTable(html, serviceKey) {
   const regions = [];
-  
-  // Extract table rows
+
+  // Veeam help-center pages wrap region data in <table class="Blue_Table">.
+  // Other tables on the page (notably class="Note" admonitions on the M365 page)
+  // must be ignored, or their <tr>s leak in as bogus regions — see #95, #96.
+  const dataTablePattern = /<table[^>]*class="[^"]*\bBlue_Table\b[^"]*"[^>]*>([\s\S]*?)<\/table>/gi;
+  const dataTables = [...html.matchAll(dataTablePattern)].map(m => m[1]);
+
+  if (dataTables.length === 0) {
+    console.warn(`   ⚠️  No <table class="Blue_Table"> found for ${serviceKey}; page structure may have changed`);
+    return regions;
+  }
+
+  const scopedHtml = dataTables.join('\n');
+
   const tableRowPattern = /<tr[^>]*>(.*?)<\/tr>/gis;
   const cellPattern = /<t[dh][^>]*>(.*?)<\/t[dh]>/gis;
-  
-  const rows = [...html.matchAll(tableRowPattern)];
+
+  const rows = [...scopedHtml.matchAll(tableRowPattern)];
   
   for (let i = 0; i < rows.length; i++) {
     const rowHtml = rows[i][1];
