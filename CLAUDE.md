@@ -10,8 +10,9 @@ Interactive map + REST API for visualizing Veeam Data Cloud (VDC) service availa
 
 ```bash
 # Development
-npm run dev              # Full stack dev server at http://localhost:8788 (Hugo + API via wrangler)
-hugo server              # Frontend only at http://localhost:1313
+npm run dev              # API + already-built public/ at http://localhost:8788 via wrangler.
+                         # Does NOT rebuild Hugo — run `npm run build` first if public/ is stale.
+hugo server              # Frontend hot reload at http://localhost:1313 (no API)
 
 # Build
 npm run build            # Full production build: build:data → build:worker → typecheck → hugo
@@ -21,7 +22,8 @@ npm run typecheck        # tsc --noEmit (strict validation)
 
 # Testing
 npm run test             # All tests: validate + scraper + API
-npm run test:api         # API integration tests
+                         # `pretest` hook auto-runs build:data + build:worker first
+npm run test:api         # API integration tests (require server already running)
 npm run test:validate    # YAML validation tests
 npm run test:ui          # Playwright UI tests (headless)
 npm run test:ui:headed   # Playwright with browser UI
@@ -51,14 +53,20 @@ data/regions/{aws,azure}/*.yaml   ← Source of truth for region data
 ```
 
 ### Frontend
-- **Single-file SPA:** `layouts/index.html` (~1600 lines) — Leaflet map, search, filters
+- **Single-file SPA:** `layouts/index.html` (~1665 lines) — Leaflet map, search, filters
 - **Hugo** injects YAML data as a `regions[]` JavaScript array at build time — no runtime data fetching
 - Leaflet.js with CartoDB Dark Matter tiles; uses marker clustering for dense regions
+- **UI edit hotspots:** `getServiceIcon()` (inline SVGs per service), `getProviderBadgeColor()` (Tailwind classes per provider), and the `serviceDisplayNames` object — search for these when changing service rendering
 
 ### API (Cloudflare Workers)
 - Entry point: `src/functions/_worker.ts` — Hono app with middleware + route registration
-- Routes: `src/functions/routes/v1/` — 8 endpoints (ping, health, services, regions, nearest, compare, etc.)
+- Routes: `src/functions/routes/v1/` — 8 endpoints:
+  - `ping.ts`, `health.ts`
+  - `services.ts`, `services-by-id.ts`
+  - `regions.ts`, `regions-by-id.ts`, `regions-nearest.ts`, `regions-compare.ts`
 - Schemas: `src/functions/schemas/common.ts` — Zod + `@hono/zod-openapi` for automatic OpenAPI 3.1 spec
+- Utils: `src/functions/utils/` — `data.ts` (loads `regions.json` and provides stats helpers), `geo.ts` (haversine distance for `regions-nearest`), `response.ts`, `validation.ts`
+- Types: `src/functions/types/` — `env.ts` (`Env` interface) and `data.ts` (`Region`, `Service`, `VdcVaultConfig`, etc.)
 - OpenAPI UI available at `/api/docs` (Scalar); spec at `/api/openapi.json`
 
 ### Middleware Stack
@@ -153,3 +161,16 @@ Four GitHub Actions workflows:
 - `pr-validation.yml` — Full validation suite on PRs
 - `hugo.yml` — Legacy GitHub Pages backup
 - `region-maintenance.yml` — Weekly scraper (Mondays 9 AM UTC) that creates GitHub issues for data discrepancies
+
+Cloudflare Pages build expects `HUGO_VERSION=0.139.3` and `NODE_VERSION=18` (see `DEPLOYMENT.md`).
+
+## Further Reading
+
+Repo-internal docs to check before re-deriving things:
+
+- `ARCHITECTURE.md` — request flow, middleware stack, OpenAPI generation details, error code enum
+- `DEPLOYMENT.md` — Cloudflare Pages build config, troubleshooting (API returning HTML, build failures)
+- `TESTING.md` — manual test cases for `/api/v1/services*` endpoints
+- `GITFLOW_RELEASE_GUIDE.md` — release branch process and version bumping
+- `.github/copilot-instructions.md` — overlapping guidance with concrete UI/route code examples
+- `.github/instructions/self-explanatory-code-commenting.instructions.md` — project comment-style rules (comment WHY, not WHAT)
