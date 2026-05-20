@@ -102,6 +102,47 @@ async function runTests() {
     assert(regions.some(r => r.regionName === 'Central US'), 'Should have Central US');
   });
 
+  // Regression: M365 page wraps a "note" admonition in <table class="Note">
+  // immediately before the data table. Those rows must not leak through as regions.
+  // See issues #95, #96.
+  await test('parseRegionTable ignores <table class="Note"> admonitions', async () => {
+    const sampleHtml = `
+      <p>Intro paragraph.</p>
+      <div><table border="0" cellspacing="0" cellpadding="0" class="Note">
+        <tr style="vertical-align:top">
+          <td><p class="T_NoteType"><span class="T_NoteType">note</span></p></td>
+        </tr>
+        <tr style="vertical-align:top">
+          <td><p class="Notes"><span class="Notes">Express backup data is stored in the Microsoft-specific region based on your configuration.</span></p></td>
+        </tr>
+      </table></div>
+      <div><table border="0" cellspacing="0" cellpadding="0" class="Blue_Table">
+        <caption>Backup Storage Regions</caption>
+        <tr><th><p>Global Region</p></th><th><p>Azure Region</p></th></tr>
+        <tr><td rowspan="2"><p>AMER</p></td><td><p>East US</p></td></tr>
+        <tr><td><p>West US</p></td></tr>
+      </table></div>
+    `;
+
+    const regions = parseRegionTable(sampleHtml, 'vdc_m365');
+
+    assertEqual(regions.length, 2, `Should parse exactly 2 regions, got ${regions.length}`);
+    assert(regions.some(r => r.regionName === 'East US'), 'Should have East US');
+    assert(regions.some(r => r.regionName === 'West US'), 'Should have West US');
+    assert(!regions.some(r => r.regionName === 'note'), 'Must not parse "note" as a region');
+    assert(!regions.some(r => /Express backup/.test(r.regionName)), 'Must not parse note body as a region');
+  });
+
+  // Defensive: if the page structure changes and no Blue_Table is found, return [].
+  await test('parseRegionTable returns empty when no Blue_Table is present', async () => {
+    const sampleHtml = `
+      <table class="Note"><tr><td>note</td></tr></table>
+      <table class="SomeOtherClass"><tr><td>East US</td></tr></table>
+    `;
+    const regions = parseRegionTable(sampleHtml, 'vdc_m365');
+    assertEqual(regions.length, 0, 'Should return no regions when no Blue_Table is present');
+  });
+
   // Test 3: findMatchingRegion function
   await test('findMatchingRegion finds regions by ID', async () => {
     const scrapedRegion = {

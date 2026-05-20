@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [1.3.0] - 2026-05-20
+
+### Added
+- Sync filter state to URL query params for shareable filtered views (#91)
+- Playwright UI test suite with 33 tests covering search, filters, theme, popups, accessibility, and responsive design
+- Playwright UI tests job in PR validation CI workflow, reusing the Hugo build artifact from the existing build job
+
+### Fixed
+- Scraper: ignore `<table class="Note">` admonitions when parsing region tables (#99)
+- UI: dark mode select colours, safe area bottom padding, and error copy (#88)
+- UI: add `aria-hidden` to decorative SVGs for screen reader correctness (#87)
+- UI: align map UI with interface guidelines (#40)
+- Map: open popup for regions selected from search results, including clustered markers (#77)
+
+### Changed
+- Bump hono from 4.12.7 to 4.12.18 (#92, #93, #94)
+- Bump yaml from 2.8.2 to 2.8.3 (#89)
+
+### Documentation
+- Refresh `CLAUDE.md` with accurate paths and pointers (#97)
+
 ## [1.2.0] - 2026-03-21
 
 ### Added

@@ -8,6 +8,10 @@ functions/_worker.js
 .cloudflare/
 .wrangler/
 
+# Playwright test artifacts
+test-results/
+playwright-report/
+
 # Automated region maintenance outputs
 region-discrepancies.json
 issues-to-create.json
