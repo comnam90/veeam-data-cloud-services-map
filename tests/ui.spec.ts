@@ -120,7 +120,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await expect(resetButton).toBeVisible();
       await expect(providerFilter).toHaveValue('Azure');
       
-      const markers = page.locator('.leaflet-marker-icon .marker-glyph');
+      const markers = page.locator('.leaflet-marker-icon .map-marker-dot');
       const count = await markers.count();
       expect(count).toBeGreaterThan(0);
     });
@@ -135,7 +135,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await expect(resetButton).toBeVisible();
       await expect(providerFilter).toHaveValue('AWS');
       
-      const markers = page.locator('.leaflet-marker-icon .marker-glyph');
+      const markers = page.locator('.leaflet-marker-icon .map-marker-dot');
       const count = await markers.count();
       expect(count).toBeGreaterThan(0);
     });
@@ -305,8 +305,8 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       }
 
       if (!isMobile) {
-        await expect(page.locator('.leaflet-marker-icon .marker-glyph').first()).toBeVisible({ timeout: 5000 });
-        const markers = page.locator('.leaflet-marker-icon .marker-glyph');
+        await expect(page.locator('.leaflet-marker-icon .map-marker-dot').first()).toBeVisible({ timeout: 5000 });
+        const markers = page.locator('.leaflet-marker-icon .map-marker-dot');
         const count = await markers.count();
         expect(count).toBeGreaterThan(0);
       }
@@ -499,11 +499,11 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       }
 
       const clicked = await page.evaluate(() => {
-        const glyphs = Array.from(document.querySelectorAll<HTMLElement>('.leaflet-marker-icon .marker-glyph'));
+        const glyphs = Array.from(document.querySelectorAll<HTMLElement>('.leaflet-marker-icon .map-marker-dot'));
         for (const el of glyphs) {
           const r = el.getBoundingClientRect();
           if (r.width === 0) continue;
-          // .marker-glyph is the inner div Leaflet inserts into its
+          // .map-marker-dot is the inner div Leaflet inserts into its
           // `.leaflet-marker-icon` wrapper. The click handler is bound
           // on the wrapper, so dispatch the click there.
           const wrapper = el.closest<HTMLElement>('.leaflet-marker-icon');
@@ -601,7 +601,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
 
     test('should close popup with Escape key', async ({ page }, testInfo) => {
       test.skip(true, 'Leaflet popups do not respond to Escape; tracked as separate enhancement');
-      const marker = page.locator('.leaflet-marker-icon .marker-glyph').first();
+      const marker = page.locator('.leaflet-marker-icon .map-marker-dot').first();
       await marker.click();
       await page.waitForTimeout(1000);
 
