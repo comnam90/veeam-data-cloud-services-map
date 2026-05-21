@@ -477,43 +477,45 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
   test.describe('Region Details Popup', () => {
     
     test('should open popup when clicking map marker', async ({ page }, testInfo) => {
-      // Leaflet divIcon click→popup is fragile in Firefox/WebKit/Mobile Safari:
-      // the event reaches the marker DOM node but Leaflet's `_onMouseClick`
-      // handler doesn't always wire the popup. Coverage on Chromium-family
-      // browsers (chromium + Mobile Chrome) exercises the direct-click path;
-      // the search-driven popup flow (next test) covers the other browsers.
-      const skipProjects = ['Mobile Safari', 'firefox', 'webkit'];
-      test.skip(skipProjects.includes(testInfo.project.name), 'Leaflet divIcon click→popup unreliable outside Chromium');
+      // Verifies a marker's bound popup opens when the marker DOM node
+      // receives a click event. We dispatch the click via `el.click()`
+      // through page.evaluate rather than Playwright's mouse system —
+      // Leaflet positions markers via absolute transforms inside an
+      // overflow:hidden container, which makes coordinate-based clicks
+      // (mouse.click / locator.click + force) flaky across viewport
+      // sizes and CI hardware. A direct DOM click routes through
+      // Leaflet's `_onMouseClick` handler reliably on every browser
+      // except simulated Mobile Safari, which has its own touch-event
+      // quirks for synthetic events on transformed elements.
+      test.skip(testInfo.project.name === 'Mobile Safari', 'Synthetic click on transformed marker is unreliable in simulated Mobile Safari');
       await page.waitForTimeout(1000);
 
-      // Zoom in so individual markers escape clusters. The new globally
-      // centred default keeps every marker clustered on small viewports
-      // (e.g. Mobile Chrome 393px) otherwise.
+      // Zoom in so individual markers escape clusters. The globally
+      // centred default keeps every marker clustered at zoom 2.
       const zoomIn = page.locator('.leaflet-control-zoom-in');
       for (let i = 0; i < 4; i++) {
         await zoomIn.click();
         await page.waitForTimeout(150);
       }
 
-      // `.first()` after zoom-in can resolve to a marker positioned
-      // outside the viewport (Leaflet places them by absolute transform).
-      // Find one whose centre is actually visible and click at those
-      // coordinates so the test works on any viewport size.
-      const target = await page.evaluate(() => {
-        const glyphs = Array.from(document.querySelectorAll('.leaflet-marker-icon .marker-glyph'));
+      const clicked = await page.evaluate(() => {
+        const glyphs = Array.from(document.querySelectorAll<HTMLElement>('.leaflet-marker-icon .marker-glyph'));
         for (const el of glyphs) {
           const r = el.getBoundingClientRect();
-          const cx = r.left + r.width / 2;
-          const cy = r.top + r.height / 2;
-          if (cx >= 0 && cy >= 0 && cx <= window.innerWidth && cy <= window.innerHeight) {
-            return { x: cx, y: cy };
+          if (r.width === 0) continue;
+          // .marker-glyph is the inner div Leaflet inserts into its
+          // `.leaflet-marker-icon` wrapper. The click handler is bound
+          // on the wrapper, so dispatch the click there.
+          const wrapper = el.closest<HTMLElement>('.leaflet-marker-icon');
+          if (wrapper) {
+            wrapper.click();
+            return true;
           }
         }
-        return null;
+        return false;
       });
 
-      expect(target, 'no marker visible in viewport after zoom-in').not.toBeNull();
-      await page.mouse.click(target!.x, target!.y);
+      expect(clicked, 'no individual (un-clustered) marker available to click').toBe(true);
 
       const popup = page.locator('.leaflet-popup');
       await expect(popup).toBeVisible({ timeout: 5000 });
