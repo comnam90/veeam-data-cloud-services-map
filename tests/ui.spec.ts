@@ -525,17 +525,55 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     test('should show correct service details in popup', async ({ page }) => {
       const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await searchInput.fill('US East 1');
-      
+
       const searchResults = page.getByRole('listbox', { name: 'Search results' });
       await expect(searchResults).toBeVisible();
-      
+
       await page.getByRole('option', { name: /US East 1/i }).click();
       await page.waitForTimeout(1000);
-      
+
       const popup = page.locator('.leaflet-popup');
       await expect(popup).toBeVisible({ timeout: 3000 });
       await expect(popup).toContainText(/US East 1.*Virginia/i);
       await expect(popup).toContainText(/AWS/i);
+      await expect(popup.locator('svg.svc-icon[data-service="vdc_vault"]')).toBeVisible();
+    });
+
+    test('should expose vault tier tooltip copy via data-tooltip and aria-label', async ({ page }) => {
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
+      await searchInput.fill('US East 1');
+
+      const searchResults = page.getByRole('listbox', { name: 'Search results' });
+      await expect(searchResults).toBeVisible();
+
+      await page.getByRole('option', { name: /US East 1/i }).click();
+      await page.waitForTimeout(1000);
+
+      const popup = page.locator('.leaflet-popup');
+      await expect(popup).toBeVisible({ timeout: 3000 });
+
+      const foundationPill = popup.locator('.pill[data-tooltip]', { hasText: /Foundation/ }).first();
+      const advancedPill = popup.locator('.pill[data-tooltip]', { hasText: /Advanced/ }).first();
+
+      await expect(foundationPill).toHaveAttribute(
+        'data-tooltip',
+        /Foundation edition.*20% fair usage restore limit/i
+      );
+      await expect(foundationPill).toHaveAttribute(
+        'aria-label',
+        /Foundation.*Foundation edition.*20% fair usage restore limit/i
+      );
+      await expect(foundationPill).toHaveAttribute('tabindex', '0');
+
+      await expect(advancedPill).toHaveAttribute(
+        'data-tooltip',
+        /Advanced edition.*unlimited restores/i
+      );
+      await expect(advancedPill).toHaveAttribute(
+        'aria-label',
+        /Advanced.*Advanced edition.*unlimited restores/i
+      );
+      await expect(advancedPill).toHaveAttribute('tabindex', '0');
     });
 
     test('should close popup with close button', async ({ page }, testInfo) => {
