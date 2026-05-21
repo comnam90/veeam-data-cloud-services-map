@@ -347,110 +347,146 @@
             .ctl .ctl-label { display: none; }
         }
 
-        /* Leaflet popup - dark mode (default and explicit .dark) */
+        /* === LEAFLET POPUP === */
         .leaflet-popup-content-wrapper {
-            background: #1e293b !important;
-            color: white !important;
-            border: 1px solid #475569 !important;
-            padding: 0;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-            animation: popup-fade-in 0.2s ease-out;
+            background: var(--bg-elev) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border) !important;
+            padding: 0 !important;
+            border-radius: 10px !important;
+            box-shadow:
+                0 12px 40px rgba(0,0,0,0.5),
+                0 0 0 1px rgba(0,255,136,0.04) !important;
+            overflow: hidden;
         }
-        @keyframes popup-fade-in {
-            from { opacity: 0; transform: translateY(10px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        html.light .leaflet-popup-content-wrapper {
+            box-shadow:
+                0 12px 40px rgba(15,20,25,0.10),
+                0 0 0 1px rgba(0,128,90,0.04) !important;
         }
         .leaflet-popup-tip {
-            background: #1e293b !important;
-            border: 1px solid #475569 !important;
+            background: var(--bg-elev) !important;
+            border: 1px solid var(--border) !important;
             box-shadow: none !important;
         }
         .leaflet-container a.leaflet-popup-close-button {
-            color: #94a3b8 !important;
-            transition: color 0.2s ease, transform 0.2s ease;
+            color: var(--text-mute) !important;
             font-size: 20px !important;
-            width: 24px !important;
-            height: 24px !important;
+            width: 28px !important;
+            height: 28px !important;
             padding: 4px !important;
+            transition: color 0.2s, transform 0.2s;
+            top: 8px !important;
+            right: 8px !important;
         }
         .leaflet-container a.leaflet-popup-close-button:hover {
-            color: #f87171 !important;
+            color: var(--accent) !important;
             transform: scale(1.1);
         }
-        
-        /* Leaflet popup - light mode */
-        .light .leaflet-popup-content-wrapper {
-            background: white !important;
-            color: #0f172a !important;
-            border: 1px solid #e2e8f0 !important;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
-        }
-        .light .leaflet-popup-tip {
-            background: white !important;
-            border: 1px solid #e2e8f0 !important;
-        }
-        .light .leaflet-container a.leaflet-popup-close-button {
-            color: #64748b !important;
-        }
-        
-        .leaflet-popup-content {
-            margin: 0 !important;
-            width: auto !important;
-        }
-        
-        /* Mobile popup adjustments */
+        .leaflet-popup-content { margin: 0 !important; width: auto !important; }
+
         @media (max-width: 640px) {
-            .leaflet-popup-content-wrapper {
-                max-width: calc(100vw - 40px) !important;
-            }
-            .leaflet-popup {
-                max-width: calc(100vw - 20px) !important;
-            }
+            .leaflet-popup-content-wrapper { max-width: calc(100vw - 40px) !important; }
+            .leaflet-popup { max-width: calc(100vw - 20px) !important; }
         }
-        
-        /* Popup inner content - light mode overrides */
-        .light .leaflet-popup-content h3 { color: #0f172a !important; }
-        .light .leaflet-popup-content .bg-slate-900\/50,
-        .light .leaflet-popup-content .bg-slate-900\/60 { 
-            background: #f1f5f9 !important; 
-            border-color: #e2e8f0 !important; 
+
+        /* Popup inner */
+        .popup-card { width: 360px; max-width: calc(100vw - 40px); font-family: 'JetBrains Mono', monospace; }
+        .popup-head {
+            padding: 14px 16px 12px;
+            border-bottom: 1px solid var(--border);
         }
-        .light .leaflet-popup-content .bg-slate-800,
-        .light .leaflet-popup-content .bg-slate-800\/80 { 
-            background: #ffffff !important; 
-            border-color: #e2e8f0 !important;
+        .popup-region-id {
+            font-size: 9px; color: var(--text-dim);
+            letter-spacing: 0.16em; text-transform: uppercase;
         }
-        .light .leaflet-popup-content .bg-slate-700\/50,
-        .light .leaflet-popup-content .bg-slate-700\/60,
-        .light .leaflet-popup-content .bg-gradient-to-r { 
-            background: #f1f5f9 !important; 
+        .popup-region-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 19px; font-weight: 700;
+            margin-top: 4px;
+            letter-spacing: -0.01em;
+            color: var(--text);
         }
-        .light .leaflet-popup-content .border-slate-700,
-        .light .leaflet-popup-content .border-slate-700\/50,
-        .light .leaflet-popup-content .border-slate-700\/30 { 
-            border-color: #e2e8f0 !important; 
+        .popup-region-coord {
+            font-size: 10px; color: var(--text-mute);
+            margin-top: 6px; letter-spacing: 0.04em;
         }
-        .light .leaflet-popup-content .text-white { color: #0f172a !important; }
-        .light .leaflet-popup-content .text-slate-300 { color: #334155 !important; }
-        .light .leaflet-popup-content .text-slate-400 { color: #475569 !important; }
-        .light .leaflet-popup-content .text-slate-500 { color: #64748b !important; }
-        
-        /* Light mode service icon wrapper hover */
-        .light .leaflet-popup-content .service-icon-wrapper:hover {
-            background: rgba(0, 0, 0, 0.05) !important;
+        .popup-provider-strip {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 16px;
+            background: var(--bg-elev-2);
+            border-bottom: 1px solid var(--border);
+            font-size: 10px;
+            color: var(--text-mute);
+            text-transform: uppercase; letter-spacing: 0.12em;
         }
-        
-        /* Light mode badge adjustments */
-        .light .leaflet-popup-content .text-green-400 { color: #16a34a !important; }
-        .light .leaflet-popup-content .bg-green-500\/10 { background: rgba(22, 163, 74, 0.1) !important; }
-        .light .leaflet-popup-content .border-green-500\/30 { border-color: rgba(22, 163, 74, 0.3) !important; }
-        .light .leaflet-popup-content .text-blue-400 { color: #2563eb !important; }
-        .light .leaflet-popup-content .bg-blue-500\/10 { background: rgba(37, 99, 235, 0.1) !important; }
-        .light .leaflet-popup-content .border-blue-500\/30 { border-color: rgba(37, 99, 235, 0.3) !important; }
-        .light .leaflet-popup-content .text-amber-400 { color: #d97706 !important; }
-        .light .leaflet-popup-content .bg-amber-500\/10 { background: rgba(217, 119, 6, 0.1) !important; }
-        .light .leaflet-popup-content .border-amber-500\/30 { border-color: rgba(217, 119, 6, 0.3) !important; }
+        .popup-provider-strip .pchip {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-weight: 500;
+        }
+        .popup-provider-strip .pchip.azure { color: var(--azure); }
+        .popup-provider-strip .pchip.aws { color: var(--aws); }
+        .popup-provider-strip .pchip svg { width: 11px; height: 11px; }
+        .popup-services { padding: 6px 16px 14px; }
+        .popup-svc {
+            display: grid;
+            grid-template-columns: 16px 1fr auto;
+            align-items: center; gap: 12px;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+        }
+        .popup-svc:last-child { border-bottom: none; }
+        .popup-svc .check { width: 14px; height: 14px; color: var(--accent); }
+        .popup-svc .name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 500;
+            color: var(--text);
+            letter-spacing: -0.005em;
+        }
+        .popup-svc .pills {
+            display: flex; gap: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            color: var(--text-mute);
+        }
+        .popup-svc .pill {
+            border: 1px solid var(--border-strong);
+            background: var(--bg-elev-2);
+            padding: 3px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .popup-svc .pill.core {
+            color: var(--accent);
+            border-color: rgba(0, 255, 136, 0.3);
+            background: rgba(0, 255, 136, 0.06);
+        }
+        html.light .popup-svc .pill.core {
+            border-color: rgba(0, 128, 90, 0.3);
+            background: rgba(0, 128, 90, 0.06);
+        }
+        .popup-svc .pill.noncore {
+            color: var(--aws);
+            border-color: rgba(255, 157, 61, 0.3);
+            background: rgba(255, 157, 61, 0.06);
+        }
+        html.light .popup-svc .pill.noncore {
+            border-color: rgba(217, 117, 6, 0.3);
+            background: rgba(217, 117, 6, 0.06);
+        }
+        .popup-svc .available {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            color: var(--text-mute);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border: 1px solid var(--border-strong);
+            padding: 3px 7px;
+            border-radius: 4px;
+            background: var(--bg-elev-2);
+        }
 
         /* Legend styling */
         .legend-container {
@@ -1323,77 +1359,70 @@
 
                 if (matchesProvider && matchesService) {
                     
-                    let iconGrid = '';
-                    let serviceList = '';
-                    const providerColor = getProviderBadgeColor(region.provider);
+                    const providerKey = region.provider.toLowerCase();
+                    const providerGlyph = providerKey === 'azure'
+                        ? '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M7.3 2.5h4.7L7.2 17a.8.8 0 01-.7.5H2.8a.7.7 0 01-.7-1l4.5-13.5a.8.8 0 01.7-.5z"/></svg>'
+                        : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.3v3.7l3.5 2-3.5 2v3.7l6.7-4.2V9.6L13.5 5.3zM10.5 5.3L3.8 9.6v3.9l6.7 4.2v-3.7l-3.5-2 3.5-2V5.3z"/></svg>';
+
+                    let serviceRows = '';
+                    let svcCount = 0;
 
                     if (region.services) {
                         Object.keys(region.services).forEach(key => {
                             const serviceValue = region.services[key];
-                            
-                            iconGrid += `
-                                <div class="service-icon-wrapper flex flex-col items-center justify-center w-12 p-1.5 rounded-lg hover:bg-slate-700/30 cursor-default">
-                                    ${getServiceIcon(key)}
-                                    <span class="text-[9px] mt-1.5 text-slate-400 font-medium uppercase tracking-wide">${getServiceDisplayName(key, 'short')}</span>
-                                </div>
-                            `;
+                            svcCount += 1;
+                            const displayName = getServiceDisplayName(key, 'full');
+
+                            const checkSvg = '<svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>';
 
                             if (serviceValue === true) {
-                                serviceList += `
-                                    <li class="flex items-center text-xs py-1.5 border-b border-slate-700/50 last:border-0">
-                                        <span class="text-slate-300 flex-1 font-medium">
-                                            ${getServiceDisplayName(key, 'full')} 
-                                        </span>
-                                        <span class="text-green-400 ml-2 text-[10px] bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/30 font-medium">
-                                            Available
-                                        </span>
-                                    </li>
+                                serviceRows += `
+                                    <div class="popup-svc">
+                                        ${checkSvg}
+                                        <span class="name">${displayName}</span>
+                                        <span class="available">Available</span>
+                                    </div>
                                 `;
                             } else {
                                 const configs = ensureArray(serviceValue);
-                                configs.forEach(conf => {
-                                    if (!conf) return; 
-
-                                    const badgeClass = conf.tier === 'Core' 
-                                        ? 'text-blue-400 bg-blue-500/10 border-blue-500/30' 
-                                        : 'text-amber-400 bg-amber-500/10 border-amber-500/30';
-                                    
-                                    serviceList += `
-                                        <li class="flex items-center text-xs py-1.5 border-b border-slate-700/50 last:border-0">
-                                            <span class="text-slate-300 font-medium flex-1">
-                                                ${getServiceDisplayName(key, 'full')} 
-                                            </span>
-                                            <span class="${badgeClass} ml-2 text-[10px] px-2 py-0.5 rounded-full border font-medium">
-                                                ${conf.edition || 'Std'} (${conf.tier || 'N/A'})
-                                            </span>
-                                        </li>
-                                    `;
-                                });
+                                const pills = configs
+                                    .filter(c => c)
+                                    .map(c => {
+                                        const cls = c.tier === 'Core' ? 'pill core' : 'pill noncore';
+                                        const edition = c.edition || 'Std';
+                                        const tier = c.tier || 'N/A';
+                                        return `<span class="${cls}">${edition} · ${tier}</span>`;
+                                    })
+                                    .join('');
+                                serviceRows += `
+                                    <div class="popup-svc">
+                                        ${checkSvg}
+                                        <span class="name">${displayName}</span>
+                                        <span class="pills">${pills}</span>
+                                    </div>
+                                `;
                             }
                         });
                     }
 
+                    const safeCoord = Array.isArray(region.coords)
+                        ? `${region.coords[0].toFixed(3)}°N · ${region.coords[1].toFixed(3)}°E`
+                        : '';
+                    const regionIdSlug = (region.id || region.name).toLowerCase().replace(/_/g, '-');
+
                     const popupHTML = `
-                        <div class="w-[calc(100vw-60px)] sm:w-80 max-w-80 p-3 sm:p-5 font-sans">
-                            <div class="flex justify-between items-start mb-3 sm:mb-4">
-                                <h3 class="font-bold text-base sm:text-lg text-white leading-tight pr-2 sm:pr-3">${region.name}</h3>
-                                <span class="${providerColor} text-white text-[9px] sm:text-[10px] font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md shadow-md flex-shrink-0">
-                                    ${region.provider.toUpperCase()}
-                                </span>
+                        <div class="popup-card">
+                            <div class="popup-head">
+                                <div class="popup-region-id">Region // ${regionIdSlug}</div>
+                                <div class="popup-region-name">${region.name}</div>
+                                <div class="popup-region-coord">${safeCoord}</div>
                             </div>
-
-                            <div class="flex gap-1 mb-3 sm:mb-4 p-2 sm:p-2.5 bg-slate-900/60 rounded-xl border border-slate-700/30 overflow-x-auto -mx-1 px-1" style="scrollbar-width: thin;">
-                                ${iconGrid}
+                            <div class="popup-provider-strip">
+                                <span class="pchip ${providerKey}">${providerGlyph} ${region.provider}</span>
+                                <span style="color:var(--text-dim)">·</span>
+                                <span>${svcCount} / 05 Services</span>
                             </div>
-
-                            <div class="bg-slate-800/80 rounded-xl border border-slate-700/50 overflow-hidden shadow-inner">
-                                <div class="bg-gradient-to-r from-slate-700/60 to-slate-700/30 px-3 sm:px-3.5 py-1.5 sm:py-2 border-b border-slate-700/50">
-                                    <span class="text-[9px] sm:text-[10px] font-semibold text-slate-400 tracking-wider uppercase">Available Services</span>
-                                </div>
-                                <ul class="px-3 sm:px-3.5 py-2 sm:py-2.5 space-y-0">
-                                    ${serviceList}
-                                </ul>
-                            </div>
+                            <div class="popup-services">${serviceRows}</div>
                         </div>
                     `;
 
