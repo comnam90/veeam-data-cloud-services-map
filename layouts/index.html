@@ -1153,8 +1153,8 @@
         const legend = L.control({ position: 'bottomleft' });
         legend.onAdd = function() {
             const div = L.DomUtil.create('div', 'leaflet-bar panel-legend');
-            const azureGlyph = '<svg viewBox="0 0 20 20" width="14" height="14" fill="var(--azure)"><path d="M7.3 2.5h4.7L7.2 17a.8.8 0 01-.7.5H2.8a.7.7 0 01-.7-1l4.5-13.5a.8.8 0 01.7-.5z"/><path d="M14.2 12.2H6.7a.4.4 0 00-.3.6l4.8 4.5c.1.1.3.2.5.2h4.3l-1.8-5.3z" opacity="0.7"/></svg>';
-            const awsGlyph = '<svg viewBox="0 0 24 24" width="14" height="14" fill="var(--aws)"><path d="M13.5 5.3v3.7l3.5 2-3.5 2v3.7l6.7-4.2V9.6L13.5 5.3zM10.5 5.3L3.8 9.6v3.9l6.7 4.2v-3.7l-3.5-2 3.5-2V5.3z"/></svg>';
+            const azureGlyph = '<svg aria-hidden="true" focusable="false" viewBox="0 0 20 20" width="14" height="14" fill="var(--azure)"><path d="M7.3 2.5h4.7L7.2 17a.8.8 0 01-.7.5H2.8a.7.7 0 01-.7-1l4.5-13.5a.8.8 0 01.7-.5z"/><path d="M14.2 12.2H6.7a.4.4 0 00-.3.6l4.8 4.5c.1.1.3.2.5.2h4.3l-1.8-5.3z" opacity="0.7"/></svg>';
+            const awsGlyph = '<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="14" height="14" fill="var(--aws)"><path d="M13.5 5.3v3.7l3.5 2-3.5 2v3.7l6.7-4.2V9.6L13.5 5.3zM10.5 5.3L3.8 9.6v3.9l6.7 4.2v-3.7l-3.5-2 3.5-2V5.3z"/></svg>';
             div.innerHTML = `
                 <div class="label">Providers <span class="live">Live</span></div>
                 <div class="row"><span class="glyph">${azureGlyph}</span><span>Azure</span><span class="count" id="legendAzureCount"></span></div>
@@ -1399,6 +1399,8 @@
         function renderMap() {
             clusterGroup.clearLayers();
             let visibleCount = 0;
+            let visibleAzureCount = 0;
+            let visibleAwsCount = 0;
 
             const pFilter = providerFilter.value;
             const selectedServices = getSelectedServices();
@@ -1421,8 +1423,8 @@
                     
                     const providerKey = region.provider.toLowerCase();
                     const providerGlyph = providerKey === 'azure'
-                        ? '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M7.3 2.5h4.7L7.2 17a.8.8 0 01-.7.5H2.8a.7.7 0 01-.7-1l4.5-13.5a.8.8 0 01.7-.5z"/></svg>'
-                        : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.3v3.7l3.5 2-3.5 2v3.7l6.7-4.2V9.6L13.5 5.3zM10.5 5.3L3.8 9.6v3.9l6.7 4.2v-3.7l-3.5-2 3.5-2V5.3z"/></svg>';
+                        ? '<svg aria-hidden="true" focusable="false" viewBox="0 0 20 20" fill="currentColor"><path d="M7.3 2.5h4.7L7.2 17a.8.8 0 01-.7.5H2.8a.7.7 0 01-.7-1l4.5-13.5a.8.8 0 01.7-.5z"/></svg>'
+                        : '<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.3v3.7l3.5 2-3.5 2v3.7l6.7-4.2V9.6L13.5 5.3zM10.5 5.3L3.8 9.6v3.9l6.7 4.2v-3.7l-3.5-2 3.5-2V5.3z"/></svg>';
 
                     let serviceRows = '';
                     let svcCount = 0;
@@ -1433,7 +1435,7 @@
                             svcCount += 1;
                             const displayName = getServiceDisplayName(key, 'full');
 
-                            const checkSvg = '<svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>';
+                            const checkSvg = '<svg class="check" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>';
 
                             if (serviceValue === true) {
                                 serviceRows += `
@@ -1466,7 +1468,7 @@
                     }
 
                     const safeCoord = Array.isArray(region.coords)
-                        ? `${region.coords[0].toFixed(3)}°N · ${region.coords[1].toFixed(3)}°E`
+                        ? `${Math.abs(region.coords[0]).toFixed(3)}°${region.coords[0] >= 0 ? 'N' : 'S'} · ${Math.abs(region.coords[1]).toFixed(3)}°${region.coords[1] >= 0 ? 'E' : 'W'}`
                         : '';
                     const regionIdSlug = (region.id || region.name).toLowerCase().replace(/_/g, '-');
 
@@ -1502,24 +1504,26 @@
 
                     clusterGroup.addLayer(marker);
                     visibleCount++;
+                    if (region.provider === 'Azure') visibleAzureCount++;
+                    else if (region.provider === 'AWS') visibleAwsCount++;
                 }
             });
 
-            updateRegionCount(visibleCount, regions.length);
+            updateRegionCount(visibleCount, regions.length, visibleAzureCount, visibleAwsCount);
             updateResetButtonVisibility();
         }
 
         providerFilter.addEventListener('change', () => handleFilterChange('push'));
 
-        function updateRegionCount(visible, total) {
+        function updateRegionCount(visible, total, azureVisible, awsVisible) {
             document.getElementById('visibleCount').textContent = visible;
             document.getElementById('totalCount').textContent = total;
-            const azureCount = regions.filter(r => r.provider === 'Azure').length;
-            const awsCount = regions.filter(r => r.provider === 'AWS').length;
+            // Legend reflects the currently-visible markers, not the
+            // full dataset — keeps the "Live" label honest under filters.
             const azureEl = document.getElementById('legendAzureCount');
             const awsEl = document.getElementById('legendAwsCount');
-            if (azureEl) azureEl.textContent = azureCount;
-            if (awsEl) awsEl.textContent = awsCount;
+            if (azureEl) azureEl.textContent = azureVisible ?? regions.filter(r => r.provider === 'Azure').length;
+            if (awsEl) awsEl.textContent = awsVisible ?? regions.filter(r => r.provider === 'AWS').length;
         }
 
         function hasActiveFilters() {
