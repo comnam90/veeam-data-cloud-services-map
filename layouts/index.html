@@ -609,25 +609,6 @@
             height: 52px;
             font-size: 16px;
         }
-        /* Provider indicator bar at bottom of cluster */
-        .cluster-providers {
-            position: absolute;
-            bottom: -4px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 2px;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .cluster-providers .azure-bar {
-            height: 4px;
-            background: #0078D4;
-        }
-        .cluster-providers .aws-bar {
-            height: 4px;
-            background: #FF9900;
-        }
         /* Cluster spiderfy leg styles */
         .leaflet-cluster-anim .leaflet-marker-icon, .leaflet-cluster-anim .leaflet-marker-shadow {
             transition: transform 0.3s ease-out, opacity 0.3s ease-out;
@@ -1286,39 +1267,15 @@
             LARGE: 20
         };
 
-        const PROVIDER_BAR = {
-            MIN_WIDTH: 4,
-            MAX_WIDTH: 24
-        };
-
         function createClusterIcon(cluster) {
             const count = cluster.getChildCount();
-            const markers = cluster.getAllChildMarkers();
-            
-            let azureCount = 0;
-            let awsCount = 0;
-            markers.forEach(m => {
-                if (m.options.provider === 'Azure') azureCount++;
-                else if (m.options.provider === 'AWS') awsCount++;
-            });
-            
+
             let sizeClass = 'cluster-small';
             if (count > CLUSTER_SIZE_THRESHOLDS.LARGE) sizeClass = 'cluster-large';
             else if (count > CLUSTER_SIZE_THRESHOLDS.MEDIUM) sizeClass = 'cluster-medium';
-            
-            // Minimum 4px width prevents bars from being invisible at high zoom levels or with uneven provider distributions
-            const total = azureCount + awsCount;
-            const azureWidth = azureCount > 0 ? Math.max(PROVIDER_BAR.MIN_WIDTH, Math.round((azureCount / total) * PROVIDER_BAR.MAX_WIDTH)) : 0;
-            const awsWidth = awsCount > 0 ? Math.max(PROVIDER_BAR.MIN_WIDTH, Math.round((awsCount / total) * PROVIDER_BAR.MAX_WIDTH)) : 0;
-            
+
             return L.divIcon({
-                html: `<div class="cluster-marker ${sizeClass}">
-                    <span>${count}</span>
-                    <div class="cluster-providers">
-                        ${azureCount > 0 ? `<div class="azure-bar" style="width: ${azureWidth}px"></div>` : ''}
-                        ${awsCount > 0 ? `<div class="aws-bar" style="width: ${awsWidth}px"></div>` : ''}
-                    </div>
-                </div>`,
+                html: `<div class="cluster-marker ${sizeClass}"><span>${count}</span></div>`,
                 className: 'custom-cluster-marker',
                 iconSize: L.point(52, 52),
                 iconAnchor: L.point(26, 26)
