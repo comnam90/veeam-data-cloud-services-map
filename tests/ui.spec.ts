@@ -101,9 +101,11 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
         mobilePlatforms.includes(testInfo.project.name),
         `Skipping on mobile: ${testInfo.project.name}`
       );
-      const counter = page.getByText(/72 of 72 regions/i);
-      await expect(counter).toBeVisible();
-      
+      const visibleEl = page.locator('#visibleCount');
+      const totalEl = page.locator('#totalCount');
+      await expect(totalEl).toHaveText('72');
+      await expect(visibleEl).toHaveText('72');
+
       const providerFilter = page.locator('#providerFilter');
       await expect(providerFilter).toHaveValue('all');
     });
@@ -149,13 +151,13 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await providerFilter.selectOption('Azure');
       await page.waitForTimeout(300);
 
-      const counter = page.getByText(/of 72 regions/i);
-      await expect(counter).toBeVisible();
+      const visibleEl = page.locator('#visibleCount');
+      const totalEl = page.locator('#totalCount');
+      await expect(totalEl).toHaveText('72');
 
-      const counterText = await counter.textContent();
-      const match = counterText?.match(/(\d+) of 72/);
-      const filteredCount = match ? parseInt(match[1]) : 0;
-      
+      const visibleText = await visibleEl.textContent();
+      const filteredCount = parseInt(visibleText ?? '0', 10);
+
       expect(filteredCount).toBe(45);
       expect(filteredCount).toBeLessThan(72);
     });
@@ -171,13 +173,13 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await providerFilter.selectOption('AWS');
       await page.waitForTimeout(300);
 
-      const counter = page.getByText(/of 72 regions/i);
-      await expect(counter).toBeVisible();
+      const visibleEl = page.locator('#visibleCount');
+      const totalEl = page.locator('#totalCount');
+      await expect(totalEl).toHaveText('72');
 
-      const counterText = await counter.textContent();
-      const match = counterText?.match(/(\d+) of 72/);
-      const filteredCount = match ? parseInt(match[1]) : 0;
-      
+      const visibleText = await visibleEl.textContent();
+      const filteredCount = parseInt(visibleText ?? '0', 10);
+
       expect(filteredCount).toBe(27);
       expect(filteredCount).toBeLessThan(72);
     });
@@ -206,11 +208,10 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await page.waitForTimeout(300);
       
       await expect(page.getByRole('button', { name: /M365/i })).toBeVisible();
-      
-      const counter = page.getByText(/of 72 regions/i);
-      const counterText = await counter.textContent();
-      const match = counterText?.match(/(\d+) of 72/);
-      const filteredCount = match ? parseInt(match[1]) : 0;
+
+      const visibleEl = page.locator('#visibleCount');
+      const visibleText = await visibleEl.textContent();
+      const filteredCount = parseInt(visibleText ?? '0', 10);
       expect(filteredCount).toBeLessThan(72);
       expect(filteredCount).toBeGreaterThan(0);
     });
@@ -222,13 +223,12 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       
       await page.getByRole('checkbox', { name: 'M365' }).check();
       await page.getByRole('checkbox', { name: 'Vault' }).check();
-      
+
       await page.waitForTimeout(300);
-      
-      const counter = page.getByText(/of 72 regions/i);
-      const counterText = await counter.textContent();
-      const match = counterText?.match(/(\d+) of 72/);
-      const filteredCount = match ? parseInt(match[1]) : 0;
+
+      const visibleEl = page.locator('#visibleCount');
+      const visibleText = await visibleEl.textContent();
+      const filteredCount = parseInt(visibleText ?? '0', 10);
       expect(filteredCount).toBeGreaterThan(0);
     });
 
@@ -252,7 +252,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await page.waitForTimeout(300);
       
       await expect(page.getByRole('button', { name: /all services/i })).toBeVisible();
-      await expect(page.getByText(/72 of 72 regions/i)).toBeVisible();
+      await expect(page.locator('#visibleCount')).toHaveText('72');
     });
   });
 
@@ -267,11 +267,10 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await serviceButton.click();
       await page.getByRole('checkbox', { name: 'M365' }).check();
       await page.waitForTimeout(300);
-      
-      const counter = page.getByText(/of 72 regions/i);
-      const counterText = await counter.textContent();
-      const match = counterText?.match(/(\d+) of 72/);
-      const filteredCount = match ? parseInt(match[1]) : 0;
+
+      const visibleEl = page.locator('#visibleCount');
+      const visibleText = await visibleEl.textContent();
+      const filteredCount = parseInt(visibleText ?? '0', 10);
       expect(filteredCount).toBeGreaterThan(0);
       expect(filteredCount).toBeLessThan(72);
     });
@@ -302,7 +301,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await expect(page.getByRole('button', { name: /all services/i })).toBeVisible();
 
       if (!isMobile) {
-        await expect(page.getByText(/72 of 72 regions/i)).toBeVisible();
+        await expect(page.locator('#visibleCount')).toHaveText('72');
       }
 
       if (!isMobile) {
@@ -711,9 +710,9 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       
       const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await expect(searchInput).toBeVisible();
-      
-      const counter = page.getByText(/72 of 72 regions/i);
-      await expect(counter).toBeVisible();
+
+      await expect(page.locator('#visibleCount')).toHaveText('72');
+      await expect(page.locator('#totalCount')).toHaveText('72');
     });
   });
 });
