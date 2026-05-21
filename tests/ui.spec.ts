@@ -383,7 +383,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
         const response = await route.fetch();
         const html = await response.text();
         const injectedHtml = html.replace(
-          /(<input type=checkbox value=vdc_azure_backup> Azure<\/label>)(<\/div>)/,
+          /(<input type=checkbox value=vdc_azure_backup> Azure Protection<\/label>)(<\/div>)/,
           '$1<label class="multiselect-option text-white light:text-slate-900"><input type=checkbox value=vdc_test_service> Test Service</label>$2'
         );
 
