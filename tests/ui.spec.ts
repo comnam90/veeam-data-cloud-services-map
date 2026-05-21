@@ -118,7 +118,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await expect(resetButton).toBeVisible();
       await expect(providerFilter).toHaveValue('Azure');
       
-      const markers = page.locator('path.leaflet-interactive');
+      const markers = page.locator('.leaflet-marker-icon .marker-glyph');
       const count = await markers.count();
       expect(count).toBeGreaterThan(0);
     });
@@ -133,7 +133,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await expect(resetButton).toBeVisible();
       await expect(providerFilter).toHaveValue('AWS');
       
-      const markers = page.locator('path.leaflet-interactive');
+      const markers = page.locator('.leaflet-marker-icon .marker-glyph');
       const count = await markers.count();
       expect(count).toBeGreaterThan(0);
     });
@@ -306,8 +306,8 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       }
 
       if (!isMobile) {
-        await expect(page.locator('path.leaflet-interactive').first()).toBeVisible({ timeout: 5000 });
-        const markers = page.locator('path.leaflet-interactive');
+        await expect(page.locator('.leaflet-marker-icon .marker-glyph').first()).toBeVisible({ timeout: 5000 });
+        const markers = page.locator('.leaflet-marker-icon .marker-glyph');
         const count = await markers.count();
         expect(count).toBeGreaterThan(0);
       }
@@ -483,7 +483,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       // Markers are SVG/Canvas elements without accessible roles
       await page.waitForTimeout(1000);
       
-      const marker = page.locator('path.leaflet-interactive').first();
+      const marker = page.locator('.leaflet-marker-icon .marker-glyph').first();
       await marker.click({ force: true });
       
       await page.waitForTimeout(3000);
@@ -536,7 +536,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
     test('should close popup with Escape key', async ({ page }, testInfo) => {
       test.skip(testInfo.project.name === 'Mobile Safari', 'Direct SVG marker clicks are unreliable on simulated mobile');
       // Known issue: Leaflet popups do not respond to Escape key
-      const marker = page.locator('path.leaflet-interactive').first();
+      const marker = page.locator('.leaflet-marker-icon .marker-glyph').first();
       await marker.click();
       await page.waitForTimeout(1000);
       
