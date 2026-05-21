@@ -481,15 +481,25 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       // Known issue: Leaflet markers are not exposed in accessibility tree
       // Markers are SVG/Canvas elements without accessible roles
       await page.waitForTimeout(1000);
-      
+
+      // Zoom in so markers break out of clusters. On small viewports
+      // (e.g. Mobile Chrome 393px) the default zoom keeps every marker
+      // clustered, so .marker-glyph wouldn't exist in the DOM.
+      const zoomIn = page.locator('.leaflet-control-zoom-in');
+      for (let i = 0; i < 4; i++) {
+        await zoomIn.click();
+        await page.waitForTimeout(150);
+      }
+
       const marker = page.locator('.leaflet-marker-icon .marker-glyph').first();
+      await expect(marker).toBeVisible({ timeout: 5000 });
       await marker.click({ force: true });
-      
+
       await page.waitForTimeout(3000);
-      
+
       const popup = page.locator('.leaflet-popup');
       await expect(popup).toBeVisible({ timeout: 5000 });
-      
+
       await expect(popup).toContainText(/AWS|Azure/i);
     });
 
