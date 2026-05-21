@@ -528,35 +528,26 @@
             transform: scale(1.05);
         }
 
-        /* Info panel */
+        /* Info panel slide-out */
         #infoPanel {
             scrollbar-width: thin;
-            scrollbar-color: #475569 transparent;
+            scrollbar-color: var(--border-strong) transparent;
             transform: translateX(100%);
-            transition: transform 0.3s ease-out;
+            transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+            background: var(--bg-elev);
+            border-left: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
         }
-        #infoPanel::-webkit-scrollbar {
-            width: 6px;
-        }
-        #infoPanel::-webkit-scrollbar-track {
-            background: transparent;
-        }
+        #infoPanel::-webkit-scrollbar { width: 6px; }
+        #infoPanel::-webkit-scrollbar-track { background: transparent; }
         #infoPanel::-webkit-scrollbar-thumb {
-            background: #475569;
+            background: var(--border-strong);
             border-radius: 3px;
         }
-        .light #infoPanel {
-            scrollbar-color: #cbd5e1 transparent;
-        }
-        .light #infoPanel::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-        }
-        #infoPanelOverlay.open {
-            opacity: 1;
-        }
-        #infoPanel.open {
-            transform: translateX(0);
-        }
+        #infoPanel.open { transform: translateX(0); }
+        #infoPanelOverlay.open { opacity: 1; }
+        #infoBtn { /* uses .ctl-icon */ }
 
         /* Custom cluster marker styles */
         .marker-cluster {
@@ -726,6 +717,122 @@
         .panel-legend .row .count {
             margin-left: auto; color: var(--text-mute); font-size: 10px;
         }
+
+        /* Info panel content */
+        .info-callout {
+            display: flex; gap: 10px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--accent);
+            background: var(--accent-soft);
+            margin-bottom: 16px;
+        }
+        .info-callout-icon { width: 18px; height: 18px; color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+        .info-callout-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+        .info-callout-body {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-mute);
+            line-height: 1.5;
+        }
+        .info-section { margin-bottom: 20px; }
+        .info-section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            margin-bottom: 10px;
+        }
+        .info-section-body {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.5;
+        }
+        .info-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .info-stat {
+            background: var(--bg-elev-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        .info-stat-num {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+        .info-stat-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--text-mute);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 4px;
+        }
+        .info-link-group { display: flex; flex-direction: column; gap: 6px; }
+        .info-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg-elev-2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text);
+            text-decoration: none;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .info-link:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+        .info-link-icon { width: 16px; height: 16px; flex-shrink: 0; color: var(--text-mute); }
+        .info-link:hover .info-link-icon { color: var(--accent); }
+        .info-link span { flex: 1; }
+        .info-arrow { width: 12px; height: 12px; color: var(--text-dim); }
+        .info-link-card { gap: 12px; padding: 10px 12px; }
+        .info-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .info-link-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 500;
+            font-size: 13px;
+            color: var(--text);
+        }
+        .info-link-sub {
+            font-size: 10px;
+            color: var(--text-mute);
+            margin-top: 2px;
+            letter-spacing: 0.04em;
+        }
+        .info-link-accent .info-link-icon { color: var(--accent); }
+        .info-footer {
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        .info-footer p {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-bottom: 4px;
+            letter-spacing: 0.04em;
+        }
     </style>
 </head>
 <body class="font-sans antialiased">
@@ -844,128 +951,99 @@
 
 <div id="infoPanelOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[2000] hidden opacity-0 transition-opacity duration-300"></div>
 
-<div id="infoPanel" class="fixed top-0 right-0 h-full w-full sm:w-96 max-w-full bg-slate-900 light:bg-white border-l border-slate-700 light:border-slate-200 shadow-2xl z-[2001] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="infoPanelTitle">
-    <div class="p-4 sm:p-5">
+<div id="infoPanel" class="fixed top-0 right-0 h-full w-full sm:w-96 max-w-full shadow-2xl z-[2001] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="infoPanelTitle">
+    <div class="p-5" style="padding-top: calc(1.25rem + env(safe-area-inset-top));">
         <div class="flex items-center justify-between mb-4">
-            <h2 id="infoPanelTitle" class="text-xl font-bold text-white light:text-slate-900">About This Map</h2>
-            <button id="closeInfoPanel" class="p-2 rounded-lg hover:bg-slate-800 light:hover:bg-slate-100 transition-colors" aria-label="Close panel">
-                <svg aria-hidden="true" class="w-5 h-5 text-slate-400 light:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <h2 id="infoPanelTitle" class="font-bold" style="font-family: 'Space Grotesk', sans-serif; font-size: 22px; letter-spacing: -0.01em;">About This Map</h2>
+            <button id="closeInfoPanel" class="ctl ctl-icon" aria-label="Close panel">
+                <svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
         </div>
 
-        <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4">
-            <div class="flex gap-2.5">
-                <svg aria-hidden="true" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                </svg>
+        <div class="info-callout">
+            <svg aria-hidden="true" class="info-callout-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <div>
+                <p class="info-callout-title">Community Project</p>
+                <p class="info-callout-body">This is an unofficial, community-maintained project. Not affiliated with or endorsed by Veeam Software. Data may be incomplete or outdated.</p>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3 class="info-section-label">What is this?</h3>
+            <p class="info-section-body">An interactive map visualizing Veeam Data Cloud (VDC) service availability across AWS and Azure regions. Quickly find where services like Veeam Data Cloud Vault, Microsoft 365 Protection, and more are available.</p>
+        </div>
+
+        <div class="info-stats">
+            <div class="info-stat">
+                <div class="info-stat-num" id="infoTotalRegions">0</div>
+                <div class="info-stat-label">Total Regions</div>
+            </div>
+            <div class="info-stat">
+                <div class="info-stat-num">5</div>
+                <div class="info-stat-label">Services Tracked</div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3 class="info-section-label">Maintained By</h3>
+            <a href="https://github.com/comnam90" target="_blank" rel="noopener noreferrer" class="info-link info-link-card">
+                <div class="info-avatar">C</div>
                 <div>
-                    <p class="text-amber-400 font-semibold text-sm">Community Project</p>
-                    <p class="text-slate-400 light:text-slate-500 text-xs mt-1">This is an unofficial, community-maintained project. Not affiliated with or endorsed by Veeam Software. Data may be incomplete or outdated.</p>
+                    <div class="info-link-name">@comnam90</div>
+                    <div class="info-link-sub">GitHub</div>
                 </div>
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <h3 class="text-sm font-semibold text-slate-400 light:text-slate-500 uppercase tracking-wider mb-2">What is this?</h3>
-            <p class="text-slate-300 light:text-slate-600 text-sm leading-relaxed">
-                An interactive map visualizing Veeam Data Cloud (VDC) service availability across AWS and Azure regions. Quickly find where services like VDC Vault, M365 Protection, and more are available.
-            </p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2.5 mb-4">
-            <div class="bg-slate-800/50 light:bg-slate-100 rounded-lg p-3 border border-slate-700/50 light:border-slate-200">
-                <div class="text-2xl font-bold text-white light:text-slate-900" id="infoTotalRegions">0</div>
-                <div class="text-xs text-slate-400 light:text-slate-500">Total Regions</div>
-            </div>
-            <div class="bg-slate-800/50 light:bg-slate-100 rounded-lg p-3 border border-slate-700/50 light:border-slate-200">
-                <div class="text-2xl font-bold text-white light:text-slate-900">5</div>
-                <div class="text-xs text-slate-400 light:text-slate-500">Services Tracked</div>
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <h3 class="text-sm font-semibold text-slate-400 light:text-slate-500 uppercase tracking-wider mb-2">Maintained By</h3>
-            <a href="https://github.com/comnam90" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-800/50 light:bg-slate-100 border border-slate-700/50 light:border-slate-200 hover:border-green-500/50 transition-colors group">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-white font-bold text-sm">C</div>
-                <div>
-                    <div class="text-white light:text-slate-900 font-medium group-hover:text-green-400 transition-colors">@comnam90</div>
-                    <div class="text-xs text-slate-400 light:text-slate-500">GitHub</div>
-                </div>
-                <svg aria-hidden="true" class="w-4 h-4 text-slate-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                </svg>
+                <svg aria-hidden="true" class="info-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
             </a>
         </div>
 
-        <div class="mb-4">
-            <h3 class="text-sm font-semibold text-slate-400 light:text-slate-500 uppercase tracking-wider mb-2">Quick Links</h3>
-            <div class="space-y-1.5">
-                <a href="https://github.com/comnam90/veeam-data-cloud-services-map" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-800/50 light:bg-slate-100 border border-slate-700/50 light:border-slate-200 hover:border-green-500/50 transition-colors group">
-                    <svg aria-hidden="true" class="w-5 h-5 text-slate-400 group-hover:text-green-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                    <span class="text-slate-300 light:text-slate-600 text-sm group-hover:text-green-400 transition-colors">View on GitHub</span>
-                    <svg aria-hidden="true" class="w-4 h-4 text-slate-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                    </svg>
+        <div class="info-section">
+            <h3 class="info-section-label">Quick Links</h3>
+            <div class="info-link-group">
+                <a href="https://github.com/comnam90/veeam-data-cloud-services-map" target="_blank" rel="noopener noreferrer" class="info-link">
+                    <svg aria-hidden="true" class="info-link-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <span>View on GitHub</span>
+                    <svg aria-hidden="true" class="info-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                 </a>
-                <a href="/api/docs" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-800/50 light:bg-slate-100 border border-slate-700/50 light:border-slate-200 hover:border-green-500/50 transition-colors group">
-                    <svg aria-hidden="true" class="w-5 h-5 text-slate-400 group-hover:text-green-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                    </svg>
-                    <span class="text-slate-300 light:text-slate-600 text-sm group-hover:text-green-400 transition-colors">API Documentation</span>
-                    <svg aria-hidden="true" class="w-4 h-4 text-slate-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                    </svg>
+                <a href="/api/docs" target="_blank" rel="noopener noreferrer" class="info-link">
+                    <svg aria-hidden="true" class="info-link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    <span>API Documentation</span>
+                    <svg aria-hidden="true" class="info-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                 </a>
-                <a href="https://www.veeam.com/products/veeam-data-cloud.html" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-800/50 light:bg-slate-100 border border-slate-700/50 light:border-slate-200 hover:border-green-500/50 transition-colors group">
-                    <svg aria-hidden="true" class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 144 144">
-                        <path d="M118.21 117.2c0 .49-.2.94-.53 1.27-.33.32-.77.53-1.27.53l-21.51.11v12.01H105c3.21 0 6.3-1.28 8.57-3.55l13.2-13.2c2.27-2.27 3.55-5.36 3.55-8.57V94.65h-12.11v22.56zM25.79 26.8c0-.49.2-.94.53-1.27.32-.32.77-.53 1.27-.53l21.51-.11V12.88H39c-3.21 0-6.3 1.28-8.57 3.55l-13.2 13.2a12.14 12.14 0 0 0-3.55 8.57v11.15h12.11V26.79zm-.47 90.68a1.8 1.8 0 0 1-.52-1.27l-.11-21.51H12.68v10.1c0 3.21 1.28 6.3 3.55 8.57l13.2 13.2c2.27 2.27 5.36 3.55 8.57 3.55h11.15v-12.11H26.59c-.49-.01-.94-.21-1.27-.54zm102.46-86.86-13.2-13.2a12.14 12.14 0 0 0-8.57-3.55H94.86v12.11h22.56c.49.01.94.21 1.27.54.32.32.52.77.52 1.27l.11 21.51h12.01V39.2c0-3.21-1.28-6.3-3.55-8.57zM71.86 78.79a6.65 6.65 0 1 0 0-13.3 6.65 6.65 0 0 0 0 13.3"/>
-                    </svg>
-                    <span class="text-slate-300 light:text-slate-600 text-sm group-hover:text-green-400 transition-colors">Official Veeam Data Cloud</span>
-                    <svg aria-hidden="true" class="w-4 h-4 text-slate-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                    </svg>
+                <a href="https://www.veeam.com/products/veeam-data-cloud.html" target="_blank" rel="noopener noreferrer" class="info-link">
+                    <svg aria-hidden="true" class="info-link-icon" style="color: var(--accent);" fill="currentColor" viewBox="0 0 144 144"><path d="M118.21 117.2c0 .49-.2.94-.53 1.27-.33.32-.77.53-1.27.53l-21.51.11v12.01H105c3.21 0 6.3-1.28 8.57-3.55l13.2-13.2c2.27-2.27 3.55-5.36 3.55-8.57V94.65h-12.11v22.56zM25.79 26.8c0-.49.2-.94.53-1.27.32-.32.77-.53 1.27-.53l21.51-.11V12.88H39c-3.21 0-6.3 1.28-8.57 3.55l-13.2 13.2a12.14 12.14 0 0 0-3.55 8.57v11.15h12.11V26.79zm-.47 90.68a1.8 1.8 0 0 1-.52-1.27l-.11-21.51H12.68v10.1c0 3.21 1.28 6.3 3.55 8.57l13.2 13.2c2.27 2.27 5.36 3.55 8.57 3.55h11.15v-12.11H26.59c-.49-.01-.94-.21-1.27-.54zm102.46-86.86-13.2-13.2a12.14 12.14 0 0 0-8.57-3.55H94.86v12.11h22.56c.49.01.94.21 1.27.54.32.32.52.77.52 1.27l.11 21.51h12.01V39.2c0-3.21-1.28-6.3-3.55-8.57zM71.86 78.79a6.65 6.65 0 1 0 0-13.3 6.65 6.65 0 0 0 0 13.3"/></svg>
+                    <span>Official Veeam Data Cloud</span>
+                    <svg aria-hidden="true" class="info-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                 </a>
             </div>
         </div>
 
-        <div class="mb-4">
-            <h3 class="text-sm font-semibold text-slate-400 light:text-slate-500 uppercase tracking-wider mb-2">Found an Issue?</h3>
-            <div class="space-y-1.5">
-                <a href="https://github.com/comnam90/veeam-data-cloud-services-map/issues/new?template=missing-service.yml" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/30 hover:bg-blue-500/20 transition-colors group">
-                    <svg aria-hidden="true" class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span class="text-blue-400 text-sm font-medium">Report Missing Service</span>
+        <div class="info-section">
+            <h3 class="info-section-label">Found an Issue?</h3>
+            <div class="info-link-group">
+                <a href="https://github.com/comnam90/veeam-data-cloud-services-map/issues/new?template=missing-service.yml" target="_blank" rel="noopener noreferrer" class="info-link info-link-accent">
+                    <svg aria-hidden="true" class="info-link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Report Missing Service</span>
                 </a>
-                <a href="https://github.com/comnam90/veeam-data-cloud-services-map/issues/new?template=missing-region.yml" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 transition-colors group">
-                    <svg aria-hidden="true" class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    <span class="text-purple-400 text-sm font-medium">Report Missing Region</span>
+                <a href="https://github.com/comnam90/veeam-data-cloud-services-map/issues/new?template=missing-region.yml" target="_blank" rel="noopener noreferrer" class="info-link info-link-accent">
+                    <svg aria-hidden="true" class="info-link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>Report Missing Region</span>
                 </a>
-                <a href="https://github.com/comnam90/veeam-data-cloud-services-map/issues/new?template=incorrect-information.yml" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 transition-colors group">
-                    <svg aria-hidden="true" class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                    <span class="text-amber-400 text-sm font-medium">Report Incorrect Info</span>
+                <a href="https://github.com/comnam90/veeam-data-cloud-services-map/issues/new?template=incorrect-information.yml" target="_blank" rel="noopener noreferrer" class="info-link info-link-accent">
+                    <svg aria-hidden="true" class="info-link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    <span>Report Incorrect Info</span>
                 </a>
             </div>
         </div>
 
-        <div class="pt-3 border-t border-slate-700/50 light:border-slate-200">
+        <div class="info-footer">
             {{ with .GitInfo }}
-            <p class="text-xs text-slate-400 light:text-slate-500 text-center mb-2">
-                Last updated: {{ now.Format "January 2, 2006" }}
-            </p>
+            <p>Last updated: {{ now.Format "January 2, 2006" }}</p>
             {{ end }}
-            <p class="text-xs text-slate-500 light:text-slate-400 text-center">
-                Built with Hugo, Leaflet.js & Tailwind CSS
-            </p>
+            <p>Built with Hugo, Leaflet.js &amp; Tailwind CSS</p>
         </div>
     </div>
 </div>
