@@ -583,16 +583,22 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            background: #ffffff;
-            border: 1px solid var(--border-subtle, #e2e8f0);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-            color: #11151c;
-            font-weight: 600;
-            transition: transform 0.15s ease;
+            background-color: var(--accent);
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+            font-weight: 700;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
             cursor: pointer;
         }
         .cluster-marker:hover {
-            transform: scale(1.18);
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+        }
+        html.light .cluster-marker {
+            background-color: var(--accent);
+            color: #ffffff;
+            border-color: #ffffff;
         }
         .cluster-small {
             width: 36px;
