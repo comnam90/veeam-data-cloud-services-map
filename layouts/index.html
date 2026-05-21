@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Interactive map of Veeam Data Cloud service availability across AWS and Azure regions.">
-    <meta name="theme-color" content="#0f172a" id="themeColorMeta">
+    <meta name="theme-color" content="#0a0d12" id="themeColorMeta">
     <meta name="color-scheme" content="light dark">
     <title>{{ .Site.Title }}</title>
     
@@ -12,7 +12,10 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://static.cloudflareinsights.com" crossorigin>
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
@@ -22,15 +25,48 @@
     <style type="text/tailwindcss">
         @custom-variant dark (&:where(.dark, .dark *));
         @custom-variant light (&:where(.light, .light *));
-        
-        body { 
-            background-color: #0f172a; 
-            color: white;
+
+        :root {
+            /* Dark tokens (default) */
+            --bg: #0a0d12;
+            --bg-elev: #11151c;
+            --bg-elev-2: #161b24;
+            --border: #232a35;
+            --border-strong: #2f3744;
+            --text: #e6edf3;
+            --text-mute: #8892a0;
+            --text-dim: #5a6473;
+            --accent: #00ff88;
+            --accent-soft: rgba(0, 255, 136, 0.10);
+            --accent-glow: rgba(0, 255, 136, 0.35);
+            --azure: #4ea3ff;
+            --aws: #ff9d3d;
+        }
+        html.light {
+            --bg: #fafbfc;
+            --bg-elev: #ffffff;
+            --bg-elev-2: #f4f6f8;
+            --border: #e5e8ec;
+            --border-strong: #d0d5da;
+            --text: #1a202c;
+            --text-mute: #5a6473;
+            --text-dim: #98a0ad;
+            --accent: #00805a;
+            --accent-soft: rgba(0, 128, 90, 0.10);
+            --accent-glow: rgba(0, 128, 90, 0.20);
+            --azure: #2c5fa8;
+            --aws: #d97506;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 13px;
+            letter-spacing: 0.005em;
             transition: background-color 0.3s ease, color 0.3s ease;
             touch-action: manipulation;
         }
-        .dark body { background-color: #0f172a; color: white; }
-        .light body { background-color: #f1f5f9; color: #0f172a; }
         
         /* Full height layout using flexbox */
         .app-container {
@@ -1033,7 +1069,7 @@
                 html.classList.add('light');
                 html.classList.remove('dark');
                 html.style.colorScheme = 'light';
-                if (themeMeta) themeMeta.setAttribute('content', '#f1f5f9');
+                if (themeMeta) themeMeta.setAttribute('content', '#fafbfc');
                 if (map.hasLayer(darkTiles)) map.removeLayer(darkTiles);
                 if (!map.hasLayer(lightTiles)) lightTiles.addTo(map);
                 currentTiles = lightTiles;
@@ -1041,7 +1077,7 @@
                 html.classList.remove('light');
                 html.classList.add('dark');
                 html.style.colorScheme = 'dark';
-                if (themeMeta) themeMeta.setAttribute('content', '#0f172a');
+                if (themeMeta) themeMeta.setAttribute('content', '#0a0d12');
                 if (map.hasLayer(lightTiles)) map.removeLayer(lightTiles);
                 if (!map.hasLayer(darkTiles)) darkTiles.addTo(map);
                 currentTiles = darkTiles;
