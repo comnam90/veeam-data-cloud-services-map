@@ -224,13 +224,12 @@
         .ctl-icon { padding: 7px 9px; }
         .ctl-icon svg { width: 14px; height: 14px; }
         .ctl-search {
-            min-width: 200px;
+            min-width: 240px;
             text-transform: none;
             letter-spacing: 0;
             font-family: 'JetBrains Mono', monospace;
             padding-left: 30px;
         }
-        .ctl-search:focus { min-width: 240px; }
         .ctl-search::placeholder { color: var(--text-dim); }
         .ctl-reset {
             color: var(--aws);
@@ -335,7 +334,6 @@
 
         @media (max-width: 640px) {
             .ctl-search { min-width: 0; flex: 1; }
-            .ctl-search:focus { min-width: 0; }
             .ctl .ctl-label { display: none; }
         }
 
@@ -1656,9 +1654,12 @@
                     if (Math.abs(markerLat - region.coords[0]) < EPSILON &&
                         Math.abs(markerLng - region.coords[1]) < EPSILON) {
                         found = true;
-                        const targetZoom = Math.max(map.getZoom(), CLUSTER_CONFIG.DISABLE_AT_ZOOM);
-                        map.setView(region.coords, targetZoom, { animate: !reducedMotion });
-                        map.once('moveend', () => marker.openPopup());
+                        // zoomToShowLayer expands the parent cluster (if any) and waits until
+                        // the marker is on the map pane before invoking the callback, so the
+                        // popup actually attaches to a live marker rather than a clustered one.
+                        clusterGroup.zoomToShowLayer(marker, () => {
+                            marker.openPopup();
+                        });
                     }
                 });
             }
@@ -1731,6 +1732,15 @@
             } else if (e.key === 'Escape') {
                 setSearchDropdownOpen(false);
                 searchInput.blur();
+            }
+        });
+
+        // Prevent the search input from losing focus when a dropdown option is clicked.
+        // Keeps focus state stable across mousedown/mouseup so any future focus-driven
+        // layout shift can't move the dropdown's hit-box mid-click.
+        searchResults.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.search-result-item')) {
+                e.preventDefault();
             }
         });
 
