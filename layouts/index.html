@@ -117,6 +117,83 @@
             background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
         }
 
+        /* === NEW HEADER === */
+        .hud {
+            display: flex;
+            align-items: center;
+            padding: 14px 24px;
+            background: var(--bg-elev);
+            border-bottom: 1px solid var(--border);
+            padding-top: calc(14px + env(safe-area-inset-top));
+        }
+        .brand { display: flex; align-items: center; gap: 14px; }
+        .brand-mark {
+            width: 26px; height: 26px;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .brand-mark::after {
+            content: ''; width: 10px; height: 10px;
+            background: var(--accent); border-radius: 50%;
+            box-shadow: 0 0 14px var(--accent-glow);
+        }
+        .brand-mark::before {
+            content: ''; position: absolute; inset: 4px;
+            border: 1.5px solid var(--accent);
+            border-radius: 50%;
+            opacity: 0.35;
+            animation: brand-pulse 2.4s ease-out infinite;
+        }
+        @keyframes brand-pulse {
+            0% { transform: scale(0.7); opacity: 0.6; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+        .brand-text { display: flex; flex-direction: column; gap: 1px; }
+        .brand-text .tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px; letter-spacing: 0.18em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+        .brand-text .title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700; font-size: 15px;
+            letter-spacing: -0.005em;
+            color: var(--text);
+        }
+        .brand-text .title em { color: var(--accent); font-style: normal; }
+
+        .status {
+            margin-left: 36px;
+            display: flex; align-items: center; gap: 24px;
+            flex: 1;
+            font-size: 11px; color: var(--text-mute);
+            text-transform: uppercase; letter-spacing: 0.12em;
+        }
+        .status .row { display: flex; align-items: baseline; gap: 8px; }
+        .status .row b {
+            font-weight: 500; color: var(--text);
+            font-size: 13px; letter-spacing: 0;
+        }
+        .status .sep { width: 1px; height: 14px; background: var(--border); }
+        .status .dot {
+            width: 6px; height: 6px;
+            background: var(--accent); border-radius: 50%;
+            box-shadow: 0 0 6px var(--accent-glow);
+        }
+
+        .hud .controls { display: flex; align-items: center; gap: 6px; }
+
+        @media (max-width: 900px) {
+            .status { display: none; }
+        }
+        @media (max-width: 640px) {
+            .hud { padding: 10px 14px; gap: 8px; flex-wrap: wrap; }
+            .brand-text .tag { display: none; }
+            .hud .controls { margin-left: auto; }
+        }
+
         /* Select dropdown styling */
         select {
             background-color: #1e293b;
@@ -616,106 +693,83 @@
 </head>
 <body class="font-sans antialiased">
 <div class="app-container overflow-hidden">
-    <header class="header-gradient border-b border-slate-800/50 light:border-slate-200 flex flex-col justify-center px-3 sm:px-6 lg:px-8 py-2 sm:py-3 flex-shrink-0" style="padding-top: calc(0.5rem + env(safe-area-inset-top));">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 max-w-[1800px] mx-auto w-full">
-            <div class="flex items-center gap-2 sm:gap-3">
-                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg shadow-green-500/20 flex-shrink-0">
-                    <svg aria-hidden="true" class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+    <header class="hud">
+        <div class="brand">
+            <div class="brand-mark" aria-hidden="true"></div>
+            <div class="brand-text">
+                <span class="tag">VDC // Global Telemetry</span>
+                <h1 class="title"><em>Veeam</em> Data Cloud Service Map</h1>
+            </div>
+        </div>
+
+        <div class="status" aria-hidden="true">
+            <div class="row"><span class="dot"></span> Online</div>
+            <div class="sep"></div>
+            <div class="row">Regions <b><span id="visibleCount">0</span>/<span id="totalCount">0</span></b></div>
+            <div class="row">Providers <b>02</b></div>
+            <div class="row">Services <b>05</b></div>
+        </div>
+
+        <div class="controls">
+            <!-- Search input -->
+            <div class="search-container">
+                <div class="relative">
+                    <svg aria-hidden="true" class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
+                    <input type="text" id="regionSearch" placeholder="Search regions…" autocomplete="off" aria-label="Search regions"
+                            role="combobox" aria-expanded="false" aria-controls="searchResults" aria-autocomplete="list" aria-activedescendant=""
+                            class="ctl ctl-search">
                 </div>
-                <div class="min-w-0">
-                    <h1 class="text-lg sm:text-2xl font-bold truncate">
-                        <span class="bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">Veeam Data Cloud</span>
-                        <span class="text-white light:text-slate-900"> Service Map</span>
-                    </h1>
-                    <p class="text-[10px] sm:text-xs text-slate-400 light:text-slate-500 tracking-wide hidden sm:block">Interactive Global Availability</p>
+                <div id="searchResults" role="listbox" aria-label="Search results" aria-hidden="true"></div>
+            </div>
+
+            <select id="providerFilter" aria-label="Filter by provider" class="ctl">
+                <option value="all">All Providers</option>
+                <option value="Azure">Azure</option>
+                <option value="AWS">AWS</option>
+            </select>
+
+            <div class="multiselect" id="serviceMultiselect">
+                <button type="button" id="serviceFilterBtn" aria-expanded="false" class="ctl multiselect-btn">
+                    <span id="serviceFilterLabel">All Services</span>
+                    <svg aria-hidden="true" class="multiselect-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <div class="multiselect-dropdown" id="serviceDropdown" aria-hidden="true">
+                    <label class="multiselect-option"><input type="checkbox" value="vdc_vault"> Vault</label>
+                    <label class="multiselect-option"><input type="checkbox" value="vdc_m365"> M365</label>
+                    <label class="multiselect-option"><input type="checkbox" value="vdc_entra_id"> Entra ID</label>
+                    <label class="multiselect-option"><input type="checkbox" value="vdc_salesforce"> Salesforce</label>
+                    <label class="multiselect-option"><input type="checkbox" value="vdc_azure_backup"> Azure Protection</label>
                 </div>
             </div>
 
-            <div class="flex gap-1.5 sm:gap-2 lg:gap-3 items-center flex-wrap">
-                <!-- Search Input -->
-                <div class="search-container">
-                    <div class="relative">
-                        <svg aria-hidden="true" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                        <input type="text" id="regionSearch" placeholder="Search regions…" autocomplete="off" aria-label="Search regions"
-                                role="combobox"
-                                aria-expanded="false"
-                                aria-controls="searchResults"
-                                aria-autocomplete="list"
-                                aria-activedescendant=""
-                                class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg pl-8 pr-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 placeholder-slate-400 light:placeholder-slate-500 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm">
-                    </div>
-                    <div id="searchResults" role="listbox" aria-label="Search results" aria-hidden="true"></div>
-                </div>
+            <button id="resetFilters" aria-label="Reset all filters" class="ctl ctl-reset hidden" title="Reset all filters">
+                <svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                <span class="ctl-label">Reset</span>
+            </button>
 
-                <select id="providerFilter" aria-label="Filter by provider" class="bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 focus:ring-2 focus:ring-green-500/50 focus:border-green-500 outline-none shadow-sm backdrop-blur-sm min-w-0">
-                    <option value="all">All Providers</option>
-                    <option value="Azure">Azure</option>
-                    <option value="AWS">AWS</option>
-                </select>
+            <button id="themeToggle" aria-label="Toggle theme" class="ctl ctl-icon" title="Toggle theme">
+                <svg id="iconSystem" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/>
+                </svg>
+                <svg id="iconLight" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" class="hidden">
+                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+                </svg>
+                <svg id="iconDark" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" class="hidden">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                </svg>
+            </button>
 
-                <div class="multiselect" id="serviceMultiselect">
-                    <button type="button" id="serviceFilterBtn" aria-expanded="false" class="multiselect-btn bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white light:text-slate-900 shadow-sm backdrop-blur-sm min-w-0">
-                        <span id="serviceFilterLabel">All Services</span>
-                        <svg aria-hidden="true" class="multiselect-chevron w-3 h-3 sm:w-4 sm:h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </button>
-                    <div class="multiselect-dropdown" id="serviceDropdown" aria-hidden="true">
-                        <label class="multiselect-option text-white light:text-slate-900">
-                            <input type="checkbox" value="vdc_vault"> Vault
-                        </label>
-                        <label class="multiselect-option text-white light:text-slate-900">
-                            <input type="checkbox" value="vdc_m365"> M365
-                        </label>
-                        <label class="multiselect-option text-white light:text-slate-900">
-                            <input type="checkbox" value="vdc_entra_id"> Entra ID
-                        </label>
-                        <label class="multiselect-option text-white light:text-slate-900">
-                            <input type="checkbox" value="vdc_salesforce"> Salesforce
-                        </label>
-                        <label class="multiselect-option text-white light:text-slate-900">
-                            <input type="checkbox" value="vdc_azure_backup"> Azure
-                        </label>
-                    </div>
-                </div>
-
-                <div id="regionCount" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/60 light:bg-slate-100 rounded-lg border border-slate-600/30 light:border-slate-300 text-xs text-slate-300 light:text-slate-600">
-                    <svg aria-hidden="true" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    <span><span id="visibleCount" class="font-semibold text-white light:text-slate-900">0</span> of <span id="totalCount" class="font-semibold">0</span> regions</span>
-                </div>
-
-                <button id="resetFilters" aria-label="Reset all filters" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/20 light:bg-amber-100 border border-amber-500/40 light:border-amber-400 text-amber-400 light:text-amber-700 hover:bg-amber-500/30 light:hover:bg-amber-200 text-xs font-medium transition-colors duration-200 flex-shrink-0" title="Reset all filters">
-                    <svg aria-hidden="true" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                    <span class="hidden sm:inline">Reset</span>
-                </button>
-
-                <button id="themeToggle" aria-label="Toggle theme" class="p-2 sm:p-2.5 rounded-lg bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-100 hover:border-green-500/50 shadow-sm backdrop-blur-sm flex-shrink-0" title="Toggle theme">
-                    <svg id="iconSystem" aria-hidden="true" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 light:text-slate-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/>
-                    </svg>
-                    <svg id="iconLight" aria-hidden="true" class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 hidden" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
-                    </svg>
-                    <svg id="iconDark" aria-hidden="true" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 hidden" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
-                    </svg>
-                </button>
-
-                <button id="infoBtn" class="p-2 sm:p-2.5 rounded-lg bg-slate-800/80 light:bg-white border border-slate-600/50 light:border-slate-300 hover:bg-slate-700 light:hover:bg-slate-100 hover:border-green-500/50 shadow-sm backdrop-blur-sm flex-shrink-0" title="About this map" aria-label="Open about panel" aria-expanded="false" aria-controls="infoPanel">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300 light:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </button>
-            </div>
+            <button id="infoBtn" class="ctl ctl-icon" title="About this map" aria-label="Open about panel" aria-expanded="false" aria-controls="infoPanel">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </button>
         </div>
     </header>
 
