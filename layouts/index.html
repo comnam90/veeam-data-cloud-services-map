@@ -1053,11 +1053,11 @@
         }
 
         const serviceDisplayNames = {
-            'vdc_vault': { short: 'Vault', full: 'VAULT' },
-            'vdc_m365': { short: 'M365', full: 'M365 Protection' },
-            'vdc_entra_id': { short: 'Entra', full: 'ENTRA ID Protection' },
-            'vdc_salesforce': { short: 'SF', full: 'SALESFORCE Protection' },
-            'vdc_azure_backup': { short: 'Azure', full: 'AZURE Protection' }
+            'vdc_vault':         { short: 'Vault',             full: 'Veeam Data Cloud Vault' },
+            'vdc_m365':          { short: 'M365',              full: 'Microsoft 365 Protection' },
+            'vdc_entra_id':      { short: 'Entra ID',          full: 'Microsoft Entra ID Protection' },
+            'vdc_salesforce':    { short: 'Salesforce',        full: 'Salesforce Protection' },
+            'vdc_azure_backup':  { short: 'Azure Protection',  full: 'Microsoft Azure Protection' }
         };
 
         function getServiceDisplayName(key, type = 'short') {
@@ -1086,10 +1086,10 @@
             }
 
             map = L.map('map', {
-                center: [-25, 140],
-                minZoom: 3.0,
+                center: [25, 10],
+                minZoom: 2.0,
                 maxZoom: 6.0,
-                zoom: 3,
+                zoom: 2,
                 zoomControl: false,
                 worldCopyJump: true,
                 maxBoundsViscosity: 1.0,

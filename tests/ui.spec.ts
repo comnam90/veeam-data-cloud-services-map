@@ -193,7 +193,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await expect(page.getByRole('checkbox', { name: 'M365' })).toBeVisible();
       await expect(page.getByRole('checkbox', { name: 'Entra ID' })).toBeVisible();
       await expect(page.getByRole('checkbox', { name: 'Salesforce' })).toBeVisible();
-      await expect(page.getByRole('checkbox', { name: 'Azure' })).toBeVisible();
+      await expect(page.getByRole('checkbox', { name: 'Azure Protection' })).toBeVisible();
     });
 
     test('should filter regions by M365 service', async ({ page }) => {
