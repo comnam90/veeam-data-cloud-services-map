@@ -1029,20 +1029,20 @@ Append to the `<style>` block:
 
 ```css
         /* === PROVIDER MARKERS === */
-        .marker-glyph {
+        .map-marker-dot {
             width: 22px; height: 22px;
             position: relative;
             display: flex; align-items: center; justify-content: center;
             filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
             transition: transform 0.15s ease;
         }
-        html.light .marker-glyph {
+        html.light .map-marker-dot {
             filter: drop-shadow(0 2px 4px rgba(15,20,25,0.25));
         }
-        .marker-glyph.azure { color: var(--azure); }
-        .marker-glyph.aws { color: var(--aws); }
-        .marker-glyph:hover { transform: scale(1.18); }
-        .marker-glyph svg { width: 100%; height: 100%; }
+        .map-marker-dot.azure { color: var(--azure); }
+        .map-marker-dot.aws { color: var(--aws); }
+        .map-marker-dot:hover { transform: scale(1.18); }
+        .map-marker-dot svg { width: 100%; height: 100%; }
 ```
 
 - [ ] **Step 2: Replace the marker creation block**
@@ -1052,7 +1052,7 @@ Find the existing block starting at `const marker = L.circleMarker(region.coords
 ```js
                     const markerIcon = L.divIcon({
                         className: '',
-                        html: `<div class="marker-glyph ${providerKey}">${providerGlyph}</div>`,
+                        html: `<div class="map-marker-dot ${providerKey}">${providerGlyph}</div>`,
                         iconSize: [22, 22],
                         iconAnchor: [11, 11],
                         popupAnchor: [0, -11]
@@ -1066,7 +1066,7 @@ Find the existing block starting at `const marker = L.circleMarker(region.coords
 
 - [ ] **Step 3: Update Playwright test marker selector**
 
-In `tests/ui.spec.ts`, find every occurrence of `path.leaflet-interactive` and replace with `.leaflet-marker-icon .marker-glyph` (the new selector that picks up our glyph divs):
+In `tests/ui.spec.ts`, find every occurrence of `path.leaflet-interactive` and replace with `.leaflet-marker-icon .map-marker-dot` (the new selector that picks up our glyph divs):
 
 ```bash
 grep -n "path.leaflet-interactive" tests/ui.spec.ts
@@ -1075,7 +1075,7 @@ grep -n "path.leaflet-interactive" tests/ui.spec.ts
 Replace each with:
 
 ```typescript
-const markers = page.locator('.leaflet-marker-icon .marker-glyph');
+const markers = page.locator('.leaflet-marker-icon .map-marker-dot');
 ```
 
 - [ ] **Step 4: Build, run, visually verify**
@@ -1097,7 +1097,7 @@ Open the browser. Verify:
 npm run test:ui
 ```
 
-Expected: tests that previously used `path.leaflet-interactive` now pass with the new `.leaflet-marker-icon .marker-glyph` selector. If any test fails for other reasons (e.g. label text), note the failure for the next task.
+Expected: tests that previously used `path.leaflet-interactive` now pass with the new `.leaflet-marker-icon .map-marker-dot` selector. If any test fails for other reasons (e.g. label text), note the failure for the next task.
 
 - [ ] **Step 6: Commit**
 
@@ -1489,7 +1489,7 @@ Run a grep for any remaining hardcoded slate colours that were used by the old d
 grep -nE "bg-slate-|text-slate-|border-slate-|#0f172a|#1e293b|#334155|#475569" layouts/index.html | head -40
 ```
 
-For each match, check whether the CSS class is still used by an element in the new design. The map / overlay / Tailwind utilities you keep should be: any class that styles `info-*`, `popup-*`, `panel-*`, `ctl*`, `hud`, `status`, `brand`, `marker-glyph`. Anything else that was specifically targeting old class names (`.header-gradient`, `.legend-container` selectors not used anymore) can be deleted.
+For each match, check whether the CSS class is still used by an element in the new design. The map / overlay / Tailwind utilities you keep should be: any class that styles `info-*`, `popup-*`, `panel-*`, `ctl*`, `hud`, `status`, `brand`, `map-marker-dot`. Anything else that was specifically targeting old class names (`.header-gradient`, `.legend-container` selectors not used anymore) can be deleted.
 
 This is housekeeping — leftover unused CSS is harmless but adds bytes. Aim to remove at least the dead `.header-gradient`, `.legend-container` (replaced by `.panel-legend`), and any `.dark` / `.light` selectors that target classes which no longer exist.
 
@@ -1597,7 +1597,7 @@ EOF
 
 **Placeholder scan** — No TBDs, no "Add appropriate error handling", no "implement later", no "similar to Task N" without showing the code. Every CSS block, JS replacement, and HTML chunk is given in full.
 
-**Type consistency** — Reviewed: `providerKey`, `serviceDisplayNames`, `popupHTML`, `markerIcon` are used consistently across Tasks 6, 7, 8. Marker selector `.leaflet-marker-icon .marker-glyph` is used identically in the JS (Task 7) and Playwright tests (Task 7 Step 3).
+**Type consistency** — Reviewed: `providerKey`, `serviceDisplayNames`, `popupHTML`, `markerIcon` are used consistently across Tasks 6, 7, 8. Marker selector `.leaflet-marker-icon .map-marker-dot` is used identically in the JS (Task 7) and Playwright tests (Task 7 Step 3).
 
 **Other notes for the executing engineer:**
 
