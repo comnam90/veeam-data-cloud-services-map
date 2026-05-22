@@ -1152,12 +1152,9 @@
             }
 
             map = L.map('map', {
-                center: [25, 10],
-                minZoom: 2.0,
+                minZoom: 1,
                 maxZoom: 6.0,
-                zoom: 2,
                 zoomControl: false,
-                worldCopyJump: true,
                 maxBoundsViscosity: 1.0,
                 maxBounds: [[-60, -185], [90, 185]],
                 fadeAnimation: !reducedMotion,
@@ -1188,16 +1185,29 @@
 
         const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
-            maxZoom: 19
+            maxZoom: 19,
+            noWrap: true,
+            bounds: [[-90, -180], [90, 180]]
         });
-        
+
         const lightTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
-            maxZoom: 19
+            maxZoom: 19,
+            noWrap: true,
+            bounds: [[-90, -180], [90, 180]]
         });
 
         let currentTiles = darkTiles;
         currentTiles.addTo(map);
+
+        const regionLatLngs = regions
+            .filter(r => Array.isArray(r.coords) && r.coords.length === 2)
+            .map(r => r.coords);
+        map.fitBounds(L.latLngBounds(regionLatLngs), {
+            padding: [48, 48],
+            maxZoom: 3,
+            animate: false
+        });
 
         const systemDarkQuery = window.matchMedia('(prefers-color-scheme: dark)');
         const themeModes = ['system', 'dark', 'light'];
