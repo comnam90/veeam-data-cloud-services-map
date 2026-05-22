@@ -195,7 +195,7 @@
         @media (max-width: 640px) {
             .hud { padding: 10px 14px; gap: 8px; flex-wrap: wrap; }
             .brand-text .tag { display: none; }
-            .hud .controls { width: 100%; flex-wrap: wrap; gap: 8px; }
+            .hud .controls { width: 100%; flex-wrap: wrap; gap: 6px; }
         }
 
         /* === CONTROLS === */
@@ -338,8 +338,11 @@
             .ctl .ctl-label { display: none; }
             .hud .controls .search-container { flex: 1 1 100%; }
             .hud .controls #providerFilter,
-            .hud .controls .multiselect { flex: 1 1 0; min-width: 0; }
-            .hud .controls .multiselect-btn { width: 100%; white-space: nowrap; }
+            .hud .controls .multiselect { flex: 0 1 auto; min-width: 0; }
+            .hud .controls .multiselect-btn { width: 100%; min-width: 0; overflow: hidden; }
+            .hud .controls .multiselect-btn > #serviceFilterLabel {
+                min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            }
         }
 
         /* === LEAFLET POPUP === */
