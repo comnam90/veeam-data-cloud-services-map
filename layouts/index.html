@@ -1483,7 +1483,7 @@
                             <div class="popup-provider-strip">
                                 <span class="pchip ${providerKey}">${providerGlyph} ${region.provider}</span>
                                 <span style="color:var(--text-dim)">·</span>
-                                <span>${svcCount} / 05 Services</span>
+                                <span>${String(svcCount).padStart(2, '0')} / 05 Services</span>
                             </div>
                             <div class="popup-services">${serviceRows}</div>
                         </div>
