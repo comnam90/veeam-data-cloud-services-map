@@ -91,6 +91,43 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       
       await expect(popup).toContainText(/East US 2|Virginia/i);
     });
+
+    test('NZ popup fits inside mobile viewport when zoomed in (regression: east-bound cutoff)', async ({ page }, testInfo) => {
+      const mobilePlatforms = ['Mobile Chrome', 'Mobile Safari'];
+      test.skip(!mobilePlatforms.includes(testInfo.project.name), 'Mobile-only regression: at low zoom the popup can\'t fit geometrically regardless of bounds');
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet map navigation causes webkit instability on Linux');
+
+      // Simulate the user's reported flow: they "zoom in a lot" to view NZ, then tap the marker.
+      // setView via the exposed map global so the test is deterministic.
+      const NZ_COORDS: [number, number] = [-36.8485, 174.7633];
+      const markerPoint = await page.evaluate((coords) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const m = (window as any).__map;
+        // Zoom 4: at this level on a 412px viewport, the old maxBounds east edge (+185)
+        // forced the NZ marker ~88px right of viewport center, causing the centered popup
+        // to overflow ~77px past the right edge. Extending the bound east lets the marker
+        // sit at center and the popup fit.
+        m.setView(coords, 4, { animate: false });
+        const c = m.latLngToContainerPoint(coords);
+        const r = m.getContainer().getBoundingClientRect();
+        return { x: r.left + c.x, y: r.top + c.y };
+      }, NZ_COORDS);
+
+      await page.mouse.click(markerPoint.x, markerPoint.y);
+      const popup = page.locator('.leaflet-popup');
+      await expect(popup).toBeVisible({ timeout: 5000 });
+      // Let autoPan animation settle before measuring.
+      await page.waitForTimeout(500);
+
+      const box = await popup.boundingBox();
+      const vp = page.viewportSize();
+      expect(box).not.toBeNull();
+      expect(vp).not.toBeNull();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.y).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(vp!.width);
+      expect(box!.y + box!.height).toBeLessThanOrEqual(vp!.height);
+    });
   });
 
   test.describe('Provider Filter', () => {

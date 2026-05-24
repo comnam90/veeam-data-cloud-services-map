@@ -1150,11 +1150,12 @@
                 zoomControl: false,
                 worldCopyJump: true,
                 maxBoundsViscosity: 1.0,
-                maxBounds: [[-60, -185], [90, 185]],
+                maxBounds: [[-60, -185], [90, 210]],
                 fadeAnimation: !reducedMotion,
                 zoomAnimation: !reducedMotion,
                 markerZoomAnimation: !reducedMotion
             });
+            window.__map = map;
         } catch (e) {
             console.error('Map initialization failed:', e);
             showError();
