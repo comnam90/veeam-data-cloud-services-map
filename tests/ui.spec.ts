@@ -128,6 +128,30 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       expect(box!.x + box!.width).toBeLessThanOrEqual(vp!.width);
       expect(box!.y + box!.height).toBeLessThanOrEqual(vp!.height);
     });
+
+    test('NZ search-click popup fits inside mobile viewport (regression: search lands at low zoom)', async ({ page }, testInfo) => {
+      const mobilePlatforms = ['Mobile Chrome', 'Mobile Safari'];
+      test.skip(!mobilePlatforms.includes(testInfo.project.name), 'Mobile-only regression: at the initial fitBounds zoom the popup can\'t fit for edge regions');
+      test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Leaflet map navigation causes webkit instability on Linux');
+
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
+      await searchInput.fill('New Zealand');
+      await page.getByRole('option', { name: /New Zealand North/i }).click();
+
+      const popup = page.locator('.leaflet-popup');
+      await expect(popup).toBeVisible({ timeout: 5000 });
+      // Let the zoom-escalation setView + autoPan settle before measuring.
+      await page.waitForTimeout(800);
+
+      const box = await popup.boundingBox();
+      const vp = page.viewportSize();
+      expect(box).not.toBeNull();
+      expect(vp).not.toBeNull();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.y).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(vp!.width);
+      expect(box!.y + box!.height).toBeLessThanOrEqual(vp!.height);
+    });
   });
 
   test.describe('Provider Filter', () => {

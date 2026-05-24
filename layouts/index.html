@@ -1664,8 +1664,18 @@
                         // zoomToShowLayer expands the parent cluster (if any) and waits until
                         // the marker is on the map pane before invoking the callback, so the
                         // popup actually attaches to a live marker rather than a clustered one.
+                        // POPUP_MIN_ZOOM: below this level, the centered popup card can't
+                        // geometrically fit on a mobile viewport for edge regions like NZ,
+                        // regardless of how far maxBounds extends — the marker is forced
+                        // off-center. Escalate to zoom 4 so the popup always fits.
+                        const POPUP_MIN_ZOOM = 4;
                         clusterGroup.zoomToShowLayer(marker, () => {
-                            marker.openPopup();
+                            if (map.getZoom() < POPUP_MIN_ZOOM) {
+                                map.once('moveend', () => marker.openPopup());
+                                map.setView(marker.getLatLng(), POPUP_MIN_ZOOM, { animate: !reducedMotion });
+                            } else {
+                                marker.openPopup();
+                            }
                         });
                     }
                 });
