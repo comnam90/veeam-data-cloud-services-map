@@ -93,7 +93,7 @@
         }
         .skip-link:focus-visible {
             top: 8px;
-            outline: 2px solid var(--accent);
+            outline: 2px solid var(--text);
             outline-offset: 2px;
         }
 
@@ -908,7 +908,7 @@
     </header>
 
     <div class="map-container bg-[var(--bg)] transition-colors duration-300 relative">
-        <div id="map"></div>
+        <div id="map" tabindex="-1"></div>
         
         <div id="mapLoading" class="absolute inset-0 flex items-center justify-center z-[1000]" style="background: rgba(10, 13, 18, 0.92); backdrop-filter: blur(4px);">
             <div class="flex flex-col items-center gap-3">
