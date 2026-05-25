@@ -23,15 +23,15 @@ This API provides comprehensive information about which Veeam Data Cloud (VDC) s
 ```
 GET /api/v1/regions?provider=AWS&service=vdc_vault&tier=Core
 ```
-Returns all AWS regions offering VDC Vault in Core pricing tier.
+Returns all AWS regions offering Veeam Data Cloud Vault in Core pricing tier.
 
 ## VDC Services Covered
 
-1. **VDC Vault** - Object storage backup repository (tiered: Foundation/Advanced, Core/Non-Core)
-2. **VDC for Microsoft 365** - Backup for Exchange, SharePoint, OneDrive, Teams
-3. **VDC for Entra ID** - Azure Active Directory backup
-4. **VDC for Salesforce** - CRM data protection
-5. **VDC for Azure** - Azure VM and resource backup
+1. **Veeam Data Cloud Vault** (`vdc_vault`) - Object storage backup repository (tiered: Foundation/Advanced, Core/Non-Core)
+2. **Microsoft 365 Protection** (`vdc_m365`) - Backup for Exchange, SharePoint, OneDrive, Teams
+3. **Microsoft Entra ID Protection** (`vdc_entra_id`) - Microsoft Entra ID (formerly Azure AD) backup
+4. **Salesforce Protection** (`vdc_salesforce`) - CRM data protection
+5. **Microsoft Azure Protection** (`vdc_azure_backup`) - Azure VM and resource backup
 
 ## Common Use Cases
 
