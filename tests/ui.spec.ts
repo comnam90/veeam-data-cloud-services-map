@@ -788,13 +788,18 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Dynamic aria-hidden accessibility tree updates are unreliable in webkit on Linux');
       test.skip(testInfo.project.name === 'Mobile Safari', 'Hardware keyboard navigation does not apply to mobile');
       await page.keyboard.press('Tab');
-      
+
+      const skipLink = page.getByRole('link', { name: 'Skip to map' });
+      await expect(skipLink).toBeFocused();
+
+      await page.keyboard.press('Tab');
+
       const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await expect(searchInput).toBeFocused();
-      
+
       await page.keyboard.press('Tab');
       await page.keyboard.press('Tab');
-      
+
       const serviceButton = page.getByRole('button', { name: /all services/i });
       await expect(serviceButton).toBeFocused();
 
