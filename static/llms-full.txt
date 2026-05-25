@@ -60,14 +60,14 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 | provider | string | No | AWS, Azure | Filter by cloud provider. Omit to see both. |
 | country | string | No | Any string | Search by country or location name. Matches region names and aliases (e.g., "Japan" finds Tokyo). Case-insensitive partial matching. |
 | service | string | No | vdc_vault, vdc_m365, vdc_entra_id, vdc_salesforce, vdc_azure_backup | Show only regions where this service is available. |
-| tier | string | No | Core, Non-Core | Filter VDC Vault by pricing tier. Only applies to vdc_vault service. |
-| edition | string | No | Foundation, Advanced | Filter VDC Vault by edition. Only applies to vdc_vault service. |
+| tier | string | No | Core, Non-Core | Filter Veeam Data Cloud Vault by pricing tier. Only applies to vdc_vault service. |
+| edition | string | No | Foundation, Advanced | Filter Veeam Data Cloud Vault by edition. Only applies to vdc_vault service. |
 
 **Filtering Logic:**
 - All parameters are optional and can be combined
 - Multiple filters use AND logic (all must match)
 - Country search is case-insensitive and supports partial matching
-- Tier and edition filters only affect VDC Vault results
+- Tier and edition filters only affect Veeam Data Cloud Vault results
 - Empty/no filters return all 63 regions
 
 **Response Schema:**
@@ -113,7 +113,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
    GET /api/v1/regions?service=vdc_m365
    ```
 
-3. **AWS regions with VDC Vault Advanced/Core:**
+3. **AWS regions with Veeam Data Cloud Vault Advanced/Core:**
    ```
    GET /api/v1/regions?provider=AWS&service=vdc_vault&edition=Advanced&tier=Core
    ```
@@ -578,7 +578,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
     },
     {
       "id": "vdc_m365",
-      "name": "VDC for Microsoft 365",
+      "name": "Microsoft 365 Protection",
       "type": "boolean",
       "description": "Backup and recovery for Microsoft 365 data",
       "regionCount": 23,
@@ -589,9 +589,9 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
     },
     {
       "id": "vdc_entra_id",
-      "name": "VDC for Entra ID",
+      "name": "Microsoft Entra ID Protection",
       "type": "boolean",
-      "description": "Backup and recovery for Microsoft Entra ID (Azure AD)",
+      "description": "Backup and recovery for Microsoft Entra ID (formerly Azure AD)",
       "regionCount": 23,
       "providerBreakdown": {
         "AWS": 0,
@@ -600,7 +600,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
     },
     {
       "id": "vdc_salesforce",
-      "name": "VDC for Salesforce",
+      "name": "Salesforce Protection",
       "type": "boolean",
       "description": "Backup and recovery for Salesforce data",
       "regionCount": 12,
@@ -611,7 +611,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
     },
     {
       "id": "vdc_azure_backup",
-      "name": "VDC for Azure",
+      "name": "Microsoft Azure Protection",
       "type": "boolean",
       "description": "Native Azure backup capabilities",
       "regionCount": 36,
@@ -634,25 +634,25 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 **Service Details:**
 
-1. **VDC Vault** (vdc_vault)
+1. **Veeam Data Cloud Vault** (vdc_vault)
    - Type: Tiered
    - Purpose: Object storage backup repository
    - Editions: Foundation (entry-level), Advanced (full-featured)
    - Tiers: Core (premium performance), Non-Core (cost-optimized)
 
-2. **VDC for Microsoft 365** (vdc_m365)
+2. **Microsoft 365 Protection** (vdc_m365)
    - Type: Boolean
    - Purpose: Backup for Exchange Online, SharePoint Online, OneDrive, Teams
 
-3. **VDC for Entra ID** (vdc_entra_id)
+3. **Microsoft Entra ID Protection** (vdc_entra_id)
    - Type: Boolean
-   - Purpose: Azure Active Directory backup
+   - Purpose: Microsoft Entra ID (formerly Azure AD) backup
 
-4. **VDC for Salesforce** (vdc_salesforce)
+4. **Salesforce Protection** (vdc_salesforce)
    - Type: Boolean
    - Purpose: Salesforce CRM data protection
 
-5. **VDC for Azure** (vdc_azure_backup)
+5. **Microsoft Azure Protection** (vdc_azure_backup)
    - Type: Boolean
    - Purpose: Azure VM and resource backup
 
@@ -661,8 +661,8 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 **Use Cases:**
 
-1. **Compare service availability**: Quickly see that VDC Vault has 80 regions while VDC for Salesforce has only 12
-2. **Understand provider distribution**: See that M365/Entra ID are Azure-only while VDC Vault spans both providers
+1. **Compare service availability**: Quickly see that Veeam Data Cloud Vault has 80 regions while Salesforce Protection has only 12
+2. **Understand provider distribution**: See that M365/Entra ID are Azure-only while Veeam Data Cloud Vault spans both providers
 3. **Configuration planning**: Check configurationBreakdown to see how many regions support Advanced-Core tier
 
 ---
@@ -691,7 +691,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 {
   "service": {
     "id": "vdc_m365",
-    "name": "VDC for Microsoft 365",
+    "name": "Microsoft 365 Protection",
     "type": "boolean",
     "description": "Backup and recovery for Microsoft 365 data",
     "regionCount": 23
@@ -797,7 +797,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
    GET /api/v1/services/vdc_m365
    ```
 
-2. **Get VDC Vault distribution:**
+2. **Get Veeam Data Cloud Vault distribution:**
    ```
    GET /api/v1/services/vdc_vault
    ```
@@ -833,7 +833,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 
 1. **List all regions for a service**: Use the `regions` array to get all region IDs
 2. **Find provider-specific regions**: Check `providerBreakdown.AWS.regions` or `providerBreakdown.Azure.regions`
-3. **Configuration-specific planning**: For VDC Vault, use `configurationBreakdown["Advanced-Core"].regions` to find regions supporting specific configurations
+3. **Configuration-specific planning**: For Veeam Data Cloud Vault, use `configurationBreakdown["Advanced-Core"].regions` to find regions supporting specific configurations
 4. **Build deployment matrices**: Combine with `/api/v1/regions/{id}` to get full geographic details for each region
 
 ---
@@ -960,7 +960,7 @@ interface VaultService {
 
 **Understanding Service Data:**
 
-1. **Tiered Service (VDC Vault)**:
+1. **Tiered Service (Veeam Data Cloud Vault)**:
    - Represented as array of edition/tier combinations
    - Region may offer multiple combinations
    - Example: `[{edition: "Foundation", tier: "Core"}, {edition: "Advanced", tier: "Core"}]`
@@ -1036,7 +1036,7 @@ Step 3: Select region based on geography/latency
 ```
 Step 1: GET /api/v1/regions/aws-us-east-1
 Step 2: Check services object for required service
-Step 3: Verify edition/tier if using VDC Vault
+Step 3: Verify edition/tier if using Veeam Data Cloud Vault
 ```
 
 #### 4. Find Nearest Region with Required Service
@@ -1184,7 +1184,7 @@ Action: Replace 'GCP' with 'AWS' or 'Azure' and retry
 
 ### Service Availability Rules
 
-1. **VDC Vault (Tiered Service)**
+1. **Veeam Data Cloud Vault (Tiered Service)**
    - Can have multiple edition/tier combinations per region
    - Not all combinations available in all regions
    - Typical pattern: both editions in Core tier, fewer in Non-Core
@@ -1207,12 +1207,12 @@ When multiple filters are applied:
 ```
 AND logic: ALL conditions must be met
 Example: provider=AWS&service=vdc_vault&tier=Core
-Returns: AWS regions that have VDC Vault with Core tier
+Returns: AWS regions that have Veeam Data Cloud Vault with Core tier
 ```
 
 Special cases:
-- `tier` without `service` - filters only VDC Vault
-- `edition` without `service` - filters only VDC Vault
+- `tier` without `service` - filters only Veeam Data Cloud Vault
+- `edition` without `service` - filters only Veeam Data Cloud Vault
 - Empty result set is valid (no matching regions)
 
 ### Data Freshness
@@ -1437,7 +1437,7 @@ async function getServiceRegionDetails(serviceId) {
   const serviceResp = await fetch(`/api/v1/services/${serviceId}`);
   const serviceData = await serviceResp.json();
 
-  // For VDC Vault, find regions supporting Advanced-Core
+  // For Veeam Data Cloud Vault, find regions supporting Advanced-Core
   if (serviceId === 'vdc_vault' && serviceData.configurationBreakdown) {
     const advancedCoreRegions = serviceData.configurationBreakdown['Advanced-Core'].regions;
 
@@ -1462,7 +1462,7 @@ const coverage = await analyzeServiceCoverage();
 console.log('Service coverage analysis:', coverage);
 
 const vaultRegions = await getServiceRegionDetails('vdc_vault');
-console.log('VDC Vault Advanced-Core regions:', vaultRegions);
+console.log('Veeam Data Cloud Vault Advanced-Core regions:', vaultRegions);
 ```
 
 ### Example 6: Building Region Selector UI
@@ -1537,7 +1537,7 @@ console.log(`Loaded ${stats.totalRegions} regions`);
    - Check for property existence before accessing
    - Absent property typically means service not available
 
-2. **VDC Vault is Special**
+2. **Veeam Data Cloud Vault is Special**
    - Only service with tiered availability
    - Returns array, not boolean
    - Can have 0, 1, or multiple edition/tier combinations
