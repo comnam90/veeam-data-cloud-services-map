@@ -293,7 +293,6 @@
 
         /* Multi-select */
         .multiselect { position: relative; display: inline-block; }
-        .multiselect-btn { /* uses .ctl base, additional layout */ }
         .multiselect-chevron { transition: transform 0.2s ease; }
         .multiselect-btn[aria-expanded="true"] .multiselect-chevron { transform: rotate(180deg); }
         .multiselect-dropdown {
@@ -389,7 +388,7 @@
             border-bottom: 1px solid var(--border);
         }
         .popup-region-id {
-            font-size: 9px; color: var(--text-dim);
+            font-size: 10px; color: var(--text-mute);
             letter-spacing: 0.16em; text-transform: uppercase;
         }
         .popup-region-name {
@@ -442,7 +441,7 @@
             align-items: flex-end;
             gap: 4px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 9px;
+            font-size: 10px;
             color: var(--text-mute);
         }
         .popup-svc .pill {
@@ -473,7 +472,7 @@
         }
         .popup-svc .available {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 9px;
+            font-size: 10px;
             color: var(--text-mute);
             letter-spacing: 0.08em;
             text-transform: uppercase;
@@ -535,14 +534,6 @@
         .map-marker-dot:hover { transform: scale(1.18); }
         .map-marker-dot svg { width: 16px; height: 16px; }
 
-        /* Service icon hover effect */
-        .service-icon-wrapper {
-            transition: transform 0.2s ease;
-        }
-        .service-icon-wrapper:hover {
-            transform: scale(1.1);
-        }
-
         /* Zoom controls */
         .leaflet-control-zoom a {
             transition: transform 0.2s ease !important;
@@ -570,7 +561,6 @@
         }
         #infoPanel.open { transform: translateX(0); }
         #infoPanelOverlay.open { opacity: 1; }
-        #infoBtn { /* uses .ctl-icon */ }
 
         /* Custom cluster marker styles */
         .marker-cluster {
@@ -823,8 +813,8 @@
 
         <div class="status">
             <div class="row" aria-live="polite" aria-atomic="true">Regions <b><span id="visibleCount">0</span>/<span id="totalCount">0</span></b></div>
-            <div class="row" aria-hidden="true">Providers <b>02</b></div>
-            <div class="row" aria-hidden="true">Services <b>05</b></div>
+            <div class="row" aria-hidden="true">Providers <b id="hudProviderCount">--</b></div>
+            <div class="row" aria-hidden="true">Services <b id="hudServiceCount">--</b></div>
         </div>
 
         <div class="controls">
@@ -1484,7 +1474,7 @@
                             <div class="popup-provider-strip">
                                 <span class="pchip ${providerKey}">${providerGlyph} ${region.provider}</span>
                                 <span style="color:var(--text-dim)">·</span>
-                                <span>${String(svcCount).padStart(2, '0')} / 05 Services</span>
+                                <span>${String(svcCount).padStart(2, '0')} / ${String(Object.keys(serviceDisplayNames).length).padStart(2, '0')} Services</span>
                             </div>
                             <div class="popup-services">${serviceRows}</div>
                         </div>
@@ -1524,8 +1514,8 @@
             // full dataset — keeps the "Live" label honest under filters.
             const azureEl = document.getElementById('legendAzureCount');
             const awsEl = document.getElementById('legendAwsCount');
-            if (azureEl) azureEl.textContent = azureVisible ?? regions.filter(r => r.provider === 'Azure').length;
-            if (awsEl) awsEl.textContent = awsVisible ?? regions.filter(r => r.provider === 'AWS').length;
+            if (azureEl) azureEl.textContent = azureVisible;
+            if (awsEl) awsEl.textContent = awsVisible;
         }
 
         function hasActiveFilters() {
@@ -1557,6 +1547,19 @@
         });
 
         updateRegionCount(0, regions.length);
+        // HUD provider/service counts mirror the dataset, so the strip stays honest
+        // when a new provider or service is added (see code-review item #1, PR #103).
+        const hudProviderCountEl = document.getElementById('hudProviderCount');
+        const hudServiceCountEl = document.getElementById('hudServiceCount');
+        if (hudProviderCountEl) {
+            const providerCount = new Set(regions.map(r => r.provider).filter(Boolean)).size;
+            hudProviderCountEl.textContent = String(providerCount).padStart(2, '0');
+        }
+        if (hudServiceCountEl) {
+            const serviceCount = Object.keys(serviceDisplayNames).length;
+            hudServiceCountEl.textContent = String(serviceCount).padStart(2, '0');
+        }
+
         applyFilterStateFromUrl();
         syncFilterStateToUrl('replace');
         renderMap();
