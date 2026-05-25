@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-05-25
+
+### Changed
+- Mission Control redesign: rebuilt map UI with brand-aligned header, status strip, unified `.ctl` control primitive, restyled legend, and a new typography + theme token system (#103)
+- Map markers now render as hybrid POI dots displaying provider brand logos in place of plain provider-coloured circles (#103)
+- Cluster badges restyled to match the POI-dot treatment with an inverted brand accent for light/dark contrast; provider-mix strips removed (#103)
+- Popup template restructured with service icons, AA-contrast colours, and vault editions stacked as vertical pills on a single row (#103)
+- Adopted official Veeam help-center service names across the UI (e.g. "Azure Protection") and matched the providers legend icons to the map markers (#103)
+- Initial map view now fits to populated regions via `fitBounds` and tiles wrap so wide viewports no longer show empty edges (#103)
+
+### Added
+- Themed CSS tooltip pattern with `aria-label` replacing native `title=` tooltips for tier and control hints (#103)
+
+### Fixed
+- Search-click zoom escalates so popups for edge regions fit on screen, and the east map bound is extended so the NZ popup fits on mobile (#103)
+- Popup header zero-pads the available services count to stop layout shift between single- and double-digit values (#103)
+- Marker SVG `defs` IDs scoped per marker to prevent gradient/clip collisions across markers (#103)
+- Mobile header layout: filters stack below search and the multi-select chevron no longer overlaps the reset button (#103)
+- Live region count is exposed to assistive tech in the redesigned header (#103)
+- Removed lingering "status page" wording from the header and legend (#103)
+
+### Documentation
+- Added ADRs covering the Mission Control aesthetic and design tokens, official Veeam service naming, custom CSS tooltip pattern, cluster marker treatment, and initial map view + tile wrap (ADR-003 through ADR-007) (#103)
+- Added the Mission Control redesign implementation plan under `plans/mission-control-redesign/` (#103)
+
 ## [1.3.0] - 2026-05-20
 
 ### Added
@@ -80,6 +105,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dark-mode map with CartoDB Dark Matter tiles
 - GitHub Actions CI/CD pipeline
 
+[1.4.0]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.1.0...v1.1.1
