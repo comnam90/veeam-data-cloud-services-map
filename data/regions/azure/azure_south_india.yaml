@@ -13,5 +13,7 @@ services:
   vdc_vault:
     - edition: "Foundation"
       tier: "Non-Core"
+    - edition: "Advanced"
+      tier: "Non-Core"
   vdc_m365: true
   vdc_azure_backup: true
