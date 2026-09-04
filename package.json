@@ -34,7 +34,7 @@
   "license": "MIT",
   "dependencies": {
     "@hono/zod-openapi": "^1.2.0",
-    "@scalar/hono-api-reference": "^0.9.30",
+    "@scalar/hono-api-reference": "^0.9.48",
     "hono": "^4.12.18",
     "js-yaml": "^4.1.1",
     "zod": "^4.3.4"
