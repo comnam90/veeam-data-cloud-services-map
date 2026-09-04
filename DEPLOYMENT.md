@@ -19,6 +19,7 @@ Add under Settings > Environment variables > Production:
 |----------|-------|
 | `HUGO_VERSION` | `0.139.3` |
 | `NODE_VERSION` | `18` |
+| `HUGO_PARAMS_CARTOAPIKEY` | *(CARTO basemaps API key — set the real value in the Cloudflare dashboard, never commit it here)* |
 
 ## How the Build Works
 
