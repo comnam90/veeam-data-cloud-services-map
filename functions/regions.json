@@ -888,7 +888,8 @@
         }
       ],
       "vdc_m365": true,
-      "vdc_entra_id": true
+      "vdc_entra_id": true,
+      "vdc_azure_backup": true
     }
   },
   {
