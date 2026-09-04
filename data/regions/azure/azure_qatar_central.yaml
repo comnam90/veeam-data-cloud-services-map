@@ -1,0 +1,12 @@
+id: "azure-qatar-central"
+name: "Qatar Central (Doha)"
+provider: "Azure"
+coords: [25.2854, 51.5310]
+aliases:
+  - "Doha"
+  - "Qatar"
+  - "QA"
+services:
+  vdc_vault:
+    - edition: "Archive"
+      tier: "Core"

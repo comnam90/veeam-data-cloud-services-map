@@ -61,7 +61,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 | country | string | No | Any string | Search by country or location name. Matches region names and aliases (e.g., "Japan" finds Tokyo). Case-insensitive partial matching. |
 | service | string | No | vdc_vault, vdc_m365, vdc_entra_id, vdc_salesforce, vdc_azure_backup | Show only regions where this service is available. |
 | tier | string | No | Core, Non-Core | Filter Veeam Data Cloud Vault by pricing tier. Only applies to vdc_vault service. |
-| edition | string | No | Foundation, Advanced | Filter Veeam Data Cloud Vault by edition. Only applies to vdc_vault service. |
+| edition | string | No | Foundation, Advanced, Archive | Filter Veeam Data Cloud Vault by edition. Only applies to vdc_vault service. |
 
 **Filtering Logic:**
 - All parameters are optional and can be combined
@@ -136,7 +136,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 - Invalid provider (must be "AWS" or "Azure")
 - Invalid service ID
 - Invalid tier (must be "Core" or "Non-Core")
-- Invalid edition (must be "Foundation" or "Advanced")
+- Invalid edition (must be "Foundation", "Advanced", or "Archive")
 
 ---
 
@@ -227,7 +227,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 | `provider` | string | No | `AWS`, `Azure` | Filter to specific cloud provider |
 | `service` | string | No | `vdc_vault`, `vdc_m365`, `vdc_entra_id`, `vdc_salesforce`, `vdc_azure_backup` | Filter to regions offering this service |
 | `tier` | string | No | `Core`, `Non-Core` | Filter vdc_vault by tier (requires `service=vdc_vault`) |
-| `edition` | string | No | `Foundation`, `Advanced` | Filter vdc_vault by edition (requires `service=vdc_vault`) |
+| `edition` | string | No | `Foundation`, `Advanced`, `Archive` | Filter vdc_vault by edition (requires `service=vdc_vault`) |
 
 **Important Validation Rules:**
 - `tier` and `edition` are ONLY valid when `service=vdc_vault`
@@ -562,7 +562,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
       "name": "Veeam Data Cloud Vault",
       "type": "tiered",
       "description": "Immutable backup storage with configurable pricing tiers",
-      "editions": ["Foundation", "Advanced"],
+      "editions": ["Foundation", "Advanced", "Archive"],
       "tiers": ["Core", "Non-Core"],
       "regionCount": 80,
       "providerBreakdown": {
@@ -573,7 +573,8 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
         "Foundation-Core": 12,
         "Advanced-Core": 45,
         "Foundation-Non-Core": 8,
-        "Advanced-Non-Core": 15
+        "Advanced-Non-Core": 15,
+        "Archive-Core": 42
       }
     },
     {
@@ -637,7 +638,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
 1. **Veeam Data Cloud Vault** (vdc_vault)
    - Type: Tiered
    - Purpose: Object storage backup repository
-   - Editions: Foundation (entry-level), Advanced (full-featured)
+   - Editions: Foundation (entry-level), Advanced (full-featured), Archive (cold storage, long-term retention; Core-only today)
    - Tiers: Core (premium performance), Non-Core (cost-optimized)
 
 2. **Microsoft 365 Protection** (vdc_m365)
@@ -726,7 +727,7 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
     "name": "Veeam Data Cloud Vault",
     "type": "tiered",
     "description": "Immutable backup storage with configurable pricing tiers",
-    "editions": ["Foundation", "Advanced"],
+    "editions": ["Foundation", "Advanced", "Archive"],
     "tiers": ["Core", "Non-Core"],
     "regionCount": 80
   },
@@ -777,6 +778,13 @@ This API provides programmatic access to comprehensive data about Veeam Data Clo
       "count": 15,
       "regions": [
         "aws-us-east-1"
+      ]
+    },
+    "Archive-Core": {
+      "count": 42,
+      "regions": [
+        "azure-au-east",
+        "azure-france-central"
       ]
     }
   }
@@ -953,7 +961,7 @@ interface Services {
 }
 
 interface VaultService {
-  edition: "Foundation" | "Advanced";
+  edition: "Foundation" | "Advanced" | "Archive";
   tier: "Core" | "Non-Core";
 }
 ```
@@ -1002,7 +1010,7 @@ interface Error {
 - `INVALID_PROVIDER` - Provider must be "AWS" or "Azure"
 - `INVALID_SERVICE` - Service ID not recognized
 - `INVALID_TIER` - Tier must be "Core" or "Non-Core"
-- `INVALID_EDITION` - Edition must be "Foundation" or "Advanced"
+- `INVALID_EDITION` - Edition must be "Foundation", "Advanced", or "Archive"
 
 ---
 
@@ -1163,7 +1171,7 @@ Action: Replace 'GCP' with 'AWS' or 'Azure' and retry
 - Case-sensitive
 
 **Edition Parameter:**
-- Must be exactly "Foundation" or "Advanced"
+- Must be exactly "Foundation", "Advanced", or "Archive"
 - Only valid with vdc_vault service
 - Case-sensitive
 

@@ -23,8 +23,8 @@ const ServiceSchema = z.object({
     example: 'Immutable backup storage with configurable pricing tiers',
   }),
   editions: z.array(z.string()).optional().openapi({
-    description: `Available service editions (only for tiered services). Foundation is entry-level, Advanced includes full feature set. Use these values when filtering regions by edition.`,
-    example: ['Foundation', 'Advanced'],
+    description: `Available service editions (only for tiered services). Foundation is entry-level, Advanced includes full feature set, Archive is cold storage for long-term retention. Use these values when filtering regions by edition.`,
+    example: ['Foundation', 'Advanced', 'Archive'],
   }),
   tiers: z.array(z.string()).optional().openapi({
     description: `Available pricing tiers (only for tiered services). Core offers premium performance at higher cost, Non-Core is optimized for cost-effective long-term retention. Use these values when filtering regions by tier.`,
@@ -53,6 +53,7 @@ const ServiceSchema = z.object({
       'Foundation-Non-Core': 18,
       'Advanced-Core': 45,
       'Advanced-Non-Core': 8,
+      'Archive-Core': 42,
     },
   }),
 }).openapi('Service')

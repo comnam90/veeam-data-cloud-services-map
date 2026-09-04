@@ -94,7 +94,7 @@ These are strict — validation will fail otherwise:
 - **Boolean services**: `true` — not `"true"`
 - **Service IDs**: `vdc_vault`, `vdc_m365`, `vdc_entra_id`, `vdc_salesforce`, `vdc_azure_backup`
 - **Region IDs**: lowercase hyphenated (e.g., `aws-us-east-1`)
-- **Vault editions**: `"Foundation"`, `"Advanced"`
+- **Vault editions**: `"Foundation"`, `"Advanced"`, `"Archive"` (Archive is Core-only today; Non-Core Archive may be added later)
 - **Vault tiers**: `"Core"`, `"Non-Core"`
 - **`vdc_vault`** is tiered (array of `{edition, tier}` objects); all other services are boolean
 

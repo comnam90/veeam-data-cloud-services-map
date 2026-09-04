@@ -1,0 +1,14 @@
+id: "azure-uk-west"
+name: "UK West (Cardiff)"
+provider: "Azure"
+coords: [51.4816, -3.1791]
+aliases:
+  - "Cardiff"
+  - "United Kingdom"
+  - "UK"
+  - "GB"
+  - "Wales"
+services:
+  vdc_vault:
+    - edition: "Archive"
+      tier: "Core"

@@ -12,5 +12,10 @@ aliases:
   - "AZ"
   - "US West"
 services:
+  vdc_vault:
+    - edition: "Advanced"
+      tier: "Core"
+    - edition: "Archive"
+      tier: "Core"
   vdc_m365: true
   vdc_azure_backup: true
