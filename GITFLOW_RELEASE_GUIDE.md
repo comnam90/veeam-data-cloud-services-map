@@ -131,7 +131,23 @@ In gitflow, release changes must flow back to develop to ensure:
 - All tests passing
 ```
 
-### Step 5: Cleanup (Optional)
+### Step 5: Create GitHub Release
+
+A pushed tag alone does not show up on the repo's **Releases** page — publish a GitHub Release against it so the release notes are visible and the `Full Changelog` compare link is generated:
+
+```bash
+# Preferred: reuse the entry already written in CHANGELOG.md for this version
+gh release create v1.1.1 \
+  --title "v1.1.1" \
+  --notes "$(sed -n '/^## \[1.1.1\]/,/^## \[/p' CHANGELOG.md | sed '$d')"
+
+# Fallback: no CHANGELOG entry yet — let GitHub summarize merged PRs instead
+gh release create v1.1.1 --title "v1.1.1" --generate-notes
+```
+
+> Past releases (see `CHANGELOG.md`) sometimes add a short subtitle to the title, e.g. `v1.4.0 — Mission Control Redesign`. Do this when the release has a clear theme; otherwise `vX.Y.Z` alone is fine.
+
+### Step 6: Cleanup (Optional)
 
 ```bash
 # Delete the release branch locally and remotely
@@ -170,7 +186,11 @@ git cherry-pick <version-bump-commit>
 git push origin develop
 # Or create PR with the cherry-picked commit
 
-# 6. Cleanup
+# 6. Create GitHub Release
+gh release create v1.1.1 --title "v1.1.1" \
+  --notes "$(sed -n '/^## \[1.1.1\]/,/^## \[/p' CHANGELOG.md | sed '$d')"
+
+# 7. Cleanup
 git branch -d release/1.1.1
 git push origin --delete release/1.1.1
 ```
@@ -203,10 +223,11 @@ For the v1.2.0 release:
 
 1. **Always use PRs**: Even for develop, use PRs for review and CI/CD
 2. **Test thoroughly**: Run full test suite before creating release
-3. **Document changes**: Update CHANGELOG if present
+3. **Document changes**: Update `CHANGELOG.md` as part of the release branch — it becomes the source for the GitHub Release notes
 4. **Tag releases**: Always tag releases on main for easy reference
-5. **Consistent naming**: Use `release/X.Y.Z` format for release branches
-6. **Clean history**: Use `--no-ff` for merge commits to preserve release history
+5. **Publish a GitHub Release**: A tag alone doesn't appear on the Releases page — always follow it with `gh release create` (Step 5)
+6. **Consistent naming**: Use `release/X.Y.Z` format for release branches
+7. **Clean history**: Use `--no-ff` for merge commits to preserve release history
 
 ## Troubleshooting
 
