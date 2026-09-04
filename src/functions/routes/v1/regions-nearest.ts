@@ -43,7 +43,7 @@ const NearestRegionsQuerySchema = z.object({
     description: 'Filter vdc_vault regions by pricing tier. Only valid with service=vdc_vault.',
     example: 'Core',
   }),
-  edition: z.enum(['Foundation', 'Advanced']).optional().openapi({
+  edition: z.enum(['Foundation', 'Advanced', 'Archive']).optional().openapi({
     param: { name: 'edition', in: 'query' },
     description: 'Filter vdc_vault regions by edition level. Only valid with service=vdc_vault.',
     example: 'Advanced',

@@ -27,7 +27,7 @@ const RegionsResponseSchema = z.object({
       example: null
     }),
     edition: z.string().nullable().openapi({
-      description: 'Applied edition filter for VDC Vault (Foundation, Advanced, or null)',
+      description: 'Applied edition filter for VDC Vault (Foundation, Advanced, Archive, or null)',
       example: null
     }),
     country: z.string().nullable().openapi({
@@ -79,7 +79,7 @@ const regionsRoute = createRoute({
         },
         example: 'Core',
       }),
-      edition: z.enum(['Foundation', 'Advanced']).optional().openapi({
+      edition: z.enum(['Foundation', 'Advanced', 'Archive']).optional().openapi({
         param: {
           name: 'edition',
           in: 'query',
