@@ -13,3 +13,5 @@ services:
   vdc_vault:
     - edition: "Foundation"
       tier: "Non-Core"
+    - edition: "Advanced"
+      tier: "Non-Core"
