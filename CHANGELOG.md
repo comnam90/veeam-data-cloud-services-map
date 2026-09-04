@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-09-04
+
 ### Fixed
 - A11y skip link + focus rings for info links and refresh button (#113)
 - Add missing VDC for Microsoft 365 service to Azure Malaysia West
@@ -121,6 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dark-mode map with CartoDB Dark Matter tiles
 - GitHub Actions CI/CD pipeline
 
+[1.4.1]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.1.2...v1.2.0
