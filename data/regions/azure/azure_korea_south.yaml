@@ -10,4 +10,7 @@ aliases:
   - "KR"
   - "PUS"
 services:
+  vdc_vault:
+    - edition: "Archive"
+      tier: "Core"
   vdc_azure_backup: true

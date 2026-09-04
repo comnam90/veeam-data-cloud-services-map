@@ -14,6 +14,8 @@ services:
       tier: "Core"
     - edition: "Advanced"
       tier: "Core"
+    - edition: "Archive"
+      tier: "Core"
   vdc_azure_backup: true
   vdc_m365: true
   vdc_entra_id: true
