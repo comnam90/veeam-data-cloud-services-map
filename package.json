@@ -1,6 +1,6 @@
 {
   "name": "veeam-data-cloud-services-map",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Interactive map and API for Veeam Data Cloud service availability across AWS and Azure regions",
   "private": true,
   "scripts": {
@@ -34,18 +34,18 @@
   "license": "MIT",
   "dependencies": {
     "@hono/zod-openapi": "^1.2.0",
-    "@scalar/hono-api-reference": "^0.9.30",
-    "hono": "^4.12.18",
-    "js-yaml": "^4.1.1",
+    "@scalar/hono-api-reference": "^0.9.48",
+    "hono": "^4.13.5",
+    "js-yaml": "^4.3.1",
     "zod": "^4.3.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260103.0",
+    "@cloudflare/workers-types": "^5.20260904.1",
     "@playwright/test": "^1.57.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.0.3",
-    "esbuild": "^0.27.2",
+    "esbuild": "^0.28.1",
     "typescript": "^5.9.3",
-    "wrangler": "^4.76.0"
+    "wrangler": "^4.125.0"
   }
 }

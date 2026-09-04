@@ -738,7 +738,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       
       await page.waitForTimeout(1500);
       
-      await expect(page.getByRole('button', { name: /Introduction/i })).toBeVisible();
+      await expect(page.getByRole('link', { name: /Introduction/i })).toBeVisible();
       await expect(page.locator('text=Regions').first()).toBeVisible();
       await expect(page.locator('text=Services').first()).toBeVisible();
       await expect(page.locator('text=Health').first()).toBeVisible();
@@ -751,7 +751,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       
       await page.waitForTimeout(1500);
       
-      const endpointButton = page.getByRole('button', { name: /Find nearest regions/i });
+      const endpointButton = page.getByRole('link', { name: /Find nearest regions/i });
       await expect(endpointButton).toBeVisible();
     });
 
@@ -788,13 +788,18 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       test.skip(testInfo.project.name === 'webkit' && process.platform === 'linux', 'Dynamic aria-hidden accessibility tree updates are unreliable in webkit on Linux');
       test.skip(testInfo.project.name === 'Mobile Safari', 'Hardware keyboard navigation does not apply to mobile');
       await page.keyboard.press('Tab');
-      
+
+      const skipLink = page.getByRole('link', { name: 'Skip to map' });
+      await expect(skipLink).toBeFocused();
+
+      await page.keyboard.press('Tab');
+
       const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await expect(searchInput).toBeFocused();
-      
+
       await page.keyboard.press('Tab');
       await page.keyboard.press('Tab');
-      
+
       const serviceButton = page.getByRole('button', { name: /all services/i });
       await expect(serviceButton).toBeFocused();
 

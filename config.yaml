@@ -5,3 +5,6 @@ title: "Veeam Cloud Service Map"
 enableGitInfo: true
 
 disableKinds: ["taxonomy", "term"]
+
+params:
+  cartoApiKey: ""

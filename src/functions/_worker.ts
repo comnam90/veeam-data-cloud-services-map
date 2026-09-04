@@ -124,6 +124,7 @@ app.get('/api/openapi.yaml', (c) => {
 // Serve interactive API documentation UI at /api/docs
 app.get('/api/docs', Scalar({
   url: '/api/openapi.json',
+  cdn: 'https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.67.0',
   pageTitle: 'Veeam Data Cloud Service Availability API',
   theme: 'solarized',
 }))

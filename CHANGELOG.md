@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-09-04
+
+### Fixed
+- A11y skip link + focus rings for info links and refresh button (#113)
+- Add missing VDC for Microsoft 365 service to Azure Malaysia West
+- Add missing VDC for Entra ID service to Azure Malaysia West
+- Add missing VDC for Azure service to Azure Brazil South
+- Add missing VDC Vault Advanced Non-Core tier to Azure South India
+- UI: append CARTO API key to basemap tile URLs (#132)
+- API: pin Scalar API docs CDN version to stop upstream UI breaks (#134)
+- Bump wrangler and @cloudflare/workers-types together (#133)
+
+### Changed
+- Bump esbuild from 0.27.3 to 0.28.1 (#116)
+- Bump nanoid and @scalar/hono-api-reference (#125)
+- Bump hono from 4.12.18 to 4.13.5 (#124)
+- Bump js-yaml from 4.1.1 to 4.3.1 (#126)
+
 ## [1.4.0] - 2026-05-25
 
 ### Changed
@@ -105,6 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dark-mode map with CartoDB Dark Matter tiles
 - GitHub Actions CI/CD pipeline
 
+[1.4.1]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.1.2...v1.2.0
