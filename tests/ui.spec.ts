@@ -738,7 +738,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       
       await page.waitForTimeout(1500);
       
-      await expect(page.getByRole('button', { name: /Introduction/i })).toBeVisible();
+      await expect(page.getByRole('link', { name: /Introduction/i })).toBeVisible();
       await expect(page.locator('text=Regions').first()).toBeVisible();
       await expect(page.locator('text=Services').first()).toBeVisible();
       await expect(page.locator('text=Health').first()).toBeVisible();
@@ -751,7 +751,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       
       await page.waitForTimeout(1500);
       
-      const endpointButton = page.getByRole('button', { name: /Find nearest regions/i });
+      const endpointButton = page.getByRole('link', { name: /Find nearest regions/i });
       await expect(endpointButton).toBeVisible();
     });
 
