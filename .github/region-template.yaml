@@ -18,6 +18,8 @@ services:
       tier: "Core"                   # "Core" = standard pricing, "Non-Core" = price uplift
     - edition: "Advanced"
       tier: "Core"
+    - edition: "Archive"
+      tier: "Core"                   # Archive is Core-only today; Non-Core may come later
 
   # --- BOOLEAN SERVICES (delete any not available) ---
   vdc_m365: true                     # VDC for Microsoft 365

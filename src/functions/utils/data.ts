@@ -107,7 +107,7 @@ export function getServices(): Service[] {
       name: 'Veeam Data Cloud Vault',
       type: 'tiered',
       description: 'Immutable backup storage with configurable pricing tiers',
-      editions: ['Foundation', 'Advanced'],
+      editions: ['Foundation', 'Advanced', 'Archive'],
       tiers: ['Core', 'Non-Core'],
     },
     {

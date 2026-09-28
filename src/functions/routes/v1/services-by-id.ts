@@ -48,7 +48,7 @@ const ServiceInfoSchema = z.object({
   }),
   editions: z.array(z.string()).optional().openapi({
     description: 'Available service editions (only for tiered services)',
-    example: ['Foundation', 'Advanced'],
+    example: ['Foundation', 'Advanced', 'Archive'],
   }),
   tiers: z.array(z.string()).optional().openapi({
     description: 'Available pricing tiers (only for tiered services)',
@@ -78,6 +78,10 @@ const ServiceDetailResponseSchema = z.object({
       'Advanced-Core': {
         count: 45,
         regions: ['aws-af-south-1', 'aws-ap-east-1'],
+      },
+      'Archive-Core': {
+        count: 42,
+        regions: ['azure-au-east', 'azure-france-central'],
       },
     },
   }),

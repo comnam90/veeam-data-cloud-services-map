@@ -9,11 +9,12 @@ import { z } from '@hono/zod-openapi'
  * VDC Vault service configuration with tier and edition
  */
 export const VdcVaultConfigSchema = z.object({
-  edition: z.enum(['Foundation', 'Advanced']).openapi({
+  edition: z.enum(['Foundation', 'Advanced', 'Archive']).openapi({
     description: `
 Service edition level. Foundation provides core backup and recovery features.
 Advanced includes additional capabilities like compliance features and
-ransomware protection.
+ransomware protection. Archive is a cold-storage edition for long-term
+retention; currently only offered at the Core tier.
     `.trim(),
     example: 'Advanced',
   }),
@@ -36,8 +37,8 @@ Veeam Data Cloud Vault availability in this region. This is a tiered service,
 meaning different edition and tier combinations may be available. Each array
 element represents one available combination.
 
-- edition: Foundation (entry-level) or Advanced (full-featured)
-- tier: Core (premium performance) or Non-Core (cost-optimized)
+- edition: Foundation (entry-level), Advanced (full-featured), or Archive (cold storage, long-term retention)
+- tier: Core (premium performance) or Non-Core (cost-optimized). Archive is currently Core-only.
 
 A region may offer multiple combinations (e.g., both Foundation/Core and Advanced/Core).
 If this property is absent, VDC Vault is not available in this region.
@@ -153,7 +154,7 @@ to programmatically handle specific error conditions. Common codes include:
 - INVALID_PROVIDER: Provider must be "AWS" or "Azure"
 - INVALID_SERVICE: Service ID not recognized
 - INVALID_TIER: Tier must be "Core" or "Non-Core"
-- INVALID_EDITION: Edition must be "Foundation" or "Advanced"
+- INVALID_EDITION: Edition must be "Foundation", "Advanced", or "Archive"
     `.trim(),
     pattern: '^[A-Z_]+$',
     example: 'REGION_NOT_FOUND',
@@ -278,7 +279,7 @@ export const ServiceDetailTieredSchema = z.object({
     }),
     editions: z.array(z.string()).openapi({
       description: 'Available service editions',
-      example: ['Foundation', 'Advanced'],
+      example: ['Foundation', 'Advanced', 'Archive'],
     }),
     tiers: z.array(z.string()).openapi({
       description: 'Available pricing tiers',

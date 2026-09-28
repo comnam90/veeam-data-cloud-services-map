@@ -309,6 +309,50 @@ services:
     }
   });
 
+  await test('Archive edition passes validation', async () => {
+    const archiveYaml = `
+id: "azure-test-region"
+name: "Test Region"
+provider: "Azure"
+coords: [51.5, -3.2]
+services:
+  vdc_vault:
+    - edition: "Archive"
+      tier: "Core"
+`;
+    const { filePath, cleanup } = createTempFile(archiveYaml);
+    try {
+      const result = validateRegionFile(filePath);
+      assert(result.valid === true, `Expected Archive edition to pass, got: ${JSON.stringify(result.errors)}`);
+    } finally {
+      cleanup();
+    }
+  });
+
+  await test('Lowercase archive edition fails validation', async () => {
+    const lowercaseArchiveYaml = `
+id: "azure-test-region"
+name: "Test Region"
+provider: "Azure"
+coords: [51.5, -3.2]
+services:
+  vdc_vault:
+    - edition: "archive"
+      tier: "Core"
+`;
+    const { filePath, cleanup } = createTempFile(lowercaseArchiveYaml);
+    try {
+      const result = validateRegionFile(filePath);
+      assert(result.valid === false, 'Expected lowercase edition to fail validation');
+      assert(
+        result.errors.some(e => e.type === 'invalid_service_config' && e.field === 'edition'),
+        'Expected invalid_service_config error on edition field'
+      );
+    } finally {
+      cleanup();
+    }
+  });
+
   // Test 11: Boolean service validation
   await test('Boolean service with string value fails validation', async () => {
     const invalidBooleanYaml = `

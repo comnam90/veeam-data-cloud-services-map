@@ -27,7 +27,7 @@ Returns all AWS regions offering Veeam Data Cloud Vault in Core pricing tier.
 
 ## VDC Services Covered
 
-1. **Veeam Data Cloud Vault** (`vdc_vault`) - Object storage backup repository (tiered: Foundation/Advanced, Core/Non-Core)
+1. **Veeam Data Cloud Vault** (`vdc_vault`) - Object storage backup repository (tiered: Foundation/Advanced/Archive editions, Core/Non-Core tiers; Archive is Core-only today)
 2. **Microsoft 365 Protection** (`vdc_m365`) - Backup for Exchange, SharePoint, OneDrive, Teams
 3. **Microsoft Entra ID Protection** (`vdc_entra_id`) - Microsoft Entra ID (formerly Azure AD) backup
 4. **Salesforce Protection** (`vdc_salesforce`) - CRM data protection

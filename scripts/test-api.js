@@ -134,6 +134,26 @@ async function runTests() {
     assert(keys.every(k => k.includes('-')), 'All keys should follow "Edition-Tier" format');
   });
 
+  await test('GET /api/v1/services vdc_vault lists Archive edition and Archive-Core breakdown', async () => {
+    const res = await makeRequest('/api/v1/services');
+    const vault = res.data.services.find(s => s.id === 'vdc_vault');
+    assert(vault.editions.includes('Archive'), `editions should include Archive, got ${JSON.stringify(vault.editions)}`);
+    assert(vault.configurationBreakdown['Archive-Core'] > 0, 'configurationBreakdown should count Archive-Core regions');
+  });
+
+  await test('GET /api/v1/services/vdc_vault Archive-Core breakdown matches regions filter', async () => {
+    const detail = await makeRequest('/api/v1/services/vdc_vault');
+    const archiveCore = detail.data.configurationBreakdown['Archive-Core'];
+    assert(archiveCore, 'configurationBreakdown should include Archive-Core');
+    assert(archiveCore.count === archiveCore.regions.length, 'Archive-Core count should match region list length');
+
+    const filtered = await makeRequest('/api/v1/regions?service=vdc_vault&edition=Archive&tier=Core');
+    const filteredIds = filtered.data.data.map(r => r.id).sort();
+    const breakdownIds = [...archiveCore.regions].sort();
+    assert(JSON.stringify(filteredIds) === JSON.stringify(breakdownIds),
+      `Archive-Core breakdown (${breakdownIds.length}) should match /regions filter (${filteredIds.length})`);
+  });
+
   await test('GET /api/v1/services boolean services do not have configurationBreakdown', async () => {
     const res = await makeRequest('/api/v1/services');
     const booleanServices = res.data.services.filter(s => s.type === 'boolean');
@@ -304,6 +324,24 @@ async function runTests() {
     ), 'All regions should have Foundation edition');
   });
 
+  await test('GET /api/v1/regions?service=vdc_vault&edition=Archive returns only Archive regions', async () => {
+    const res = await makeRequest('/api/v1/regions?service=vdc_vault&edition=Archive');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.filters.edition === 'Archive', 'Filter should show Archive edition');
+    assert(res.data.count > 0, 'Expected at least one Archive region');
+    assert(res.data.data.every(r =>
+      r.services.vdc_vault.some(v => v.edition === 'Archive')
+    ), 'All regions should have Archive edition');
+  });
+
+  await test('GET /api/v1/regions with unknown edition returns 400 listing Archive', async () => {
+    const res = await makeRequest('/api/v1/regions?service=vdc_vault&edition=Premium');
+    assert(res.status === 400, `Expected 400, got ${res.status}`);
+    assert(res.data.parameter === 'edition', 'Should identify edition as the problematic parameter');
+    assert(Array.isArray(res.data.allowedValues) && res.data.allowedValues.includes('Archive'),
+      `allowedValues should include Archive, got ${JSON.stringify(res.data.allowedValues)}`);
+  });
+
   // Region by ID endpoint tests
   await test('GET /api/v1/regions/{id} returns specific region', async () => {
     const allRegions = await makeRequest('/api/v1/regions');
@@ -425,6 +463,18 @@ async function runTests() {
     );
     assert(allHaveAdvanced, 'Expected all regions with Advanced edition');
     assert(res.data.query.edition === 'Advanced', 'Expected edition in query');
+  });
+
+  await test('Nearest regions filters by edition=Archive (with service=vdc_vault)', async () => {
+    // London — close to the Archive-only UK West region
+    const res = await makeRequest('/api/v1/regions/nearest?lat=51.5&lng=-0.1&service=vdc_vault&edition=Archive&limit=5');
+    assert(res.status === 200, `Expected 200, got ${res.status}`);
+    assert(res.data.count > 0, 'Expected at least one Archive region');
+    const allHaveArchive = res.data.results.every(r =>
+      r.region.services.vdc_vault?.some(config => config.edition === 'Archive')
+    );
+    assert(allHaveArchive, 'Expected all regions with Archive edition');
+    assert(res.data.query.edition === 'Archive', 'Expected edition in query');
   });
 
   await test('Nearest regions combines tier and edition filters', async () => {
