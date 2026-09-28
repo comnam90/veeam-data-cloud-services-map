@@ -751,6 +751,12 @@
       "Australian Capital Territory"
     ],
     "services": {
+      "vdc_vault": [
+        {
+          "edition": "Archive",
+          "tier": "Core"
+        }
+      ],
       "vdc_azure_backup": true
     }
   },
@@ -778,6 +784,10 @@
         },
         {
           "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Archive",
           "tier": "Core"
         }
       ],
@@ -808,6 +818,10 @@
         {
           "edition": "Foundation",
           "tier": "Non-Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_azure_backup": true
@@ -835,6 +849,10 @@
         },
         {
           "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Archive",
           "tier": "Core"
         }
       ],
@@ -917,6 +935,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -950,6 +972,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_azure_backup": true
@@ -978,6 +1004,10 @@
         },
         {
           "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Archive",
           "tier": "Core"
         }
       ],
@@ -1014,6 +1044,10 @@
         },
         {
           "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Archive",
           "tier": "Core"
         }
       ],
@@ -1063,6 +1097,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -1097,6 +1135,10 @@
         {
           "edition": "Advanced",
           "tier": "Non-Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -1130,6 +1172,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_azure_backup": true
@@ -1158,6 +1204,10 @@
         },
         {
           "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Archive",
           "tier": "Core"
         }
       ],
@@ -1189,6 +1239,10 @@
         },
         {
           "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Archive",
           "tier": "Core"
         }
       ],
@@ -1222,6 +1276,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -1248,6 +1306,10 @@
       "vdc_vault": [
         {
           "edition": "Foundation",
+          "tier": "Core"
+        },
+        {
+          "edition": "Archive",
           "tier": "Core"
         }
       ],
@@ -1277,6 +1339,10 @@
         },
         {
           "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Archive",
           "tier": "Core"
         }
       ],
@@ -1310,6 +1376,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_salesforce": true,
@@ -1342,6 +1412,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -1373,6 +1447,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -1396,6 +1474,12 @@
       "PUS"
     ],
     "services": {
+      "vdc_vault": [
+        {
+          "edition": "Archive",
+          "tier": "Core"
+        }
+      ],
       "vdc_azure_backup": true
     }
   },
@@ -1422,6 +1506,10 @@
         },
         {
           "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Archive",
           "tier": "Core"
         }
       ],
@@ -1475,6 +1563,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_salesforce": true,
@@ -1505,6 +1597,10 @@
         {
           "edition": "Foundation",
           "tier": "Non-Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_azure_backup": true
@@ -1533,12 +1629,38 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
       "vdc_salesforce": true,
       "vdc_azure_backup": true,
       "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-norway-east",
+    "name": "Norway East (Oslo)",
+    "provider": "Azure",
+    "coords": [
+      59.9139,
+      10.7522
+    ],
+    "aliases": [
+      "Oslo",
+      "Norway",
+      "NO"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Archive",
+          "tier": "Core"
+        }
+      ]
     }
   },
   {
@@ -1558,6 +1680,28 @@
     "services": {
       "vdc_m365": true,
       "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-qatar-central",
+    "name": "Qatar Central (Doha)",
+    "provider": "Azure",
+    "coords": [
+      25.2854,
+      51.531
+    ],
+    "aliases": [
+      "Doha",
+      "Qatar",
+      "QA"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Archive",
+          "tier": "Core"
+        }
+      ]
     }
   },
   {
@@ -1585,6 +1729,10 @@
         {
           "edition": "Advanced",
           "tier": "Non-Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -1613,6 +1761,14 @@
         {
           "edition": "Foundation",
           "tier": "Non-Core"
+        },
+        {
+          "edition": "Advanced",
+          "tier": "Non-Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ]
     }
@@ -1643,6 +1799,10 @@
         },
         {
           "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Archive",
           "tier": "Core"
         }
       ],
@@ -1675,6 +1835,10 @@
         {
           "edition": "Advanced",
           "tier": "Non-Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -1703,6 +1867,10 @@
         },
         {
           "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Archive",
           "tier": "Core"
         }
       ],
@@ -1758,6 +1926,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -1789,6 +1961,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -1817,6 +1993,10 @@
         {
           "edition": "Foundation",
           "tier": "Non-Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -1850,12 +2030,40 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
       "vdc_salesforce": true,
       "vdc_azure_backup": true,
       "vdc_entra_id": true
+    }
+  },
+  {
+    "id": "azure-uk-west",
+    "name": "UK West (Cardiff)",
+    "provider": "Azure",
+    "coords": [
+      51.4816,
+      -3.1791
+    ],
+    "aliases": [
+      "Cardiff",
+      "United Kingdom",
+      "UK",
+      "GB",
+      "Wales"
+    ],
+    "services": {
+      "vdc_vault": [
+        {
+          "edition": "Archive",
+          "tier": "Core"
+        }
+      ]
     }
   },
   {
@@ -1875,6 +2083,12 @@
       "West Central"
     ],
     "services": {
+      "vdc_vault": [
+        {
+          "edition": "Archive",
+          "tier": "Core"
+        }
+      ],
       "vdc_azure_backup": true
     }
   },
@@ -1902,6 +2116,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -1927,6 +2145,12 @@
       "Maharashtra"
     ],
     "services": {
+      "vdc_vault": [
+        {
+          "edition": "Archive",
+          "tier": "Core"
+        }
+      ],
       "vdc_azure_backup": true
     }
   },
@@ -1954,6 +2178,10 @@
         {
           "edition": "Foundation",
           "tier": "Non-Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_m365": true,
@@ -1990,6 +2218,10 @@
         {
           "edition": "Advanced",
           "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
         }
       ],
       "vdc_azure_backup": true
@@ -2014,6 +2246,16 @@
       "US West"
     ],
     "services": {
+      "vdc_vault": [
+        {
+          "edition": "Advanced",
+          "tier": "Core"
+        },
+        {
+          "edition": "Archive",
+          "tier": "Core"
+        }
+      ],
       "vdc_m365": true,
       "vdc_azure_backup": true
     }

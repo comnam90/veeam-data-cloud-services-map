@@ -10,4 +10,7 @@ aliases:
   - "BOM"
   - "Maharashtra"
 services:
+  vdc_vault:
+    - edition: "Archive"
+      tier: "Core"
   vdc_azure_backup: true

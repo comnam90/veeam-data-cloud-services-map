@@ -13,6 +13,8 @@ services:
   vdc_vault:
     - edition: "Foundation"
       tier: "Non-Core"
+    - edition: "Archive"
+      tier: "Core"
   vdc_m365: true
   vdc_salesforce: true
   vdc_azure_backup: true

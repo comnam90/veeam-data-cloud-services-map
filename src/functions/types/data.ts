@@ -2,7 +2,7 @@
  * VDC Vault service tier and edition
  */
 export interface VdcVaultConfig {
-  edition: 'Foundation' | 'Advanced'
+  edition: 'Foundation' | 'Advanced' | 'Archive'
   tier: 'Core' | 'Non-Core'
 }
 

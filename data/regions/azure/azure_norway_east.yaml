@@ -1,0 +1,12 @@
+id: "azure-norway-east"
+name: "Norway East (Oslo)"
+provider: "Azure"
+coords: [59.9139, 10.7522]
+aliases:
+  - "Oslo"
+  - "Norway"
+  - "NO"
+services:
+  vdc_vault:
+    - edition: "Archive"
+      tier: "Core"
