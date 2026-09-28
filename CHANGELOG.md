@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-09-28
+
 ### Added
 - VDC Vault Archive edition (Core tier only) across the API schemas, `edition` query filters, region validator, and map popup tooltips (#137)
 - Add VDC Vault Archive Core tier to 39 existing Azure regions (#137)
@@ -138,6 +140,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dark-mode map with CartoDB Dark Matter tiles
 - GitHub Actions CI/CD pipeline
 
+[1.5.0]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.2.0...v1.3.0
