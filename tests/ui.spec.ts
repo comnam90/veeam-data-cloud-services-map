@@ -1,6 +1,14 @@
 import { test, expect, type Page } from '@playwright/test';
+import regions from '../functions/regions.json';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8788';
+
+// Derived from the same YAML the map is built from, so adding a region doesn't
+// require editing these tests. Assumes `npm run build` has been run so
+// regions.json and public/ are in sync.
+const TOTAL_REGIONS = regions.length;
+const AZURE_REGIONS = regions.filter(r => r.provider === 'Azure').length;
+const AWS_REGIONS = regions.filter(r => r.provider === 'AWS').length;
 
 test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
   
@@ -164,41 +172,41 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       );
       const visibleEl = page.locator('#visibleCount');
       const totalEl = page.locator('#totalCount');
-      await expect(totalEl).toHaveText('72');
-      await expect(visibleEl).toHaveText('72');
+      await expect(totalEl).toHaveText(String(TOTAL_REGIONS));
+      await expect(visibleEl).toHaveText(String(TOTAL_REGIONS));
 
       const providerFilter = page.locator('#providerFilter');
       await expect(providerFilter).toHaveValue('all');
     });
 
+    // Assert via the legend counts rather than individual marker dots: on narrow
+    // viewports every region of a provider can sit inside a cluster, leaving
+    // zero standalone dots even though the filter worked. `.leaflet-marker-icon`
+    // matches both markers and cluster icons.
     test('should filter regions by Azure provider', async ({ page }) => {
       const providerFilter = page.locator('#providerFilter');
       await providerFilter.selectOption('Azure');
-      
-      await page.waitForTimeout(300);
-      
+
       const resetButton = page.getByRole('button', { name: /reset/i });
       await expect(resetButton).toBeVisible();
       await expect(providerFilter).toHaveValue('Azure');
-      
-      const markers = page.locator('.leaflet-marker-icon .map-marker-dot');
-      const count = await markers.count();
-      expect(count).toBeGreaterThan(0);
+
+      await expect(page.locator('#legendAzureCount')).toHaveText(String(AZURE_REGIONS));
+      await expect(page.locator('#legendAwsCount')).toHaveText('0');
+      await expect(page.locator('.leaflet-marker-icon').first()).toBeVisible();
     });
 
     test('should filter regions by AWS provider', async ({ page }) => {
       const providerFilter = page.locator('#providerFilter');
       await providerFilter.selectOption('AWS');
-      
-      await page.waitForTimeout(300);
-      
+
       const resetButton = page.getByRole('button', { name: /reset/i });
       await expect(resetButton).toBeVisible();
       await expect(providerFilter).toHaveValue('AWS');
-      
-      const markers = page.locator('.leaflet-marker-icon .map-marker-dot');
-      const count = await markers.count();
-      expect(count).toBeGreaterThan(0);
+
+      await expect(page.locator('#legendAwsCount')).toHaveText(String(AWS_REGIONS));
+      await expect(page.locator('#legendAzureCount')).toHaveText('0');
+      await expect(page.locator('.leaflet-marker-icon').first()).toBeVisible();
     });
 
     test('should show correct filtered count for Azure in counter text', async ({ page }, testInfo) => {
@@ -214,13 +222,13 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
 
       const visibleEl = page.locator('#visibleCount');
       const totalEl = page.locator('#totalCount');
-      await expect(totalEl).toHaveText('72');
+      await expect(totalEl).toHaveText(String(TOTAL_REGIONS));
 
       const visibleText = await visibleEl.textContent();
       const filteredCount = parseInt(visibleText ?? '0', 10);
 
-      expect(filteredCount).toBe(45);
-      expect(filteredCount).toBeLessThan(72);
+      expect(filteredCount).toBe(AZURE_REGIONS);
+      expect(filteredCount).toBeLessThan(TOTAL_REGIONS);
     });
 
     test('should show correct filtered count for AWS in counter text', async ({ page }, testInfo) => {
@@ -236,13 +244,13 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
 
       const visibleEl = page.locator('#visibleCount');
       const totalEl = page.locator('#totalCount');
-      await expect(totalEl).toHaveText('72');
+      await expect(totalEl).toHaveText(String(TOTAL_REGIONS));
 
       const visibleText = await visibleEl.textContent();
       const filteredCount = parseInt(visibleText ?? '0', 10);
 
-      expect(filteredCount).toBe(27);
-      expect(filteredCount).toBeLessThan(72);
+      expect(filteredCount).toBe(AWS_REGIONS);
+      expect(filteredCount).toBeLessThan(TOTAL_REGIONS);
     });
   });
 
@@ -273,7 +281,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       const visibleEl = page.locator('#visibleCount');
       const visibleText = await visibleEl.textContent();
       const filteredCount = parseInt(visibleText ?? '0', 10);
-      expect(filteredCount).toBeLessThan(72);
+      expect(filteredCount).toBeLessThan(TOTAL_REGIONS);
       expect(filteredCount).toBeGreaterThan(0);
     });
 
@@ -313,7 +321,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await page.waitForTimeout(300);
       
       await expect(page.getByRole('button', { name: /all services/i })).toBeVisible();
-      await expect(page.locator('#visibleCount')).toHaveText('72');
+      await expect(page.locator('#visibleCount')).toHaveText(String(TOTAL_REGIONS));
     });
   });
 
@@ -333,7 +341,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       const visibleText = await visibleEl.textContent();
       const filteredCount = parseInt(visibleText ?? '0', 10);
       expect(filteredCount).toBeGreaterThan(0);
-      expect(filteredCount).toBeLessThan(72);
+      expect(filteredCount).toBeLessThan(TOTAL_REGIONS);
     });
 
     test('should clear all filters with reset button', async ({ page }, testInfo) => {
@@ -362,7 +370,7 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await expect(page.getByRole('button', { name: /all services/i })).toBeVisible();
 
       if (!isMobile) {
-        await expect(page.locator('#visibleCount')).toHaveText('72');
+        await expect(page.locator('#visibleCount')).toHaveText(String(TOTAL_REGIONS));
       }
 
       if (!isMobile) {
@@ -637,6 +645,30 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       await expect(advancedPill).toHaveAttribute('tabindex', '0');
     });
 
+    test('should render Archive vault pill with tooltip copy', async ({ page }) => {
+      const searchInput = page.getByRole('combobox', { name: 'Search regions' });
+      await searchInput.fill('UK West');
+
+      const searchResults = page.getByRole('listbox', { name: 'Search results' });
+      await expect(searchResults).toBeVisible();
+
+      await page.getByRole('option', { name: /UK West/i }).click();
+      await page.waitForTimeout(1000);
+
+      const popup = page.locator('.leaflet-popup');
+      await expect(popup).toBeVisible({ timeout: 3000 });
+
+      const archivePill = popup.locator('.pill[data-tooltip]', { hasText: /Archive/ }).first();
+
+      await expect(archivePill).toHaveText(/Archive · Core/i);
+      await expect(archivePill).toHaveClass(/\bcore\b/);
+      // Only the edition prefix is asserted: the rest of the copy is a
+      // commercial disclosure still pending product review (ADR-005).
+      await expect(archivePill).toHaveAttribute('data-tooltip', /^Archive edition/);
+      await expect(archivePill).toHaveAttribute('aria-label', /Archive.*Archive edition/i);
+      await expect(archivePill).toHaveAttribute('tabindex', '0');
+    });
+
     test('should close popup with close button', async ({ page }, testInfo) => {
       test.skip(testInfo.project.name === 'Mobile Safari', 'Leaflet popup close button clicks are unreliable on simulated mobile');
       const searchInput = page.getByRole('combobox', { name: 'Search regions' });
@@ -843,8 +875,8 @@ test.describe('Veeam Data Cloud Services Map - UI Tests', () => {
       const searchInput = page.getByRole('combobox', { name: 'Search regions' });
       await expect(searchInput).toBeVisible();
 
-      await expect(page.locator('#visibleCount')).toHaveText('72');
-      await expect(page.locator('#totalCount')).toHaveText('72');
+      await expect(page.locator('#visibleCount')).toHaveText(String(TOTAL_REGIONS));
+      await expect(page.locator('#totalCount')).toHaveText(String(TOTAL_REGIONS));
     });
   });
 });
