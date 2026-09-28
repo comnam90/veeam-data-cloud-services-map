@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- VDC Vault Archive edition (Core tier only) across the API schemas, `edition` query filters, region validator, and map popup tooltips (#137)
+- Add VDC Vault Archive Core tier to 39 existing Azure regions (#137)
+- Azure Norway East (Oslo), Qatar Central (Doha), and UK West (Cardiff) regions with VDC Vault Archive support (#137)
+
+### Fixed
+- Add missing VDC Vault Advanced Core tier to Azure West US 3 (#137)
+- Add missing VDC Vault Advanced Non-Core tier to Azure South Africa West (#137)
+
+### Changed
+- UI tests derive expected region counts from `functions/regions.json`, and provider filter tests assert legend counts so they no longer depend on marker clustering (#137)
+
+### Documentation
+- Document the Archive edition in `static/llms.txt` and `static/llms-full.txt` (#137)
+
 ## [1.4.1] - 2026-09-04
 
 ### Fixed
