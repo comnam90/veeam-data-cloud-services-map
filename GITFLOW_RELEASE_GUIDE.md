@@ -27,18 +27,29 @@ git checkout -b release/1.1.1
 ### Step 2: Bump Version and Prepare Release
 
 ```bash
-# Update version in package.json
-# Change "version": "1.1.0" to "version": "1.1.1"
+# Bump package.json AND package-lock.json together. Editing package.json by
+# hand leaves the lockfile on the old version (this happened in 1.4.1).
+npm version 1.1.1 --no-git-tag-version
+```
 
-# Commit the version bump
-git add package.json
+Update `CHANGELOG.md`:
+- Add `## [1.1.1] - YYYY-MM-DD` directly under `## [Unreleased]`, so the pending entries move into the release and `[Unreleased]` is left empty
+- Add a compare link above the previous one at the bottom of the file:
+  `[1.1.1]: https://github.com/comnam90/veeam-data-cloud-services-map/compare/v1.1.0...v1.1.1`
+
+```bash
+# Commit the version bump and changelog together
+git add package.json package-lock.json CHANGELOG.md
 git commit -m "chore(release): bump version to 1.1.1"
 
-# Optional: Run tests to verify everything works
+# Verify on a clean install
 npm ci
-npm test
 npm run build
+npm test
+npm run test:ui
 ```
+
+> The API contract version (`1.0.0` in `src/functions/_worker.ts` and `routes/v1/health.ts`) is separate from the package version. Only change it for breaking API changes.
 
 ### Step 3: Merge Release to Main
 
@@ -75,6 +86,10 @@ Merging release branch to main for version 1.1.1.
 - All tests passing (specify numbers)
 ```
 
+> If the PR shows **merge conflicts** on `CHANGELOG.md` / `package.json`, or only Cloudflare Pages and GitGuardian report (GitHub doesn't run `pull_request` workflows on a conflicting PR), see [Release PR conflicts with main](#release-pr-conflicts-with-main).
+
+Merge with a **merge commit** (`gh pr merge <PR> --merge`), not squash — squashing creates a new commit on `main` that `develop` never gets, which causes conflicts on the next release.
+
 After PR is merged to main:
 ```bash
 # Tag the release on main
@@ -86,31 +101,18 @@ git push origin v1.1.1
 
 ### Step 4: Merge Release Back to Develop
 
-After merging to `main`, merge the release changes back to `develop`:
+After merging to `main`, merge the release branch itself back to `develop`. Branch from the release branch — **do not cherry-pick** the version bump onto a branch from `develop`:
 
-**Option A: Via Pull Request (Recommended)**
 ```bash
-# The release branch already has the version bump
-# Create PR: release/1.1.1 → develop (or cherry-pick to new branch)
-
-# If cherry-picking:
-git checkout develop
-git pull origin develop
-git checkout -b chore/merge-release-1.1.1-to-develop
-git cherry-pick <release-version-bump-commit-sha>
-git push origin chore/merge-release-1.1.1-to-develop
+git fetch origin
+git checkout -b chore/merge-release-1.1.1-to-develop origin/release/1.1.1
+git push -u origin chore/merge-release-1.1.1-to-develop
 
 # Create PR: chore/merge-release-1.1.1-to-develop → develop
+# Merge with a merge commit (gh pr merge <PR> --merge), not squash
 ```
 
-**Option B: Direct Merge**
-```bash
-# Only if you have direct push access
-git checkout develop
-git pull origin develop
-git merge --no-ff release/1.1.1 -m "chore: merge release/1.1.1 back to develop"
-git push origin develop
-```
+> ⚠️ **Why not cherry-pick?** A cherry-pick creates a *new* commit with the same content, so `develop` never contains the commit that went to `main`. The next release PR then diffs from a point *before* this release, and both sides appear to have edited the same lines of `CHANGELOG.md` and `package.json`. This is what made the 1.5.0 release PR conflict: the 1.4.1 bump existed as `d843b56` on `main` and `e2b9fc3` on `develop`.
 
 **PR Description Template:**
 ```markdown
@@ -151,6 +153,7 @@ gh release create v1.1.1 --title "v1.1.1" --generate-notes
 
 ```bash
 # Delete the release branch locally and remotely
+# (--delete-branch on the back-merge PR already removes the chore branch)
 git branch -d release/1.1.1
 git push origin --delete release/1.1.1
 ```
@@ -164,14 +167,16 @@ Here's a complete example for releasing version 1.1.1:
 git checkout develop
 git checkout -b release/1.1.1
 
-# 2. Bump version
-# Edit package.json: "version": "1.1.1"
-git add package.json
+# 2. Bump version (package.json + package-lock.json) and update CHANGELOG.md
+npm version 1.1.1 --no-git-tag-version
+# Edit CHANGELOG.md: add "## [1.1.1] - YYYY-MM-DD" under [Unreleased] + compare link
+git add package.json package-lock.json CHANGELOG.md
 git commit -m "chore(release): bump version to 1.1.1"
 
-# 3. Push and create PR to main
+# 3. Push and create PR to main (base MUST be main), merge with a merge commit
 git push origin release/1.1.1
-# Create PR: release/1.1.1 → main
+gh pr create --base main --head release/1.1.1 --title "chore(release): v1.1.1"
+gh pr merge <PR> --merge
 
 # 4. After PR merged to main, tag the release
 git checkout main
@@ -179,12 +184,11 @@ git pull origin main
 git tag -a v1.1.1 -m "Release version 1.1.1"
 git push origin v1.1.1
 
-# 5. Merge back to develop
-git checkout develop
-git pull origin develop
-git cherry-pick <version-bump-commit>
-git push origin develop
-# Or create PR with the cherry-picked commit
+# 5. Merge back to develop — branch from the release branch, never cherry-pick
+git checkout -b chore/merge-release-1.1.1-to-develop origin/release/1.1.1
+git push -u origin chore/merge-release-1.1.1-to-develop
+gh pr create --base develop --title "chore: merge release/1.1.1 back to develop"
+gh pr merge <PR> --merge --delete-branch
 
 # 6. Create GitHub Release
 gh release create v1.1.1 --title "v1.1.1" \
@@ -209,16 +213,6 @@ Without merging back to develop:
 - ❌ Missing release-specific fixes
 - ❌ Divergent history between main and develop
 
-## Current Release Status
-
-For the v1.2.0 release:
-
-✅ **Step 1**: Release branch created from develop
-✅ **Step 2**: Version bumped to 1.2.0
-✅ **Step 3**: Ready to merge to main (via current PR)
-⏳ **Step 4**: After main merge, needs to merge back to develop
-⏳ **Step 5**: Cleanup release branch
-
 ## Best Practices
 
 1. **Always use PRs**: Even for develop, use PRs for review and CI/CD
@@ -227,7 +221,7 @@ For the v1.2.0 release:
 4. **Tag releases**: Always tag releases on main for easy reference
 5. **Publish a GitHub Release**: A tag alone doesn't appear on the Releases page — always follow it with `gh release create` (Step 5)
 6. **Consistent naming**: Use `release/X.Y.Z` format for release branches
-7. **Clean history**: Use `--no-ff` for merge commits to preserve release history
+7. **Clean history**: Use merge commits (`--no-ff` / `gh pr merge --merge`) for both release PRs — never squash or cherry-pick release commits between `main` and `develop`
 
 ## Troubleshooting
 
@@ -244,12 +238,27 @@ git add <resolved-files>
 git commit
 ```
 
-### Cherry-pick conflicts
+### Release PR conflicts with main
+
+**Symptom:** the `release/X.Y.Z → main` PR reports conflicts on `CHANGELOG.md` and/or `package.json`, and PR Validation never starts (only Cloudflare Pages and GitGuardian report).
+
+**Cause:** a previous release's commits reached `develop` as copies (cherry-pick or squash) rather than via a merge, so `main` isn't in `develop`'s history. Check with:
 ```bash
-# If cherry-picking causes conflicts:
-git cherry-pick --abort
-# Then manually apply the changes and commit
+git fetch origin
+git merge-base --is-ancestor origin/main origin/release/X.Y.Z || echo "main is not in release history"
 ```
+
+**Fix:** merge `main` into the release branch, keeping the release branch's versions of the conflicted files. `main`'s content should already be in `develop`, so this changes history only, not the release contents. Verify before pushing:
+```bash
+git checkout release/X.Y.Z
+git merge --no-ff --no-commit origin/main
+git checkout --ours CHANGELOG.md package.json     # keep the release versions
+git add CHANGELOG.md package.json
+git diff --cached --stat <release-bump-commit>     # must be empty: contents unchanged
+git commit -m "chore(release): merge main into release/X.Y.Z"
+git push origin release/X.Y.Z
+```
+The back-merge in Step 4 then brings `main`'s history into `develop`, so the next release won't hit this again. (Done for 1.5.0 in `c529eb2`.)
 
 ## References
 
